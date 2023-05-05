@@ -1,0 +1,42 @@
+version: "3"
+
+network:
+  db_net:
+    driver: bridge
+  client_net:
+    driver: bridge
+
+services:
+
+  serrver:
+    depends_on: db
+    container_name: server
+    init: true
+    restart: unless-stopped
+    build:
+      context: ./server/.
+    ports:
+      - 8080:8080
+    networks:
+      - db_net
+      - client_net
+
+  client:
+    depends_on: serrver
+    container_name: client
+    init: true
+    restart: unless-stopped
+    build:
+      context: ./client/.
+    networks:
+      - client_net
+
+  db:
+    container_name: db
+    init: true
+    restart: unless-stopped
+    build:
+      context: ./database/.
+    networks:
+      - db_net
+    
