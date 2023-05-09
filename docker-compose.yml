@@ -2,7 +2,7 @@ version: "3"
 
 
 services:
-  server:
+  serrver:
     depends_on: 
       - db
     container_name: server
@@ -21,7 +21,7 @@ services:
 
   client:
     depends_on: 
-      - server
+      - serrver
     container_name: client
     init: true
     restart: unless-stopped
