@@ -2,6 +2,8 @@ FROM node:alpine
 
 ENV NPM_CONFIG_LOGLEVEL info
 
+EXPOSE 8080
+
 COPY ./ /app/
 
 RUN apk update
