@@ -20,9 +20,9 @@ services:
       args:                       # pass arguments to dockerfile
         - name=value
     ports:                        # map port 8080 on host to port 8080 on container "host:container"
-      - 8080:8080
-    volumes:
-      - ./server/.:~/app
+      - 8080:
+    #volumes:
+    #  - ./server/.:/app/
     networks:
       - db_net
       - client_net
