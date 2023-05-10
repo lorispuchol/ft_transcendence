@@ -1,9 +1,15 @@
 version: "3"
 
+networks:
+  db_net:
+    driver: bridge
+  client_net:
+    driver: bridge
 
 services:
+
   server:
-    depends_on: 
+    depends_on:
       - db
     container_name: server
     init: true                    # run init scripts to kill zombie processes
@@ -15,6 +21,8 @@ services:
         - name=value
     ports:                        # map port 8080 on host to port 8080 on container "host:container"
       - 8080:8080
+    volumes:
+      - ./server/.:~/app
     networks:
       - db_net
       - client_net
@@ -40,9 +48,3 @@ services:
     image: postgres:latest
     networks:
       - db_net
-    
-networks:
-  db_net:
-    driver: bridge
-  client_net:
-    driver: bridge
