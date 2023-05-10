@@ -1,6 +1,6 @@
 version: "3"
 
-network:
+networks:
   db_net:
     driver: bridge
   client_net:
@@ -9,12 +9,15 @@ network:
 services:
 
   serrver:
-    depends_on: db
+    depends_on:
+      - db
     container_name: server
     init: true
     restart: unless-stopped
     build:
       context: ./server/.
+    volumes:
+      - ./server/.:~/app
     ports:
       - 8080:8080
     networks:
@@ -22,7 +25,8 @@ services:
       - client_net
 
   client:
-    depends_on: serrver
+    depends_on:
+      - serrver
     container_name: client
     init: true
     restart: unless-stopped
@@ -39,4 +43,3 @@ services:
       context: ./database/.
     networks:
       - db_net
-    
