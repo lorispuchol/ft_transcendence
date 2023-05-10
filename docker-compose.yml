@@ -8,38 +8,43 @@ networks:
 
 services:
 
-  serrver:
+  server:
     depends_on:
       - db
     container_name: server
-    init: true
+    init: true                    # run init scripts to kill zombie processes
     restart: unless-stopped
     build:
-      context: ./server/.
+      context: ./server/.         # context for dockerfile
+      dockerfile: Dockerfile      # use custom dockerfile
+      args:                       # pass arguments to dockerfile
+        - name=value
+    ports:                        # map port 8080 on host to port 8080 on container "host:container"
+      - 8080:8080
     volumes:
       - ./server/.:~/app
-    ports:
-      - 8080:8080
     networks:
       - db_net
       - client_net
 
   client:
-    depends_on:
-      - serrver
+    depends_on: 
+      - server
     container_name: client
     init: true
     restart: unless-stopped
     build:
       context: ./client/.
+      dockerfile: Dockerfile
+      args:
+        - name=value
     networks:
-      - client_net
+      - db_net
 
   db:
     container_name: db
     init: true
     restart: unless-stopped
-    build:
-      context: ./database/.
+    image: postgres:latest
     networks:
       - db_net

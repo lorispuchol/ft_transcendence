@@ -2,8 +2,7 @@ FROM node:alpine
 
 WORKDIR '/app'
 
-COPY ./ ./app/
-
-RUN npm install && npm update
+COPY ./ /app/
 
 CMD ["npm", "start"]
+# CMD ["npm", "run", "start"]

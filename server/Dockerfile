@@ -8,5 +8,5 @@ RUN apk update
 
 WORKDIR '/app'
 
-#CMD ["npm", "run", "start:dev"]
-#CMD ["npm", "start"]
+CMD ["npm", "start"]
+# CMD ["npm", "run", "start:dev"]
