@@ -27,19 +27,19 @@ services:
       - db_net
       - client_net
 
-  client:
-    depends_on: 
-      - server
-    container_name: client
-    init: true
-    restart: unless-stopped
-    build:
-      context: ./client/.
-      dockerfile: Dockerfile
-      args:
-        - name=value
-    networks:
-      - db_net
+  # client:
+  #   depends_on: 
+  #     - server
+  #   container_name: client
+  #   init: true
+  #   restart: unless-stopped
+  #   build:
+  #     context: ./client/.
+  #     dockerfile: Dockerfile
+  #     args:
+  #       - name=value
+  #   networks:
+  #     - db_net
 
   db:
     container_name: db
