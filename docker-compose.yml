@@ -22,7 +22,7 @@ services:
     ports:                        # map port 8080 on host to port 8080 on container "host:container"
       - 8080:8080
     volumes:
-      - ./server/.:~/app
+      - ./server/.:/app/
     networks:
       - db_net
       - client_net
@@ -46,5 +46,11 @@ services:
     init: true
     restart: unless-stopped
     image: postgres:latest
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     networks:
       - db_net
