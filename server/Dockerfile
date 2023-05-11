@@ -10,5 +10,9 @@ RUN apk update
 
 WORKDIR '/app'
 
-CMD ["npm", "start"]
-# CMD ["npm", "run", "start:dev"]
+RUN npm init -y
+RUN npm install .
+RUN npm audit fix
+
+#CMD ["npm", "start"]
+CMD ["sh", "entrypoint_dev.sh"]
