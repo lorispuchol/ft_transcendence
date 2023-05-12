@@ -4,7 +4,7 @@ ENV NPM_CONFIG_LOGLEVEL info
 
 EXPOSE 8080
 
-COPY ./ /app/
+COPY ../ /app/
 
 RUN apk update
 
@@ -15,4 +15,5 @@ RUN npm install .
 RUN npm audit fix
 
 #CMD ["npm", "start"]
-CMD ["sh", "entrypoint_dev.sh"]
+
+ENTRYPOINT ["sh", "docker_build/entrypoint_dev.sh"]
