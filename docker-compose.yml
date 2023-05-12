@@ -15,14 +15,14 @@ services:
     init: true                    # run init scripts to kill zombie processes
     restart: unless-stopped
     build:
-      context: ./server/.         # context for dockerfile
+      context: ./server/docker_build/.         # context for dockerfile
       dockerfile: Dockerfile      # use custom dockerfile
       args:                       # pass arguments to dockerfile
         - name=value
     ports:                        # map port 8080 on host to port 8080 on container "host:container"
       - 8080:8080
     volumes:
-      - ./server/.:/app/
+      - ./server/.:/app/          # only for dev, remove before final push
     networks:
       - db_net
       - client_net
