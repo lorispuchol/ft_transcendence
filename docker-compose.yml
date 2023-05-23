@@ -48,6 +48,8 @@ services:
     init: true
     restart: unless-stopped
     image: postgres:latest
+    ports:
+      - 5432:5432
     environment:                            # pass environment variables to container
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
