@@ -15,10 +15,12 @@ services:
     init: true                    # run init scripts to kill zombie processes
     restart: unless-stopped
     build:
-      context: ./server/docker_build/.         # context for dockerfile
+      context: ./server/.         # context for dockerfile
       dockerfile: Dockerfile      # use custom dockerfile
       args:                       # pass arguments to dockerfile
         - name=value
+    env_file:
+      - .env
     ports:                        # map port 8080 on host to port 8080 on container "host:container"
       - 8080:8080
     volumes:
@@ -49,7 +51,7 @@ services:
     env_file:
       - .env
     environment:
-      POSTGRES_USER: ${DB_USER}
+      POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
     networks:

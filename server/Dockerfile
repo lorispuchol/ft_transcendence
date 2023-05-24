@@ -16,4 +16,4 @@ RUN npm audit fix
 
 #CMD ["npm", "start"]
 
-ENTRYPOINT ["sh", "docker_build/entrypoint_dev.sh"]
+ENTRYPOINT ["sh", "entrypoint_dev.sh"]
