@@ -21,8 +21,6 @@ services:
       dockerfile: Dockerfile      # use custom dockerfile
       args:                       # pass arguments to dockerfile
         - name=value
-    env_file:
-      - .env
     ports:                        # map port 8080 on host to port 8080 on container "host:container"
       - 8080:8080
     volumes:
