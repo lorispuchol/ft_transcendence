@@ -14,15 +14,17 @@ services:
     container_name: server
     init: true                    # run init scripts to kill zombie processes
     restart: unless-stopped
+    env_file:
+      - .env                      # pass environment variables to container
     build:
-      context: ./server/docker_build/.         # context for dockerfile
+      context: ./server/.         # context for dockerfile build (buildind can't copy files outside of context)
       dockerfile: Dockerfile      # use custom dockerfile
       args:                       # pass arguments to dockerfile
         - name=value
     ports:                        # map port 8080 on host to port 8080 on container "host:container"
       - 8080:8080
     volumes:
-      - ./server/.:/app/          # only for dev, remove before final push
+      - ./server/.:/app/          # !!!!!!!!!!!!!!!!!!!  only for dev, remove for production
     networks:
       - db_net
       - client_net
@@ -46,9 +48,9 @@ services:
     init: true
     restart: unless-stopped
     image: postgres:latest
-    env_file:
-      - .env
-    environment:
+    ports:
+      - 5432:5432
+    environment:                            # pass environment variables to container
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
