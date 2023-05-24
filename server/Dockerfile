@@ -4,7 +4,7 @@ ENV NPM_CONFIG_LOGLEVEL info
 
 EXPOSE 8080
 
-COPY ../ /app/
+COPY ./ /app/
 
 RUN apk update
 

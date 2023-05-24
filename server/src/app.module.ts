@@ -4,6 +4,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ProductsModule } from './products/products.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Admin } from 'typeorm';
 
 @Module({
 	imports: [
@@ -17,7 +19,8 @@ import { ProductsModule } from './products/products.module';
 				username: configService.get('DB_USERNAME'),
 				password: configService.get('DB_PASSWORD'),
 				database: configService.get('DB_NAME'),
-				entities: []
+				entities: [],
+        synchronize: true, //dev only
 			}),
 			inject: [ConfigService]
 		}),
