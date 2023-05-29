@@ -1,48 +1,38 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
-import { Product } from './product.model';
+import { Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { Product } from './product.entity';
+import { ProductDto } from "./product.dto";
 
 @Injectable()
 export class ProductsService {
-	products: Product[] = [];
+	constructor(
+		@InjectRepository(Product, 'lorisforever')
+		private productRepository: Repository<Product>,
+	){}
 
-	insertProduct(title: string, description: string, price: number): string {
-		const prodId = Math.random().toString();
-		const newProduct = new Product(prodId, title, description, price)
-		this.products.push(newProduct);
-		return prodId;
+	insertProduct(title: string, description: string, price: number): Promise<Product> {
+		const newProduct = this.productRepository.create(new ProductDto(title, description, price));
+		return this.productRepository.save(newProduct);
 	}
 
-	getProducts() {
-		return this.products.slice();
+	getProducts(): Promise<Product[] | null> {
+		return this.productRepository.find();
 	}
 
-	getSingleProduct(productId: string) {
-		const product = this.findProduct(productId)[0];
-		return {...product};
+	getSingleProduct(id: number): Promise<Product | null> {
+		return this.productRepository.findOneBy({id});
 	}
 
-	updateProduct(productId: string, title: string, desc: string, price: number) {
-		const [product, index] = this.findProduct(productId);
-		const updateProduct = {...product};
-		if (title) {updateProduct.title = title;}
-		if (desc) {updateProduct.description = desc;}
-		if (price) {updateProduct.price = price;}
-		this.products[index] = updateProduct;
+
+	updateProduct(productId: number, title: string, desc: string, price: number) {
+		if (title) {this.productRepository.update({ id: productId }, {title: title});}
+		if (desc) {this.productRepository.update({ id: productId }, {description: desc});}
+		if (price) {this.productRepository.update({ id: productId }, {price: price});}
 	}
 
-	deleteProduct(prodId: string) {
-		const index = this.findProduct(prodId)[1];
-		this.products.splice(index, 1);
-	}
-
-	private findProduct(id: string): [Product, number] {
-		const productIndex = this.products.findIndex((prod) => prod.id === id);
-		const product = this.products[productIndex];
-
-		if (!product) {
-			throw new NotFoundException('could not find product');
-		}
-		return [product, productIndex];
+	deleteProduct(prodId: number) {
+		this.productRepository.delete({id: prodId});
 	}
 
 }
