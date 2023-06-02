@@ -5,6 +5,7 @@ const configService = new ConfigService();
 
 export const jwtConstants = {
 	secret: configService.get('JWT_SECRET'),
+	expire: configService.get('JWT_EXPIRE'),
 };
 
 export const IS_PUBLIC_KEY = 'isPublic';
