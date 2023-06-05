@@ -8,5 +8,11 @@ export const jwtConstants = {
 	expire: configService.get('JWT_EXPIRE'),
 };
 
+export const ftConstants = {
+	uid: configService.get('42_UID'),
+	secret: configService.get('42_SECRET'),
+	link: configService.get('42_LINK'),
+}
+
 export const IS_PUBLIC_KEY = 'isPublic';
 export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
