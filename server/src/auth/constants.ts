@@ -12,6 +12,7 @@ export const ftConstants = {
 	uid: configService.get('42_UID'),
 	secret: configService.get('42_SECRET'),
 	link: configService.get('42_LINK'),
+	redirect_uri: 'http://' + configService.get('SERVER_HOST') + ':' + configService.get('SERVER_PORT') + '/auth/login',
 }
 
 export const IS_PUBLIC_KEY = 'isPublic';
