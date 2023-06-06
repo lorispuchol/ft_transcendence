@@ -1,5 +1,6 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
+import { User } from "src/user/user.entity";
 import { UserService } from "src/user/user.service";
 
 
@@ -9,26 +10,18 @@ export class AuthService {
 		private userService: UserService,
 		private jwtService: JwtService
 		) {}
-
-	async signUp(login: string, password: string, username: string) {
-		const newUser = await this.userService.createOne(login, password, username);
-		const payload = { sub: newUser.id, login: newUser.login};
+	
+	async logIn(login: string): Promise<any> {
+		let user: User = await this.userService.findOne(login);
+		if (!user)
+			user = await this.userService.createOne(login);
+		//add username generator if you want loris
+	
+		const payload = {id: user.id, login: user.username};
 
 		return {
 			access_token: await this.jwtService.signAsync(payload),
-			login: newUser.login,
-			password: newUser.password,
-			username: newUser.username,
-		}
-	}
-	
-	async logIn(login: string, pass: string): Promise<any> {
-		const user = await this.userService.findOne(login);
-		if (user?.password !== pass) {
-			throw new UnauthorizedException();
-		}
-		const payload = {sub: user.id, username: user.username };
-
-		return {access_token: await this.jwtService.signAsync(payload)};
+			login: user.login,
+		};
 	}
 }

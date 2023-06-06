@@ -1,30 +1,42 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Request, UseGuards } from "@nestjs/common";
+import { Controller, Get, HttpCode, HttpStatus, Query, Redirect, Request } from "@nestjs/common";
 import { AuthService } from "./auth.service";
-import { AuthGard } from "./auth.guard";
+import { Public, ftConstants } from "./constants";
+import axios from "axios";
 
 @Controller('auth')
 export class AuthController {
 	constructor(private authService: AuthService) {}
 
+	@Public()
+	@Get()
+	@Redirect(ftConstants.link)
+	ftRedirect() {
+	}
+
+	@Public()
 	@HttpCode(HttpStatus.OK)
-	@Post('signup')
-	signUp(
-		@Body('login') login: string,
-		@Body('password') password: string,
-		@Body('username') username: string,
+	@Get('login')
+	async signUp(
+		@Query('code') code: string,
 	) {
-		return this.authService.signUp(login, password, username);
+		const data = {
+			grant_type: "authorization_code",
+			client_id: ftConstants.uid,
+			client_secret: ftConstants.secret,
+			code: code,
+			redirect_uri: 'http://10.12.9.2:8080/auth/login'
+		};
+		const getToken = await axios.post("https://api.intra.42.fr/oauth/token", data);
+		const userData = await axios.get("https://api.intra.42.fr/v2/me", {
+			headers: { Authorization:'Bearer ' + getToken.data.access_token },
+		});
+		//const userData = await axios.get("https://api.intra.42.fr/v2/me" + "?access_token=" + response.data.access_token);
+		return this.authService.logIn(userData.data.login);
 	}
 
-	@HttpCode(HttpStatus.OK)
-	@Post('login')
-	logIn(@Body() logInDto: Record<string, any>) {
-		return this.authService.logIn(logInDto.login, logInDto.password);
-	}
-
-	@UseGuards(AuthGard)
 	@Get('profile')
-	getProfile(@Request() req) {
+	getProfile(@Request() req: any) {
 		return req.user;
 	}
+
 }

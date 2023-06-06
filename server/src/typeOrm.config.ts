@@ -1,5 +1,5 @@
 import { ConfigService } from "@nestjs/config";
-import { TypeOrmModuleAsyncOptions, TypeOrmModuleOptions } from "@nestjs/typeorm";
+import { TypeOrmModuleAsyncOptions } from "@nestjs/typeorm";
 import { Product } from "./products/product.entity";
 import { User } from "./user/user.entity";
 
