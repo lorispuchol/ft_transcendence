@@ -19,4 +19,10 @@ export class UserService {
 	async findOne(login: string): Promise<User | undefined> {
 		return this.userRepository.findOneBy({login});
 	}
+
+	////dev
+	async getAllUsers()
+	{
+		return this.userRepository.find();
+	}
 }
