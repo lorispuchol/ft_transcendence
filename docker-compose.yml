@@ -18,14 +18,14 @@ services:
       - .env                      # pass environment variables to container
       - .env_api_key
     build:
-      context: ./server/.         # context for dockerfile build (buildind can't copy files outside of context)
+      context: ./server/.         # context for dockerfile build (building can't copy files outside of context)
       dockerfile: Dockerfile      # use custom dockerfile
       args:                       # pass arguments to dockerfile
         - name=value
     ports:                        # map port 8080 on host to port 8080 on container "host:container"
       - 8080:8080
-    volumes:
-      - ./server/.:/app/          # !!!!!!!!!!!!!!!!!!!  only for dev, remove for production
+    volumes:                      # !!!!!!!!!!!!!!!!!!!  only for dev, remove for production
+      - ./server/.:/app/          # use to update containers files which have been copied from local directory ./server/
     networks:
       - db_net
       - client_net
@@ -49,7 +49,9 @@ services:
     init: true
     restart: unless-stopped
     image: postgres:latest
-    environment:
+    ports:                               # only for dev: to connect to db from outside container
+      - 5432:5432
+    environment:                         # pass environnement variables to container
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
