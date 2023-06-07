@@ -28,12 +28,6 @@ export class User {
 	username: string;
 
 	@Column({
-		type: 'varchar',
-		length: 255,
-	})
-	password: string;
-
-	@Column({
 		type: 'bytea',
 		nullable: true,
 		default: null,

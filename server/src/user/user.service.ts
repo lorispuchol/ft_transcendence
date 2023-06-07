@@ -10,8 +10,9 @@ export class UserService {
 		private userRepository: Repository<User>,
 	){}
 
-	async createOne(login: string, password: string, username: string): Promise<User | undefined> {
-		const newUser = this.userRepository.create({login, password, username});
+	async createOne(login: string): Promise<User | undefined> {
+		const username: string = login;
+		const newUser: User = this.userRepository.create({login, username});
 		return this.userRepository.save(newUser);
 	}
 	

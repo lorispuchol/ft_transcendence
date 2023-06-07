@@ -16,6 +16,7 @@ services:
     restart: unless-stopped
     env_file:
       - .env                      # pass environment variables to container
+      - .env_api_key
     build:
       context: ./server/.         # context for dockerfile build (building can't copy files outside of context)
       dockerfile: Dockerfile      # use custom dockerfile
