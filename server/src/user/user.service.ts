@@ -13,7 +13,7 @@ export class UserService {
 	async createOne(login: string): Promise<User | undefined> {
 		const username: string = login;
 		const newUser: User = this.userRepository.create({login, username});
-		return this.userRepository.save(newUser);
+		return await this.userRepository.save(newUser);
 	}
 	
 	async findOne(login: string): Promise<User | undefined> {
