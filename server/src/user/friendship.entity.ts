@@ -10,8 +10,8 @@ export enum FriendshipStatus {
 @Entity()
 export class Friendship extends BaseEntity {
 
-	// @ PC create PK column named requesterId
-	// @ MTO create FK column automatically named as: <property> + "Id"
+	// @PC create PK column named requesterId
+	// @MTO create FK column automatically named as: <property> + "Id"
 	// Because this two columns have now the same name they are like 'merged' in only one 
 	@PrimaryColumn({ type: 'integer', name: 'requesterId' })
 	@ManyToOne(() => User, (recipient) => recipient.friendships )

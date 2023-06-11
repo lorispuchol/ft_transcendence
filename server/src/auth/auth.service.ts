@@ -28,12 +28,11 @@ export class AuthService {
 	}
 
 	async logIn(login: string): Promise<any> {
-		let user: User = await this.userService.findOne(login);
+		let user: User = await this.userService.findOneByLogin(login);
 		if (!user)
 			user = await this.userService.createOne(login);
-		//add username generator if you want loris
 	
-		const payload = {id: user.id, login: user.username};
+		const payload = {id: user.id, username: user.username};
 
 		return { access_token: await this.jwtService.signAsync(payload) };
 	}

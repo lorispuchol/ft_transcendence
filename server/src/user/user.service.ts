@@ -15,14 +15,17 @@ export class UserService {
 		const newUser: User = this.userRepository.create({login, username});
 		return await this.userRepository.save(newUser);
 	}
-	
-	async findOne(login: string): Promise<User | undefined> {
+
+	async findOneById(id: number): Promise<User | undefined> {
+		return this.userRepository.findOneBy({id});
+	}
+
+	async findOneByLogin(login: string): Promise<User | undefined> {
 		return this.userRepository.findOneBy({login});
 	}
 
 	////dev
-	async getAllUsers()
-	{
+	async getAllUsers() {
 		return this.userRepository.find();
 	}
 }
