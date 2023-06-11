@@ -1,6 +1,6 @@
 FROM node:alpine
 
-ENV NPM_CONFIG_LOGLEVEL info
+# ENV NPM_CONFIG_LOGLEVEL info
 
 EXPOSE 8080
 
@@ -12,8 +12,8 @@ WORKDIR '/app'
 
 RUN npm init -y
 RUN npm install .
-RUN npm audit fix
+# RUN npm audit fix
 
-#CMD ["npm", "start"]
+# CMD ["npm", "start"]
 
 ENTRYPOINT ["sh", "entrypoint_dev.sh"]
