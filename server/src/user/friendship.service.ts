@@ -13,9 +13,13 @@ export class FriendshipService{
 	) {}
 	async askFriendship(requester: User, recipient: User): Promise< Friendship | undefined > {
 		
-		const status: string = FriendshipStatus.INVITED;
-		return this.friendshipRepository.create({requester, recipient, status});
-		// return await this.friendshipRepository.save(newFriendship);
+		const newFriendship: Friendship = new Friendship();
+
+		newFriendship.recipient = recipient;
+		newFriendship.requester = requester;
+		newFriendship.status = FriendshipStatus.INVITED;
+
+		return await this.friendshipRepository.save(newFriendship);
 	}
 
 	/// dev

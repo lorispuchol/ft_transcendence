@@ -27,14 +27,14 @@ export class UserController {
 		return this.userService.createOne(login)
 	}
  
-	// @Public()
 	@Get('askFriend/:recipient')
 	async askFriend (
 		@Request() req: any,
 		@Param('recipient') recipientId: number ) {
-			const recipient: User = await this.userService.findOneById(recipientId);
-			const requester: User = await this.userService.findOneById(req.user.id);
-			return this.friendshipService.askFriendship(requester, recipient)
+			return this.friendshipService.askFriendship (
+				await this.userService.findOneById(recipientId),
+				await this.userService.findOneById(recipientId)
+			)
     }
 
 	/// dev
