@@ -4,7 +4,6 @@ import { FriendshipService } from "./friendship.service";
 import { UserService } from "./user.service";
 import { Public } from "src/auth/constants";
 import { User } from "./user.entity";
-import { Friendship } from "./friendship.entity";
 
 @Controller('user')
 export class UserController {
