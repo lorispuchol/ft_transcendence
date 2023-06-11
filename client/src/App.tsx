@@ -25,13 +25,13 @@ function App() {
 
   return (
 	<div>
-		<a
+		<h1><a
 			href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfJ8vUgJfEaBtkAd3yWLXpZb2okK11ZtfxvDj0Thc&usqp=CAE&s"
 			title="big floppa"
 			target="_blank"
 		>
 			<p className="desc">Mi <strong>gato</strong></p>
-		</a>
+		</a></h1>
 		<img
 			className="flopa"
 			src="https://i.kym-cdn.com/entries/icons/original/000/034/421/cover1.jpg"
