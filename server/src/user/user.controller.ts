@@ -17,7 +17,6 @@ export class UserController {
 	@Get('all')
 	async getAllUsers() {
 		return await this.userService.getAllUsers();
-	}
 
 	//dev
 	@Public()
@@ -27,7 +26,6 @@ export class UserController {
 	}
  
 	@Get('askFriend/:recipient')
-	async askFriend (
 		@Request() req: any,
 		@Param('recipient') recipientId: number ) {
 			return this.friendshipService.askFriendship (
