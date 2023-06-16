@@ -23,8 +23,12 @@ export class AuthController {
 	async signUp(
 		@Query('code') code: string,
 	) {
-		const userData = await this.authService.getDataFtApi(code);
-		return this.authService.logIn(userData.data.login);
+		try {
+			const userData = await this.authService.getDataFtApi(code);
+			return this.authService.logIn(userData.data.login);
+		} catch (error) {
+			return "request to 42 API failed"
+		}
 	}
 
 	///dev

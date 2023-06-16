@@ -1,8 +1,8 @@
 import { ConfigService } from "@nestjs/config";
 import { TypeOrmModuleAsyncOptions } from "@nestjs/typeorm";
-import { Product } from "./products/product.entity";
-import { User } from "./user/user.entity";
-import { Friendship } from "./user/friendship.entity";
+import { Product } from "../products/product.entity";
+import { User } from "../user/user.entity";
+import { Friendship } from "../user/relation/friendship.entity";
 
 
 export const typeOrmConfig: TypeOrmModuleAsyncOptions = {

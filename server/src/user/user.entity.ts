@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from "typeorm";
-import { Friendship } from "./friendship.entity";
+import { Friendship } from "./relation/friendship.entity";
 
 export enum UserStatus {
     OFFLINE = "offline",

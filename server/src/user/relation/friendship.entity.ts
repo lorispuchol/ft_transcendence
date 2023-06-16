@@ -1,5 +1,5 @@
 import { Entity, ManyToOne, Column, JoinColumn, PrimaryColumn, PrimaryGeneratedColumn, BaseEntity} from "typeorm";
-import { User } from "./user.entity";
+import { User } from "../user.entity";
 
 export enum FriendshipStatus {
 	INVITED = "invited",

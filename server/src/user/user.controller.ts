@@ -1,6 +1,6 @@
 
 import { Body, Controller, Get, Param, Post, Request } from "@nestjs/common";
-import { FriendshipService } from "./friendship.service";
+import { FriendshipService } from "./relation/friendship.service";
 import { UserService } from "./user.service";
 import { Public } from "src/auth/constants";
 import { User } from "./user.entity";
