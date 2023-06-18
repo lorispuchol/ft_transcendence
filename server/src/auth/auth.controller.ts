@@ -1,6 +1,6 @@
-import { Controller, Get, HttpCode, HttpStatus, Query, Redirect, Request } from "@nestjs/common";
+import { Controller, Get, HttpCode, HttpStatus, Query, Redirect, Request, Response } from "@nestjs/common";
 import { AuthService } from "./auth.service";
-import { Public, ftConstants } from "./constants";
+import { Public, client_url, ftConstants } from "./constants";
 
 @Controller('auth')
 export class AuthController {
@@ -22,15 +22,21 @@ export class AuthController {
 	@Get('login')
 	async signUp(
 		@Query('code') code: string,
+		@Response() res: any,
 	) {
+		if (!code)
+		{
+			res.send("nique");
+			return ;
+		}		
 		const userData = await this.authService.getDataFtApi(code);
-		return this.authService.logIn(userData.data.login);
+		const token: string = await this.authService.logIn(userData.data.login);
+		res.redirect(client_url + "/login?token=" + token);
 	}
 
-	///dev
-	@Get('profile')
-	getProfile(@Request() req: any) {
-		return req.user;
+	@Get('ping')
+	getProfile() {
+		return {statu: "true"};
 	}
 
 }

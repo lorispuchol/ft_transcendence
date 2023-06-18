@@ -41,9 +41,9 @@ services:
     env_file:
       - .env_api_key            # dev
     environment:
-      PORT: 8585                # Change default port of React (3000 by default)
-      #HOST: ${HOST}            # uncomment for prod
-      SERVER_PORT: ${SERVER_PORT}
+      PORT: ${CLIENT_PORT}                # Change default port of React (3000 by default)
+      REACT_APP_SERVER_PORT: ${SERVER_PORT}
+      #REACT_APP_SERVER_HOST: ${SERVER_HOST}
     volumes:
       - ./client/.:/app/
 
