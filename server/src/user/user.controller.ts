@@ -11,8 +11,15 @@ export class UserController {
 		private readonly friendshipService: FriendshipService,
 		private userService: UserService
 	) {}
-	
-  ////dev
+
+	@Get('me')
+	async getUserData(
+		@Request() req: any
+	) {
+		return await this.userService.findOneByUsername(req.username);
+	}
+
+	//dev
 	@Public()
 	@Get('all')
 	async getAllUsers() {
@@ -31,12 +38,12 @@ export class UserController {
 		@Request() req: any,
 		@Param('recipient') recipientId: number ) {
 			return this.friendshipService.askFriendship (
-				await this.userService.findOneById(recipientId),
+				await this.userService.findOneById(req.id),
 				await this.userService.findOneById(recipientId)
 			)
     }
 
-	/// dev
+	// dev
 	@Public()
 	@Get('allfriendship')
 	async getAllFriendship() {

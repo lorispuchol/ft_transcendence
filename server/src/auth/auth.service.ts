@@ -27,13 +27,13 @@ export class AuthService {
 		}));
 	}
 
-	async logIn(login: string): Promise<any> {
+	async logIn(login: string): Promise<string> {
 		let user: User = await this.userService.findOneByLogin(login);
 		if (!user)
 			user = await this.userService.createOne(login);
 	
 		const payload = {id: user.id, username: user.username};
 
-		return { access_token: await this.jwtService.signAsync(payload) };
+		return await this.jwtService.signAsync(payload);
 	}
 }
