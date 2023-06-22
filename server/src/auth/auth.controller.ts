@@ -26,7 +26,7 @@ export class AuthController {
 	) {
 		if (!code)
 		{
-			res.send("nique");
+			res.send("42 api code requiered");
 			return ;
 		}		
 		const userData = await this.authService.getDataFtApi(code);
@@ -36,7 +36,7 @@ export class AuthController {
 
 	@Get('ping')
 	getProfile() {
-		return {statu: "true"};
+		return {isGood: "true"};
 	}
 
 }

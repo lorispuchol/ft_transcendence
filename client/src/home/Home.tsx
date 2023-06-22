@@ -1,6 +1,5 @@
 
 import { Link, Navigate } from "react-router-dom"
-import { } from "../App";
 
 export default function Home() {
 	if (!localStorage.getItem("token"))

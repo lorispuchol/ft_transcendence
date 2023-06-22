@@ -14,7 +14,7 @@ services:
     restart: unless-stopped
     env_file:
       - .env                      # pass environment variables to container
-      - .env_api_key
+      - .env.credential
     build:
       context: ./server/.         # context for dockerfile build (building can't copy files outside of context)
       dockerfile: Dockerfile      # use custom dockerfile
@@ -39,7 +39,7 @@ services:
     ports:
       - 8585:8585
     env_file:
-      - .env_api_key            # dev
+      - .env.credential                # dev
     environment:
       PORT: ${CLIENT_PORT}                # Change default port of React (3000 by default)
       REACT_APP_SERVER_PORT: ${SERVER_PORT}
