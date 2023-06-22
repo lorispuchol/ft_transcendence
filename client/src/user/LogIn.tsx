@@ -1,5 +1,8 @@
 
+import { useEffect, useState } from "react";
 import { Navigate, useSearchParams } from "react-router-dom";
+import { GetRequest, server_url } from "../utils/request";
+import ErrorHandling from "../utils/error";
 
 export default function LogIn() {
 	const [searchParams] = useSearchParams();
@@ -7,29 +10,21 @@ export default function LogIn() {
 	if (tokenParam)
 		localStorage.setItem("token", tokenParam);
 	
-	// if (data.status === "401")
-	// 	return (
-	// 		<>
-	// 			login
-	// 			<button onClick={handleClick}>
-	// 				<a href={server_url + "/auth/"} >log in</a>
-	// 			</button>
-	// 		</>
-	// 	);
-	// if (data.status !== "OK")
-	// {
-	// 	console.log("what? " + data.status);
-	// 	return (<ErrorHandling error={data.error.status} />);
-	// }
-	return (<Navigate to='/' />);
+	const [data, setData]: [any, any] = useState([]);
+	useEffect(() => {
+			GetRequest("/auth/ping").then((response) => setData(response));
+	}, []);
 	
+	if (data.status === 401)
+		return (
+				<>
+					login
+					<button>
+						<a href={server_url + "/auth/"} >log in</a>
+					</button>
+				</>
+			);
+	if (data.status !== "OK")
+		return (<ErrorHandling status={data.status} message={data.error} />);
+	return (<Navigate to='/' />);
 }
-// useEffect(() => {
-// 	axios.post("server_url", {code: code}).then((response) => {
-// 		setToken(response.data);
-// 	});
-// }, []);
-// axios.post("http://10.12.8.2:8080/auth/login" , {code: code}).then((response) => {
-// 	setToken(response.data);
-// })
-//, {headers: {'Access-Control-Allow-Origin': }}

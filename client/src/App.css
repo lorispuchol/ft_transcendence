@@ -1,6 +1,8 @@
 
 .avatar {
 	border-radius: 10%;
+	width: 300;
+	height: 250;
 }
 
 .buttonWrapper {
