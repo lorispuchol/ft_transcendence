@@ -7,7 +7,7 @@ export async function GetRequest(path: string) {
 	let res: any;
 	try { 
 		const response = await axios.get(server_url + path, { headers: { authorization: "Bearer " + token } });
-		res = { status: "OK", data: response };
+		res = { status: "OK", data: response.data };
 	}
 	catch (error: any) {
 		if (error.code === "ERR_NETWORK")
@@ -23,7 +23,7 @@ export async function PostRequest(path: string, data: JSON) {
 	let res: any;
 	try { 
 		const response = await axios.post(server_url + path, data, { headers: { authorization: "Bearer " + token } });
-		res = { status: "OK", data: response };
+		res = { status: "OK", data: response.data };
 	}
 	catch (error: any) {
 		if (error.code === "ERR_NETWORK")
