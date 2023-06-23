@@ -1,6 +1,6 @@
-import { Controller, Get, HttpCode, HttpStatus, Query, Redirect, Request } from "@nestjs/common";
+import { Controller, Get, HttpCode, HttpStatus, Query, Redirect, Request, Response } from "@nestjs/common";
 import { AuthService } from "./auth.service";
-import { Public, ftConstants } from "./constants";
+import { Public, client_url, ftConstants } from "./constants";
 
 @Controller('auth')
 export class AuthController {
@@ -22,19 +22,26 @@ export class AuthController {
 	@Get('login')
 	async signUp(
 		@Query('code') code: string,
+		@Response() res: any,
 	) {
+		if (!code)
+		{
+			res.send("42 api code requiered");
+			return ;
+		}
 		try {
 			const userData = await this.authService.getDataFtApi(code);
-			return this.authService.logIn(userData.data.login);
-		} catch (error) {
-			return "request to 42 API failed"
+			const token: string = await this.authService.logIn(userData.data.login);
+			res.redirect(client_url + "/login?token=" + token);
+		}
+		catch (error) {
+			res.send("something went wrong with 42 api");
 		}
 	}
 
-	///dev
-	@Get('profile')
-	getProfile(@Request() req: any) {
-		return req.user;
+	@Get('check_token')
+	getProfile() {
+		return {isGood: "true"};
 	}
 
 }

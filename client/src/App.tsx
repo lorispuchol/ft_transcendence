@@ -1,64 +1,42 @@
-import React from 'react';
-import './App.css';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import './App.css'
+import Home from './home/Home';
+import Profile, { RedirectToOwnProfile } from './user/Profile';
+import LogIn from './user/LogIn';
+import NoRouteFound from './NoRouteFound';
+import { useEffect, useState } from 'react';
+import { GetRequest } from './utils/request';
+import ErrorHandling from './utils/error';
 
-function MyButton() {
+export default function App() {
+	const [data, setData]: [any, any] = useState({status: "loading"});
+	useEffect(() => {
+			GetRequest("/auth/check_token").then((response) => setData(response));
+	}, []);
+	
+	if (data.status === "loading")
+		return (<>loading</>);
+	if (data.status === 401)
+		return (
+			<>
+				<Routes>
+					<Route path='*' element={<Navigate to='/login' />} />
+					<Route path='/login' element={<LogIn />} />
+				</Routes>
+			</>
+		);
+	if (data.status !== "OK")
+		return (<ErrorHandling status={data.status} message={data.error} />);
+
 	return (
-		<button>
-			log in
-		</button>
+		<Routes>
+			<Route path='*' element={<NoRouteFound />} />
+			<Route path='/' element={<Home />} />
+			<Route path='/profile' element={<RedirectToOwnProfile />} />
+			<Route path='/profile/:username' element={<Profile />} />
+			<Route path='/login' element={<Navigate to='/' />} />
+		</Routes>
 	);
 }
 
-
-function App() {
-	const user = {
-		name: 'loris',
-		imageUrl: 'https://cdn.intra.42.fr/users/2eb074494d7888e1d6cabd69dea349d0/lpuchol.jpg',
-		imageSize: 250,
-	};
-	const bouton = <MyButton />;
-	const products = [
-		{ title: 'Cabbage', id: 1 },
-		{ title: 'Garlic', id: 2 },
-		{ title: 'Apple', id: 3 },
-	];
-
-  return (
-	<div>
-		<h1><a
-			href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfJ8vUgJfEaBtkAd3yWLXpZb2okK11ZtfxvDj0Thc&usqp=CAE&s"
-			title="big floppa"
-			target="_blank"
-		>
-			<p className="desc">Mi <strong>gato</strong></p>
-		</a></h1>
-		<img
-			className="flopa"
-			src="https://i.kym-cdn.com/entries/icons/original/000/034/421/cover1.jpg"
-			alt="flopa"
-			style={{
-				width: user.imageSize + 50,
-				height: user.imageSize
-			}}
-		/>
-		<input type="text" disabled />
-		<input type="text" />
-		{/* <h1>
-			{user.name}
-		</h1>
-		<img 
-			className="avatar"
-			src={user.imageUrl}
-			alt={'photo of ' + user.name}
-			style={{
-				width: user.imageSize,
-				height: user.imageSize
-			}}
-		/>
-		<h1>Welcome</h1>
-		{bouton} */}
-   </div>
-  );
-}
-
-export default App;
+//ERR_NETWORK
