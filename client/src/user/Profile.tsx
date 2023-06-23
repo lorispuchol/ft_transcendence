@@ -2,6 +2,7 @@ import { Navigate, useParams } from "react-router-dom";
 import { GetRequest } from "../utils/request";
 import { useEffect, useState } from "react";
 import ErrorHandling from "../utils/error";
+import NoRouteFound from "../NoRouteFound";
 import Loading from "../utils/loading";
 
 export function RedirectToOwnProfile() {
@@ -17,17 +18,19 @@ export function RedirectToOwnProfile() {
 }
 
 export default function Profile() {
-	const params = useParams();
+	const param = useParams();
 
 	const [response, setResponse]: [any, any] = useState({status: "loading"});
 	useEffect(() => {
-			GetRequest("/user/me").then((response) => setResponse(response));
+			GetRequest("/user/" + param.username).then((response) => setResponse(response));
 	}, []);
 	if (response.status === "loading")
 		return (<Loading />);
 	if (response.status !== "OK")
 		return (<ErrorHandling status={response.status} message={response.error} />);
 
+	if (!response.data.username)
+		return (<NoRouteFound />)
 	console.log(response.data);
 	const profile = {
 		avatar: response.data.avatar? response.data.avatar : "https://cdn.intra.42.fr/users/292c41c82eeb97e81e28e35d25405eb8/kmammeri.jpg",

@@ -13,10 +13,17 @@ export class UserController {
 	) {}
 
 	@Get('me')
-	async getUserData(
+	async getMeData(
 		@Request() req: any
 	) {
 		return await this.userService.findOneByUsername(req.username);
+	}
+
+	@Get(':username')
+	async getUserData(
+		@Param('username') username: string
+	) {
+		return await this.userService.findOneByUsername(username);
 	}
 
 	@Patch('username')
