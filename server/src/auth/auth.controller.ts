@@ -28,13 +28,18 @@ export class AuthController {
 		{
 			res.send("42 api code requiered");
 			return ;
-		}		
-		const userData = await this.authService.getDataFtApi(code);
-		const token: string = await this.authService.logIn(userData.data.login);
-		res.redirect(client_url + "/login?token=" + token);
+		}
+		try {
+			const userData = await this.authService.getDataFtApi(code);
+			const token: string = await this.authService.logIn(userData.data.login);
+			res.redirect(client_url + "/login?token=" + token);
+		}
+		catch (error) {
+			res.send("something went wrong with 42 api");
+		}
 	}
 
-	@Get('ping')
+	@Get('check_token')
 	getProfile() {
 		return {isGood: "true"};
 	}

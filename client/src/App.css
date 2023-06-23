@@ -1,8 +1,13 @@
 
 .avatar {
-	border-radius: 10%;
+	border: 10px solid #ddd;
+	border-radius: 60%;
 	width: 300;
 	height: 250;
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	width: 50%;
 }
 
 .buttonWrapper {
