@@ -43,11 +43,11 @@ services:
     environment:
       PORT: ${CLIENT_PORT}                # Change default port of React (3000 by default)
       REACT_APP_SERVER_PORT: ${SERVER_PORT}
+      REACT_APP_CLIENT_PORT: ${CLIENT_PORT}
       #REACT_APP_SERVER_HOST: ${SERVER_HOST}
     volumes:
       - ./client/.:/app/
-
-
+  
   db:
     container_name: db
     init: true
