@@ -28,6 +28,16 @@ export class UserService {
 		return this.userRepository.findOneBy({username});
 	}
 
+	async changeUsername(userId: number, newUsername: string) {
+		try {
+			this.userRepository.update({id: userId}, {username: newUsername});
+			return ("changed")
+		}
+		catch (error) {
+			return ("taken");
+		}
+	}
+
 	////dev
 	async getAllUsers() {
 		return this.userRepository.find();

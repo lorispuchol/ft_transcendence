@@ -3,12 +3,15 @@ import { GetRequest } from "../utils/request";
 import { useEffect, useState } from "react";
 import ErrorHandling from "../utils/error";
 import NoRouteFound from "../NoRouteFound";
+import Loading from "../utils/loading";
 
 export function RedirectToOwnProfile() {
-	const [response, setResponse]: [any, any] = useState([]);
+	const [response, setResponse]: [any, any] = useState({status: "loading"});
 	useEffect(() => {
 			GetRequest("/user/me").then((response) => setResponse(response));
 	}, []);
+	if (response.status === "loading")
+		return (<Loading />);
 	if (response.status !== "OK")
 		return (<ErrorHandling status={response.status} message={response.error} />);
 	return (<Navigate to={"/profile/" + response.data.username} />)
@@ -17,10 +20,12 @@ export function RedirectToOwnProfile() {
 export default function Profile() {
 	const param = useParams();
 
-	const [response, setResponse]: [any, any] = useState([]);
+	const [response, setResponse]: [any, any] = useState({status: "loading"});
 	useEffect(() => {
 			GetRequest("/user/" + param.username).then((response) => setResponse(response));
 	}, []);
+	if (response.status === "loading")
+		return (<Loading />);
 	if (response.status !== "OK")
 		return (<ErrorHandling status={response.status} message={response.error} />);
 
@@ -37,7 +42,12 @@ export default function Profile() {
 	return (
 		<>
 			<img className="avatar" src={profile.avatar} alt={profile.username + " pp"} />
-			{profile.username} profile
+			<ul>
+				<li>login: {profile.login}</li>
+				<li>username: {profile.username}</li>
+				<li>nb_victory: {profile.nb_victory}</li>
+				<li>nb_defeat: {profile.nb_defeat}</li>
+			</ul>
 		</>
 	);
 }
