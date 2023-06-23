@@ -1,9 +1,11 @@
 import axios from "axios";
 
 export const server_url = "http://" + process.env.REACT_APP_SERVER_HOST + ":" + process.env.REACT_APP_SERVER_PORT;
+export const client_url = "http://" + process.env.REACT_APP_SERVER_HOST + ":" + process.env.REACT_APP_CLIENT_PORT;
 
 export async function GetRequest(path: string) {
 	const token = localStorage.getItem("token");
+	console.log("token: " + token);
 	let res: any;
 	try { 
 		const response = await axios.get(server_url + path, { headers: { authorization: "Bearer " + token } });

@@ -1,5 +1,5 @@
 
-import { Body, Controller, Get, Param, Post, Request } from "@nestjs/common";
+import { Body, Controller, Get, Param, Patch, Post, Request } from "@nestjs/common";
 import { FriendshipService } from "./friendship.service";
 import { UserService } from "./user.service";
 import { Public } from "src/auth/constants";
@@ -19,34 +19,43 @@ export class UserController {
 		return await this.userService.findOneByUsername(req.username);
 	}
 
-	//dev
+	@Patch('username')
+	async changeUsername(
+		@Request() req: any,
+		@Body('username') newUsername: string
+	) {
+		const status = await this.userService.changeUsername(req.user.id, newUsername);
+		const user =  await this.userService.findOneById(req.user.id);
+		return {status: status, user: user};
+	}
+
+	@Get('askFriend/:recipient')
+	async friendRequest(
+		@Request() req: any,
+		@Param('recipient') recipientId: number ) {
+			return this.friendshipService.askFriendship (
+				await this.userService.findOneById(req.user.id),
+				await this.userService.findOneById(recipientId)
+			)
+	}
+
+	//dev/////////////////////////////////////
 	@Public()
 	@Get('all')
 	async getAllUsers() {
 		return await this.userService.getAllUsers();
 	}
 
-	//dev
 	@Public()
 	@Get('create/:login')
 	createFakeUser(@Param('login') login: string): Promise<User> {
 		return this.userService.createOne(login)
 	}
  
-	@Get('askFriend/:recipient')
-	async friendRequest(
-		@Request() req: any,
-		@Param('recipient') recipientId: number ) {
-			return this.friendshipService.askFriendship (
-				await this.userService.findOneById(req.id),
-				await this.userService.findOneById(recipientId)
-			)
-    }
-
-	// dev
 	@Public()
 	@Get('allfriendship')
 	async getAllFriendship() {
 		return await this.friendshipService.getAllFriendship();
 	}
+	////////////////////////////////////////////
 }

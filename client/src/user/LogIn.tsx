@@ -1,7 +1,7 @@
 
 
-import { Navigate, useSearchParams } from "react-router-dom";
-import { server_url } from "../utils/request";
+import { useSearchParams } from "react-router-dom";
+import { client_url, server_url } from "../utils/request";
 
 export default function LogIn() {
 	const [searchParams] = useSearchParams();
@@ -9,9 +9,9 @@ export default function LogIn() {
 	if (tokenParam)
 	{
 		localStorage.setItem("token", tokenParam);
-		return (<Navigate to='/' />);
+		window.location.replace(client_url);
+		return (<strong>redirection...</strong>);
 	}
-
 	return (
 		<>
 			login
