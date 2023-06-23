@@ -23,16 +23,17 @@ export default function Profile() {
 	if (response.status !== "OK")
 		return (<ErrorHandling status={response.status} message={response.error} />);
 
+	console.log(response.data);
 	const profile = {
 		avatar: response.data.avatar? response.data.avatar : "https://cdn.intra.42.fr/users/292c41c82eeb97e81e28e35d25405eb8/kmammeri.jpg",
-
+		login: response.data.login,
+		username: response.data.username,
+		nb_victory: response.data.nb_victory,
+		nb_defeat: response.data.nb_defeat,
 	}
 	return (
 		<>
-			<img src={profile.avatar} style={{
-				width: 300,
-				height: 250
-			}}/>
+			<img className="avatar" src={profile.avatar} alt={profile.username + " pp"} />
 			{params.username} profile
 		</>
 	);
