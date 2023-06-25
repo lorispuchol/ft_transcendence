@@ -1,6 +1,6 @@
 
 import { Body, Controller, Get, Param, Patch, Post, Request } from "@nestjs/common";
-import { FriendshipService } from "./friendship.service";
+import { RelationshipService } from "./relationship.service";
 import { UserService } from "./user.service";
 import { Public } from "src/auth/constants";
 import { User } from "./user.entity";
@@ -8,7 +8,7 @@ import { User } from "./user.entity";
 @Controller('user')
 export class UserController {
 	constructor(
-		private readonly friendshipService: FriendshipService,
+		private readonly relationshipService: RelationshipService,
 		private userService: UserService
 	) {}
 	
@@ -19,7 +19,6 @@ export class UserController {
 		) {
 		return await this.userService.findOneByUsername(req.username);
 	}
-	
 
 	@Patch('username')
 	async changeUsername(
@@ -31,8 +30,7 @@ export class UserController {
 		return {status: status, user: user};
 	}
 
-	
-	//dev
+  // dev
 	@Public()
 	@Get('all')
 	async getAllUsers() {

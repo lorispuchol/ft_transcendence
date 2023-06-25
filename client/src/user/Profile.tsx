@@ -30,7 +30,6 @@ export default function Profile() {
 		return (<ErrorHandling status={response.status} message={response.error} />);
 	if (!response.data.username)
 		return (<NoRouteFound />)
-
 	const profile = {
 		avatar: response.data.avatar? response.data.avatar : "https://cdn.intra.42.fr/users/292c41c82eeb97e81e28e35d25405eb8/kmammeri.jpg",
 		login: response.data.login,

@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from "typeorm";
-import { Friendship } from "./friendship.entity";
+import { Relationship } from "./relationship.entity";
 
 export enum UserStatus {
     OFFLINE = "offline",
@@ -53,6 +53,6 @@ export class User {
 	})
 	nb_defeat: number;
 
-	@OneToMany(() => Friendship, (friendship) => friendship)
-	friendships: Friendship[];
+	@OneToMany(() => Relationship, (relationship) => relationship)
+	relationships: Relationship[];
 }
