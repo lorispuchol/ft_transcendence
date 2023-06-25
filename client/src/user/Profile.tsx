@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import ErrorHandling from "../utils/Error";
 import NoRouteFound from "../NoRouteFound";
 import Loading from "../utils/Loading";
-import ResponsiveAppBar from "../home/NavBar";
 
 export function RedirectToOwnProfile() {
 	const [response, setResponse]: [any, any] = useState({status: "loading"});
@@ -40,7 +39,7 @@ export default function Profile() {
 	}
 	return (
 		<>
-			<img className="avatar" src={profile.avatar} alt={profile.username + " pp"} />
+			<img className="profile_avatar" src={profile.avatar} alt={profile.username + " pp"} />
 			<ul>
 				<li>login: {profile.login}</li>
 				<li>username: {profile.username}</li>
