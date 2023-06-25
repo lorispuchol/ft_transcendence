@@ -11,29 +11,46 @@ export class UserController {
 		private readonly friendshipService: FriendshipService,
 		private userService: UserService
 	) {}
-
+	
+	
 	@Get('me')
 	async getMeData(
 		@Request() req: any
-	) {
+		) {
 		return await this.userService.findOneByUsername(req.username);
 	}
-
-	@Get(':username')
-	async getUserData(
-		@Param('username') username: string
-	) {
-		return await this.userService.findOneByUsername(username);
-	}
+	
 
 	@Patch('username')
 	async changeUsername(
 		@Request() req: any,
 		@Body('username') newUsername: string
-	) {
+		) {
 		const status = await this.userService.changeUsername(req.user.id, newUsername);
 		const user =  await this.userService.findOneById(req.user.id);
 		return {status: status, user: user};
+	}
+
+	
+	//dev
+	@Public()
+	@Get('all')
+	async getAllUsers() {
+		return await this.userService.getAllUsers();
+	}
+
+	//dev
+	@Public()
+	@Get('allfriendship')
+	async getAllFriendship() {
+		return await this.friendshipService.getAllFriendship();
+	}
+	
+	//dev
+	@Public()
+	@Get('create/:login')
+	createFakeUser(@Param('login') login: string): Promise<User> {
+		return this.userService.createOne(login);
 	}
 
 	@Get('askFriend/:recipient')
@@ -45,24 +62,12 @@ export class UserController {
 				await this.userService.findOneById(recipientId)
 			)
 	}
-
-	//dev/////////////////////////////////////
-	@Public()
-	@Get('all')
-	async getAllUsers() {
-		return await this.userService.getAllUsers();
+ 	
+	@Get(':username')
+	async getUserData(
+		@Param('username') username: string
+		) {
+			return await this.userService.findOneByUsername(username);
 	}
 
-	@Public()
-	@Get('create/:login')
-	createFakeUser(@Param('login') login: string): Promise<User> {
-		return this.userService.createOne(login)
-	}
- 
-	@Public()
-	@Get('allfriendship')
-	async getAllFriendship() {
-		return await this.friendshipService.getAllFriendship();
-	}
-	////////////////////////////////////////////
 }
