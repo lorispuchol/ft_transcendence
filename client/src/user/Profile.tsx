@@ -39,8 +39,7 @@ export default function Profile() {
 	}
 	return (
 		<>
-			<nav></nav>
-			<img className="avatar" src={profile.avatar} alt={profile.username + " pp"} />
+			<img className="profile_avatar" src={profile.avatar} alt={profile.username + " pp"} />
 			<ul>
 				<li>login: {profile.login}</li>
 				<li>username: {profile.username}</li>
