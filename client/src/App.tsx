@@ -5,16 +5,15 @@ import Profile, { RedirectToOwnProfile } from './user/Profile';
 import LogIn from './user/LogIn';
 import NoRouteFound from './NoRouteFound';
 import { useEffect, useState } from 'react';
-import { GetRequest } from './utils/request';
-import ErrorHandling from './utils/error';
-import Loading from './utils/loading';
+import { GetRequest } from './utils/Request';
+import ErrorHandling from './utils/Error';
+import Loading from './utils/Loading';
 
 export default function App() {
 	const [data, setData]: [any, any] = useState({status: "loading"});
 	useEffect(() => {
 			GetRequest("/auth/check_token").then((response) => setData(response));
 	}, []);
-	console.log("app");
 	if (data.status === "loading")
 		return (<Loading />);
 	if (data.status === 401)

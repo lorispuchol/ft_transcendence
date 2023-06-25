@@ -11,11 +11,12 @@ export class UserController {
 		private readonly relationshipService: RelationshipService,
 		private userService: UserService
 	) {}
-
+	
+	
 	@Get('me')
 	async getMeData(
 		@Request() req: any
-	) {
+		) {
 		return await this.userService.findOneByUsername(req.username);
 	}
 
@@ -23,47 +24,48 @@ export class UserController {
 	async changeUsername(
 		@Request() req: any,
 		@Body('username') newUsername: string
-	) {
+		) {
 		const status = await this.userService.changeUsername(req.user.id, newUsername);
 		const user =  await this.userService.findOneById(req.user.id);
 		return {status: status, user: user};
 	}
 
-	// dev
+  // dev
 	@Public()
 	@Get('all')
 	async getAllUsers() {
 		return await this.userService.getAllUsers();
 	}
- 
+
 	//dev
 	@Public()
-	@Get('allrelationship')
-	async getAllRelationship() {
-		return await this.relationshipService.getAllRelationship();
+	@Get('allfriendship')
+	async getAllFriendship() {
+		return await this.friendshipService.getAllFriendship();
 	}
 	
-	@Get('askFriend/:recipient')
-	async friendRequest(
-		@Request() req: any,
-		@Param('recipient') recipient: string ) {
-			return this.relationshipService.askRelationship (
-				await this.userService.findOneById(req.user.id),
-				await this.userService.findOneByUsername(recipient)
-			)
-	}
-
 	//dev
 	@Public()
 	@Get('create/:login')
 	createFakeUser(@Param('login') login: string): Promise<User> {
-		return this.userService.createOne(login)
+		return this.userService.createOne(login);
 	}
 
+	@Get('askFriend/:recipient')
+	async friendRequest(
+		@Request() req: any,
+		@Param('recipient') recipientId: number ) {
+			return this.friendshipService.askFriendship (
+				await this.userService.findOneById(req.user.id),
+				await this.userService.findOneById(recipientId)
+			)
+	}
+ 	
 	@Get(':username')
 	async getUserData(
 		@Param('username') username: string
-	) {
-		return await this.userService.findOneByUsername(username);
+		) {
+			return await this.userService.findOneByUsername(username);
 	}
+
 }
