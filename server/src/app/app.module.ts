@@ -2,12 +2,12 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ProductsModule } from './products/products.module';
+import { ProductsModule } from '../products/products.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { typeOrmConfig } from './typeOrm.config';
-import { AuthModule } from './auth/auth.module';
+import { typeOrmConfig } from '../db.config/typeOrm.config';
+import { AuthModule } from '../auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
-import { AuthGard } from './auth/auth.guard';
+import { AuthGard } from '../auth/auth.guard';
 
 @Module({
 	imports: [
