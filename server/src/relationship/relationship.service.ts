@@ -12,7 +12,7 @@ export class RelationshipService{
 		private relationshipRepository: Repository<Relationship>,
 	) {}
 	
-	async askRelationship(requester: User, recipient: User): Promise< Relationship | undefined > {
+	async askFriend(requester: User, recipient: User): Promise< Relationship | undefined > {
 		
 		const newRelationship: Relationship = new Relationship();
 

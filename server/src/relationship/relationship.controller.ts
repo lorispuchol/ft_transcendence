@@ -21,7 +21,7 @@ export class RelationshipController {
 	async askFriend(
 		@Request() req: any,
 		@Param('recipient') recipient: string ) {
-			return this.relationshipService.askRelationship (
+			return this.relationshipService.askFriend (
 				await this.userService.findOneById(req.user.id),
 				await this.userService.findOneByUsername(recipient)
 			)
@@ -31,10 +31,7 @@ export class RelationshipController {
 	async acceptFriend(
 		@Request() req: any,
 		@Param('recipient') recipient: string ) {
-			return this.relationshipService.askRelationship (
-				await this.userService.findOneById(req.user.id),
-				await this.userService.findOneByUsername(recipient)
-			)
+			
 	}
 
 	@Get('block/:recipient')
