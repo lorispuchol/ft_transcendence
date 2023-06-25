@@ -7,9 +7,8 @@ export default function Home() {
 	 	return (<Navigate to='/login' />);
 	return (
 		<>
-			<ResponsiveAppBar />
+
 			<div><strong><u>home</u></strong></div>
-			<div><Link to="/profile"><button>profile</button></Link></div>
 		</>
 	);
 }
