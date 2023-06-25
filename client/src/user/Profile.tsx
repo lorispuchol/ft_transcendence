@@ -1,9 +1,9 @@
 import { Navigate, useParams } from "react-router-dom";
-import { GetRequest } from "../utils/request";
+import { GetRequest } from "../utils/Request";
 import { useEffect, useState } from "react";
-import ErrorHandling from "../utils/error";
+import ErrorHandling from "../utils/Error";
 import NoRouteFound from "../NoRouteFound";
-import Loading from "../utils/loading";
+import Loading from "../utils/Loading";
 
 export function RedirectToOwnProfile() {
 	const [response, setResponse]: [any, any] = useState({status: "loading"});
@@ -28,7 +28,6 @@ export default function Profile() {
 		return (<Loading />);
 	if (response.status !== "OK")
 		return (<ErrorHandling status={response.status} message={response.error} />);
-
 	if (!response.data.username)
 		return (<NoRouteFound />)
 	const profile = {
@@ -40,6 +39,7 @@ export default function Profile() {
 	}
 	return (
 		<>
+			<nav></nav>
 			<img className="avatar" src={profile.avatar} alt={profile.username + " pp"} />
 			<ul>
 				<li>login: {profile.login}</li>

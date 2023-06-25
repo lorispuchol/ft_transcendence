@@ -1,7 +1,8 @@
 
 
 import { useSearchParams } from "react-router-dom";
-import { client_url, server_url } from "../utils/request";
+import { client_url, server_url } from "../utils/Request";
+import Loading from "../utils/Loading";
 
 export default function LogIn() {
 	const [searchParams] = useSearchParams();
@@ -10,7 +11,7 @@ export default function LogIn() {
 	{
 		localStorage.setItem("token", tokenParam);
 		window.location.replace(client_url);
-		return (<strong>redirection...</strong>);
+		return (<Loading />);
 	}
 	return (
 		<>
