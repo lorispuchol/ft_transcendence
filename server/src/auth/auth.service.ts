@@ -32,7 +32,7 @@ export class AuthService {
 		if (!user)
 			user = await this.userService.createOne(login);
 	
-		const payload = {id: user.id, username: user.username};
+		const payload = {id: user.id, login: user.login};
 
 		return await this.jwtService.signAsync(payload);
 	}

@@ -1,9 +1,9 @@
 import { Navigate, useParams } from "react-router-dom";
-import { GetRequest } from "../utils/request";
+import { GetRequest } from "../utils/Request";
 import { useEffect, useState } from "react";
-import ErrorHandling from "../utils/error";
+import ErrorHandling from "../utils/Error";
 import NoRouteFound from "../NoRouteFound";
-import Loading from "../utils/loading";
+import Loading from "../utils/Loading";
 
 export function RedirectToOwnProfile() {
 	const [response, setResponse]: [any, any] = useState({status: "loading"});
@@ -28,10 +28,9 @@ export default function Profile() {
 		return (<Loading />);
 	if (response.status !== "OK")
 		return (<ErrorHandling status={response.status} message={response.error} />);
-
 	if (!response.data.username)
 		return (<NoRouteFound />)
-	console.log(response.data);
+
 	const profile = {
 		avatar: response.data.avatar? response.data.avatar : "https://cdn.intra.42.fr/users/292c41c82eeb97e81e28e35d25405eb8/kmammeri.jpg",
 		login: response.data.login,
@@ -41,6 +40,7 @@ export default function Profile() {
 	}
 	return (
 		<>
+			<nav></nav>
 			<img className="avatar" src={profile.avatar} alt={profile.username + " pp"} />
 			<ul>
 				<li>login: {profile.login}</li>
