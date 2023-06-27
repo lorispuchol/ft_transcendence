@@ -14,11 +14,15 @@ export class RelationshipService{
 	
 	async askFriend(requester: User, recipient: User): Promise< Relationship | undefined > {
 		
+		
 		const newRelationship: Relationship = new Relationship();
-
+		
 		newRelationship.recipient = recipient;
 		newRelationship.requester = requester;
 		newRelationship.status = RelationshipStatus.INVITED;
+		
+		// if (this.relationshipRepository.findOne(newRelationship)
+
 
 		return await this.relationshipRepository.save(newRelationship);
 	}
