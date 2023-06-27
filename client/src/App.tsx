@@ -9,6 +9,9 @@ import { GetRequest } from './utils/Request';
 import ErrorHandling from './utils/Error';
 import Loading from './utils/Loading';
 import ResponsiveAppBar from './home/NavBar';
+import Chat from './chat/Chat';
+import Everyone from './user/Everyone';
+import Game from './game/Game';
 
 export default function App() {
 	const [data, setData]: [any, any] = useState({status: "loading"});
@@ -32,14 +35,17 @@ export default function App() {
 		return (<ErrorHandling status={data.status} message={data.error} />);
 	return (
 		<>
-		<ResponsiveAppBar />
-		<Routes>
-			<Route path='*' element={<NoRouteFound />} />
-			<Route path='/' element={<Home />} />
-			<Route path='/profile' element={<RedirectToOwnProfile />} />
-			<Route path='/profile/:username' element={<Profile />} />
-			<Route path='/login' element={<Navigate to='/' />} />
-		</Routes>
+			<ResponsiveAppBar />
+			<Routes>
+				<Route path='*' element={<NoRouteFound />} />
+				<Route path='/' element={<Home />} />
+				<Route path='/profile' element={<RedirectToOwnProfile />} />
+				<Route path='/profile/:username' element={<Profile />} />
+				<Route path='/everyone' element={<Everyone />} />
+				<Route path='/login' element={<Navigate to='/' />} />
+				<Route path='/chat' element={<Chat />} />
+				<Route path='/game' element={<Game />} />
+			</Routes>
 		</>
 	);
 }

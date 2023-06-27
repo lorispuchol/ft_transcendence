@@ -17,6 +17,8 @@ export function RedirectToOwnProfile() {
 	return (<Navigate to={"/profile/" + response.data.username} />)
 }
 
+export const defaultAvatar = "https://cdn.intra.42.fr/users/292c41c82eeb97e81e28e35d25405eb8/kmammeri.jpg";
+
 export default function Profile() {
 	const param = useParams();
 
@@ -31,7 +33,7 @@ export default function Profile() {
 	if (!response.data.username)
 		return (<NoRouteFound />)
 	const profile = {
-		avatar: response.data.avatar? response.data.avatar : "https://cdn.intra.42.fr/users/292c41c82eeb97e81e28e35d25405eb8/kmammeri.jpg",
+		avatar: response.data.avatar? response.data.avatar : defaultAvatar,
 		login: response.data.login,
 		username: response.data.username,
 		nb_victory: response.data.nb_victory,
