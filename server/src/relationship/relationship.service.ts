@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Relationship, RelationshipStatus } from "./relationship.entity";
 import { Repository } from "typeorm";
-import { User } from "./user.entity";
+import { User } from "../user/user.entity";
 
 
 @Injectable()
@@ -12,13 +12,17 @@ export class RelationshipService{
 		private relationshipRepository: Repository<Relationship>,
 	) {}
 	
-	async askRelationship(requester: User, recipient: User): Promise< Relationship | undefined > {
+	async askFriend(requester: User, recipient: User): Promise< Relationship | undefined > {
+		
 		
 		const newRelationship: Relationship = new Relationship();
-
+		
 		newRelationship.recipient = recipient;
 		newRelationship.requester = requester;
 		newRelationship.status = RelationshipStatus.INVITED;
+		
+		// if (this.relationshipRepository.findOne(newRelationship)
+
 
 		return await this.relationshipRepository.save(newRelationship);
 	}
