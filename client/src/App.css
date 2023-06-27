@@ -1,4 +1,9 @@
 
+.game {
+	margin: 10px;
+	border: 2px solid black;
+}
+
 .icon {
 	border: 2px solid #ddd;
 	border-radius: 20%;
@@ -10,7 +15,6 @@
 	width: 100px;
 	margin-right: 20px;
 }
-
 
 .profile_avatar {
 	border: 10px solid #ddd;
@@ -35,7 +39,6 @@
 	background-color: aqua;
 }
 
-
 .loginButton {
 	display: flex;
 	justify-content: center;
@@ -43,3 +46,4 @@
 	align-items: center;
 	background-color: blueviolet;
 }
+

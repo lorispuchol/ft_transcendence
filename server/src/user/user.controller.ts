@@ -1,5 +1,4 @@
-
-import { Body, Controller, Get, Param, Patch, Post, Request } from "@nestjs/common";
+import { Body, Controller, Get, Param, Patch, Request } from "@nestjs/common";
 import { RelationshipService } from "../relationship/relationship.service";
 import { UserService } from "./user.service";
 import { Public } from "src/auth/constants";
@@ -36,6 +35,7 @@ export class UserController {
 	async getAllUsers() {
 		return await this.userService.getAllUsers();
 	}
+  
 	//dev
 	@Public()
 	@Get('create/:login')
