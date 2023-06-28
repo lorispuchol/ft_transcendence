@@ -23,18 +23,18 @@ export default function App() {
 	if (data.status === 401)
 	{
 		return (
-			<>
+			<div className='background_primary w-screen h-screen flex justify-center items-center'>
 				<Routes>
 					<Route path='*' element={<Navigate to='/login' />} />
 					<Route path='/login' element={<LogIn />} />
 				</Routes>
-			</>
+			</div>
 		);
 	}
 	if (data.status !== "OK")
 		return (<ErrorHandling status={data.status} message={data.error} />);
 	return (
-		<>
+		<div className='background_primary w-screen h-screen'>
 			<ResponsiveAppBar />
 			<Routes>
 				<Route path='*' element={<NoRouteFound />} />
@@ -46,7 +46,7 @@ export default function App() {
 				<Route path='/chat' element={<Chat />} />
 				<Route path='/game' element={<Game />} />
 			</Routes>
-		</>
+		</div>
 	);
 }
 
