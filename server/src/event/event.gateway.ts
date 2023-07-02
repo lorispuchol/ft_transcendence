@@ -15,14 +15,15 @@ interface Message {
 }
 
 @WebSocketGateway({
-	 cors: { origin: [client_url] },
+	namespace: "event",
+	cors: { origin: [client_url] },
 })
 export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect{
 	constructor(
 		private jwtService: JwtService
 	) {}
 
-	@WebSocketServer()	wss: Server;
+	@WebSocketServer( )	wss: Server;
 	private messages: Set<Message> = new Set();
 	private users: Map<Socket, string> = new Map();
 
@@ -43,8 +44,8 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 	}
 
 	@SubscribeMessage('getMessages')
-	getMessages() {
-		this.messages.forEach((message) => this.sendMessage(message));
+	getMessages(client: Socket) {
+		this.messages.forEach((message) => this.sendMessage(client, message));
 	}
   
 	@SubscribeMessage('message')
@@ -60,12 +61,12 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 		};
   
 		this.messages.add(message);
-		this.sendMessage(message);
+		this.sendMessage(client, message);
   
 	}
   
-	private sendMessage(message: Message) {
-	  this.wss.sockets.emit('message', message);
+	private sendMessage(client: Socket, message: Message) {
+		client.emit('message', message);
 	}
 
 	// @SubscribeMessage('sendMessage')

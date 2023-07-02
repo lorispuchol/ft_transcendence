@@ -36,7 +36,7 @@ function Messages({ socket }: any) {
        		.sort((a: any, b: any) => a.time - b.time)
         	.map((message: any) => (
         		<div key={message.id}	title={`Sent at ${new Date(message.time).toLocaleTimeString()}`}>
-        			<span className="user">{message.user}:</span>
+        			<span className="user">{"-> " + message.user}:</span>
             		<span className="message">{" " + message.value + " - "}</span>
             		<span className="date">{new Date(message.time).toLocaleTimeString()}</span>
           		</div>
@@ -76,7 +76,7 @@ export default function Chat() {
 				}
 			}
 		};
-		const newSocket = io("http://" + process.env.REACT_APP_SERVER_HOST + ":" + "8080", option);
+		const newSocket = io("http://" + process.env.REACT_APP_SERVER_HOST + ":" + "8080/event", option);
 		setSocket(newSocket);
 		return () => {newSocket.close()};
 	}, [setSocket]);
