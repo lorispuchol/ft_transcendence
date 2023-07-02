@@ -5,7 +5,7 @@ export const client_url = "http://" + process.env.REACT_APP_SERVER_HOST + ":" + 
 
 export async function GetRequest(path: string) {
 	const token = localStorage.getItem("token");
-	//console.log("token: " + token);
+	console.log("token: " + token);
 	let res: any;
 	try { 
 		const response = await axios.get(server_url + path, { headers: { authorization: "Bearer " + token } });
