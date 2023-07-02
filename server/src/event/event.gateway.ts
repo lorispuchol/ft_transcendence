@@ -1,41 +1,86 @@
 
+import { Request } from "@nestjs/common";
+import { JwtService } from "@nestjs/jwt";
 import { MessageBody, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer, WsResponse } from "@nestjs/websockets";
 import { Observable, from, map } from "rxjs";
 import { Server, Socket } from "socket.io";
 import { client_url } from "src/auth/constants";
+import { v4 as uuidv4 } from 'uuid';
 
-@WebSocketGateway(8181, {
-	cors: { origin: [client_url] },
+interface Message {
+	id: string;
+	user: string;
+	value: string;
+	time: number;
+}
+
+@WebSocketGateway({
+	 cors: { origin: [client_url] },
 })
 export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect{
+	constructor(
+		private jwtService: JwtService
+	) {}
 
 	@WebSocketServer()	wss: Server;
+	private messages: Set<Message> = new Set();
+	private users: Map<Socket, string> = new Map();
 
 	afterInit(server: Server) {
 		console.log('Initialized');
 	}
 
 	handleConnection(client: Socket, ...args: any[]) {
-		console.log('client disconneted: ' + client.id);
+		const decoded: any = this.jwtService.decode(<string>client.handshake.headers.token);
+		const login = decoded.login;
+		this.users.set(client, login);
+		console.log('client conneted: ' + client.id);
 	}
 
 	handleDisconnect(client: Socket) {
+		this.users.delete(client);
 		console.log('client disconnect: ' + client.id);
 	}
 
-	@SubscribeMessage('sendMessage')
-	async handleSendmessage(client: Socket, payload: string): Promise<void> {
-		console.log(payload);
-		this.wss.emit('receiveMessage', payload);
+	@SubscribeMessage('getMessages')
+	getMessages() {
+		this.messages.forEach((message) => this.sendMessage(message));
+	}
+  
+	@SubscribeMessage('message')
+	handleMessage(client: Socket, value: string) {
+
+		const user = this.users.get(client);
+		console.log(user + " sended message");
+		const message: Message = {
+			id: uuidv4(),
+			user,
+			value,
+			time: Date.now(),
+		};
+  
+		this.messages.add(message);
+		this.sendMessage(message);
+  
+	}
+  
+	private sendMessage(message: Message) {
+	  this.wss.sockets.emit('message', message);
 	}
 
-	@SubscribeMessage('event')
-	findAll(@MessageBody() data: any): Observable<WsResponse<number>> {
-		return from([1, 2, 3]).pipe(map((item) => ({event: 'events', data: item})));
-	}
+	// @SubscribeMessage('sendMessage')
+	// async handleSendmessage(client: Socket, payload: string): Promise<void> {
+	// 	console.log(payload);
+	// 	this.wss.emit('receiveMessage', payload);
+	// }
 
-	@SubscribeMessage('identity')
-	async identity(@MessageBody() data: number): Promise<number> {
-		return data;
-	}
+	// @SubscribeMessage('event')
+	// findAll(@MessageBody() data: any): Observable<WsResponse<number>> {
+	// 	return from([1, 2, 3]).pipe(map((item) => ({event: 'events', data: item})));
+	// }
+
+	// @SubscribeMessage('identity')
+	// async identity(@MessageBody() data: number): Promise<number> {
+	// 	return data;
+	// }
 }
