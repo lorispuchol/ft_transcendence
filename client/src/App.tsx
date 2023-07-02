@@ -2,16 +2,17 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import './App.css'
 import Home from './home/Home';
 import Profile, { RedirectToOwnProfile } from './user/Profile';
-import LogIn from './user/LogIn';
+import LogIn from './pages/LogIn/LogIn';
 import NoRouteFound from './NoRouteFound';
 import { useEffect, useState } from 'react';
 import { GetRequest } from './utils/Request';
 import ErrorHandling from './utils/Error';
 import Loading from './utils/Loading';
-import ResponsiveAppBar from './home/NavBar';
+// import ResponsiveAppBar from './navbar/NavBar';
 import Chat from './chat/Chat';
 import Everyone from './user/Everyone';
 import Game from './game/Game';
+import { RootLayout } from './navbar/RootLayout';
 
 export default function App() {
 	const [data, setData]: [any, any] = useState({status: "loading"});
@@ -35,7 +36,7 @@ export default function App() {
 		return (<ErrorHandling status={data.status} message={data.error} />);
 	return (
 		<div className='background_primary w-screen h-screen'>
-			<ResponsiveAppBar />
+			<RootLayout />
 			<Routes>
 				<Route path='*' element={<NoRouteFound />} />
 				<Route path='/' element={<Home />} />
