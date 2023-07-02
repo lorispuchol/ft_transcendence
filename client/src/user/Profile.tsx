@@ -14,6 +14,7 @@ export function RedirectToOwnProfile() {
 		return (<Loading />);
 	if (response.status !== "OK")
 		return (<ErrorHandling status={response.status} message={response.error} />);
+	console.log(response)
 	return (<Navigate to={"/profile/" + response.data.username} />)
 }
 
