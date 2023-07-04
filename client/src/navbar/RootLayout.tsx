@@ -20,10 +20,10 @@ export const RootLayout = () => {
 				<div className='font-poppins items-center'>EL PONGO</div>
 				<nav className='flex items-center flex-wrap'>
 					{pages.map((page) => (
-						<NavLink key={page[0]} className={select === page[0] ? 'font-poppins items-center mr-3 text-main-c rounded' : 'font-poppins items-center mr-3 nav_button transition-all duration-200 hover:opacity-60 hover:scale-110'} onClick={() => hanldeClick(page[0])} to={page[1]}>{page[0]}</NavLink>
+						<NavLink key={page[0]} className={select === page[0] ? 'font-poppins items-center mr-3 text-main-c scale-110' : 'font-poppins items-center mr-3 nav_button transition-all duration-200 hover:opacity-60 hover:scale-110'} onClick={() => hanldeClick(page[0])} to={page[1]}>{page[0]}</NavLink>
 					))}
 					<NavLink to={'/profile'} onClick={() => hanldeClick("profile")}>
-						<Avatar className={select === "profile" ? 'font-poppins items-center mr-3 rounded-full border border-2 border-main-c' : 'font-poppins items-center mr-3 nav_button transition-all duration-300 hover:opacity-60 hover:scale-110'}  src={defaultAvatar} alt="Lemy Sharp"></Avatar>
+						<Avatar className={select === "profile" ? 'font-poppins items-center mr-3 rounded-full border border-2 border-main-c scale-110' : 'font-poppins items-center mr-3 nav_button transition-all duration-300 hover:opacity-60 hover:scale-110'}  src={defaultAvatar} alt="Lemy Sharp"></Avatar>
 					</NavLink>
 				</nav>
 			</header>
