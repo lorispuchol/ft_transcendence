@@ -8,12 +8,14 @@ import { AuthModule } from '../auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGard } from '../auth/auth.guard';
 import { RelationshipModule } from '../relationship/relationship.module';
+import { EventModule } from 'src/event/event.module';
 
 @Module({
 	imports: [
 		ConfigModule.forRoot({isGlobal: true}),
 		TypeOrmModule.forRootAsync(typeOrmConfig),
 		AuthModule,
+		EventModule,
 		RelationshipModule
 	],
 	controllers: [AppController],
