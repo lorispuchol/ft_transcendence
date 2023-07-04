@@ -2,7 +2,7 @@ import { Navigate, useParams } from "react-router-dom";
 import { GetRequest } from "../utils/Request";
 import { useEffect, useState } from "react";
 import ErrorHandling from "../utils/Error";
-import NoRouteFound from "../NoRouteFound";
+import NoRouteFound from "../pages/Error/NoRouteFound";
 import Loading from "../utils/Loading";
 
 export function RedirectToOwnProfile() {

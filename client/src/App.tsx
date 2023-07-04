@@ -3,7 +3,7 @@ import './App.css'
 import Home from './home/Home';
 import Profile, { RedirectToOwnProfile } from './user/Profile';
 import LogIn from './pages/LogIn/LogIn';
-import NoRouteFound from './NoRouteFound';
+import NoRouteFound from './pages/Error/NoRouteFound';
 import { useEffect, useState } from 'react';
 import { GetRequest } from './utils/Request';
 import ErrorHandling from './utils/Error';
@@ -12,6 +12,7 @@ import Loading from './utils/Loading';
 import Chat from './chat/Chat';
 import Everyone from './user/Everyone';
 import Game from './game/Game';
+import Loader from './pages/Loading/Loader'
 import { RootLayout } from './navbar/RootLayout';
 
 export default function App() {
@@ -46,6 +47,7 @@ export default function App() {
 				<Route path='/login' element={<Navigate to='/' />} />
 				<Route path='/chat' element={<Chat />} />
 				<Route path='/game' element={<Game />} />
+				<Route path='/loader' element={<Loader />} />
 			</Routes>
 		</div>
 	);

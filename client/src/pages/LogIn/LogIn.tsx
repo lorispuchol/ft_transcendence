@@ -19,7 +19,7 @@ export default function LogIn() {
 			<div className="flex justify-center">
 				<button className="flex justify-center text-2xl rounded ring ring-black w-24 mb-8">
 					<div className="button_login hover:opacity-60 rounded w-24 transition-opacity duration-300">
-						<a className="font-poppins font-bold" href={server_url + "/auth/"} >LOG IN</a>
+						<a className="font-poppins" href={server_url + "/auth/"} >LOG IN</a>
 					</div>
 				</button>
 			</div>
