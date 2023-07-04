@@ -35,7 +35,7 @@ export default function App() {
 	if (data.status !== "OK")
 		return (<ErrorHandling status={data.status} message={data.error} />);
 	return (
-		<div className='background_primary w-screen h-screen'>
+		<div className='background_primary w-screen h-screen px-5 py-5 flex-wrap'>
 			<RootLayout />
 			<Routes>
 				<Route path='*' element={<NoRouteFound />} />
