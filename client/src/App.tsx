@@ -8,12 +8,11 @@ import { useEffect, useState } from 'react';
 import { GetRequest } from './utils/Request';
 import ErrorHandling from './utils/Error';
 import Loading from './utils/Loading';
-// import ResponsiveAppBar from './navbar/NavBar';
 import Chat from './chat/Chat';
 import Everyone from './user/Everyone';
 import Game from './game/Game';
-import Loader from './pages/Loading/Loader'
-import { RootLayout } from './navbar/RootLayout';
+import Loader from './components/Loading/Loader'
+import { NavBar } from './components/navbar/NavBar';
 
 export default function App() {
 	const [data, setData]: [any, any] = useState({status: "loading"});
@@ -37,7 +36,7 @@ export default function App() {
 		return (<ErrorHandling status={data.status} message={data.error} />);
 	return (
 		<div className='background_primary w-screen h-screen px-5 py-5 flex-wrap'>
-			<RootLayout />
+			<NavBar />
 			<Routes>
 				<Route path='*' element={<NoRouteFound />} />
 				<Route path='/' element={<Home />} />
