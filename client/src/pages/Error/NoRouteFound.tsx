@@ -1,12 +1,18 @@
 import { Link } from "react-router-dom";
+import './Error.scss'
 
 export default function NoRouteFound() {
 	return (
-		<>
-			<strong>404 error </strong>
-			<Link to="/">
-				<button>go back to main page</button>
-			</Link>
-		</>
+		<div className='centered'>
+			<div className="flex flex-col flex-wrap justify-center justify-items-center items-center place-content-center">
+				<div className='text-9xl'>404</div>
+				<div className='mb-8 text-2xl'>PAGE NOT FOUND</div>
+				<div>
+						<Link to="/">
+							<div className="rounded border border-black bg-white">GO BACK TO HOMEPAGE</div>
+						</Link>
+				</div>
+			</div>
+		</div>
 	);
 }
