@@ -12,6 +12,11 @@ $primary_color: #fad390;
 	font-family: 'Poppins';
 }
 
+.nav_bar_img {
+	border-radius: 0.25rem; /* 4px */
+	width: 128px;
+}
+
 .nav_bar_link {
 	display: flex;
 	align-items: center;

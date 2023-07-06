@@ -12,7 +12,7 @@ import Chat from './chat/Chat';
 import Everyone from './user/Everyone';
 import Game from './game/Game';
 import Loader from './components/Loading/Loader'
-import { NavBar } from './components/navbar/NavBar';
+import { NavBar } from './components/NavBar/NavBar';
 
 export default function App() {
 	const [data, setData]: [any, any] = useState({status: "loading"});

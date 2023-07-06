@@ -2,6 +2,8 @@ import { useSearchParams } from "react-router-dom";
 import { client_url, server_url } from "../../utils/Request";
 import Loading from "../../utils/Loading";
 import './LogIn.scss'
+import '../../fonts/Poppins/Poppins-Regular.ttf';
+
 
 export default function LogIn() {
 	const [searchParams] = useSearchParams();
