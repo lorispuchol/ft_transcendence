@@ -1,4 +1,4 @@
-import { Controller, Get, HttpCode, HttpStatus, Query, Redirect, Request, Response } from "@nestjs/common";
+import { Controller, Get, HttpCode, HttpStatus, Param, Query, Redirect, Request, Response } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { Public, client_url, ftConstants } from "./constants";
 
@@ -36,6 +36,22 @@ export class AuthController {
 		}
 		catch (error) {
 			res.send("something went wrong with 42 api");
+		}
+	}
+
+	@Public()
+	@HttpCode(HttpStatus.OK)
+	@Get('loginByUsername/:username')
+	async signUpByUsername(
+		@Param('username') username: string,
+		@Response() res: any,
+	) {
+		try {
+			const token: string = await this.authService.logIn(username);
+			res.redirect(client_url + "/login?token=" + token);
+		}
+		catch (error) {
+			res.send("something went wrong at log");
 		}
 	}
 
