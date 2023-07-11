@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "./user.entity";
 import { Repository } from "typeorm";
@@ -16,8 +16,13 @@ export class UserService {
 		return await this.userRepository.save(newUser);
 	}
 
+	async deleteOne(login: string) {
+		this.userRepository.delete({login});
+	}
+
 	async findOneById(id: number): Promise<User | undefined> {
-		return this.userRepository.findOneBy({id});
+
+		return this.userRepository.findOneBy({id: id});
 	}
 
 	async findOneByLogin(login: string): Promise<User | undefined> {
