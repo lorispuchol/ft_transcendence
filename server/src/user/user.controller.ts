@@ -43,11 +43,18 @@ export class UserController {
 		return this.userService.createOne(login);
 	}
 
+	//dev
+	@Public()
+	@Get('delete/:login')
+	deleteFakeUser(@Param('login') login: string) {
+		this.userService.deleteOne(login);
+		return `User ${login} deleted`;
+	}
+
 	@Get(':username')
 	async getUserData(
 		@Param('username') username: string
 		) {
 			return await this.userService.findOneByUsername(username);
 	}
-
 }

@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn, OneToMany, BaseEntity } from "typeorm";
 import { Relationship } from "../relationship/relationship.entity";
 
 export enum UserStatus {
@@ -8,7 +8,7 @@ export enum UserStatus {
 }
 
 @Entity()
-export class User {
+export class User extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id: number;
 

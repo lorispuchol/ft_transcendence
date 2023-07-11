@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, Param, Patch, Request } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Request } from "@nestjs/common";
 import { UserService } from "src/user/user.service";
 import { RelationshipService } from "./relationship.service";
 import { Public } from "src/auth/constants";
@@ -17,6 +17,18 @@ export class RelationshipController {
 		return await this.relationshipService.getAllRelationship();
 	}
 
+	//dev 
+	@Delete('delete/') 
+	async deleteRelation(
+		@Request() req: any,
+		@Body('login') login: string
+		) {
+			return (this.relationshipService.delete(
+				await this.userService.findOneById(req.user.id),
+				await this.userService.findOneByLogin(login)
+			));
+	}
+
 	@Get('ask/:recipient')
 	async askFriend(
 		@Request() req: any,
@@ -31,16 +43,10 @@ export class RelationshipController {
 	async acceptFriend(
 		@Request() req: any,
 		@Param('recipient') recipient: string ) {
-			
 	}
 
 	@Get('block/:recipient')
 	blockSomeone() {
-
-	}
-
-	@Delete('deleteRelation') 
-	deleteRelation() {
 
 	}
 }
