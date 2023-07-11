@@ -1,4 +1,3 @@
-
 .game {
 	margin: 10px;
 	border: 2px solid black;
@@ -26,24 +25,3 @@
 	margin-right: auto;
 	width: 50%;
 }
-
-.buttonWrapper {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 100%;
-	height: 100%;
-	position: fixed;
-	top: 0;
-	left: 0;
-	background-color: aqua;
-}
-
-.loginButton {
-	display: flex;
-	justify-content: center;
-	color:#3fa54bed;
-	align-items: center;
-	background-color: blueviolet;
-}
-

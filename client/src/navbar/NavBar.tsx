@@ -17,7 +17,7 @@ import { useNavigate } from 'react-router-dom';
 const theme = createTheme({
 	palette: {
 		primary: {
-			main: '#7eb137',
+			main: '#5f1eb3',
 		},
 	},
 });
