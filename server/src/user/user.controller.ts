@@ -16,8 +16,7 @@ export class UserController {
 	async getMeData(
 		@Request() req: any
 		) {
-		// console.log("me " + req.login)
-		return await this.userService.findOneByUsername(req.username);
+		return await this.userService.findOneByUsername(req.user.login);
 	}
 
 	@Patch('username')
