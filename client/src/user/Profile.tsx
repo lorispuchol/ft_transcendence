@@ -25,7 +25,7 @@ export default function Profile() {
 	const [response, setResponse]: [any, any] = useState({status: "loading"});
 	useEffect(() => {
 			GetRequest("/user/" + param.username).then((response) => setResponse(response));
-	}, []);
+	}, [param.username]);
 	if (response.status === "loading")
 		return (<Loading />);
 	if (response.status !== "OK")

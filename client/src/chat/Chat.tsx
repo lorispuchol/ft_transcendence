@@ -1,5 +1,4 @@
-import { Socket, io } from "socket.io-client";
-import { GetRequest, server_url } from "../utils/Request";
+import { io } from "socket.io-client";
 import { useEffect, useState } from "react";
 
 function Messages({ socket }: any) {
@@ -76,7 +75,7 @@ export default function Chat() {
 				}
 			}
 		};
-		const newSocket = io("http://" + process.env.REACT_APP_SERVER_HOST + ":" + "8080/event", option);
+		const newSocket = io("http://" + process.env.REACT_APP_SERVER_HOST + ":8080/event", option);
 		setSocket(newSocket);
 		return () => {newSocket.close()};
 	}, [setSocket]);
@@ -96,10 +95,4 @@ export default function Chat() {
 		  )}
 		</div>
 	  );
-
-	return (
-		<>
-			chat
-		</>
-	);
 }
