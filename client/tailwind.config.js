@@ -5,10 +5,10 @@ module.exports = {
 	  ],
   theme: {
     extend: {
-		fontFamily: {
-			'poppins': ['Poppins', 'sans-serif'],
-			'agdasima': ['Agdasima', 'sans-serif']
-		}
+		colors: {
+			'main-c': '#fad390',
+			'second-c': '#786fa6'
+		},
 	},
   },
   plugins: [],

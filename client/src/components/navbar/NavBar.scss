@@ -1,0 +1,134 @@
+$primary_color: #fad390;
+
+.nav_bar {
+	background-color: white;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 20px;
+	box-shadow: 0 0 0 0.100rem $primary_color;
+	border-radius: 0.25rem; /* 4px */
+	flex-wrap: wrap;
+	font-family: 'Poppins';
+}
+
+.nav_bar_img {
+	border-radius: 0.25rem; /* 4px */
+	width: 128px;
+	margin-right: 12px;
+}
+
+.title {
+	margin-right: 12px;
+}
+
+.nav_bar_link {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+}
+
+.nav_bar_link_a {
+	color: $primary_color;
+	margin-right: 12px;
+	transition-property: all;
+	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+	transition-duration: 300ms;
+}
+
+.nav_bar_link_p {
+	margin-right: 12px;
+	transition-property: all;
+	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+	transition-duration: 300ms;
+}
+
+.nav_bar_link_p:hover {
+	opacity: 0.6;
+	scale: (1.1);
+	transition-property: all;
+	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+	transition-duration: 300ms;
+}
+
+.nav_bar_avatar_a {
+	scale: (1.1);
+	border-color: $primary_color;
+	border-width: 2px;
+	border-radius: 9999px;
+	margin-right: 12px;
+	transition-property: all;
+	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+	transition-duration: 300ms;
+}
+
+.nav_bar_avatar_p {
+	margin-right: 12px;
+	transition-property: all;
+	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+	transition-duration: 300ms;
+}
+
+.nav_bar_avatar_p:hover {
+	opacity: 0.6;
+	scale: (1.1);
+	transition-property: all;
+	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+	transition-duration: 300ms;
+}
+
+.menu_btn {
+	display: none;
+	max-width: 48px;
+	margin-right: 12px;
+}
+
+@media screen and (max-width: 586px) {
+	.title {
+		display: none;
+	}
+	.menu_btn {
+		display: block;
+		filter: blur(0);
+	}
+	.nav_bar_link {
+		display: flex;
+		position: absolute;
+		top: 0;
+		left: 0;
+		flex-direction: column;
+		background-color: rgba(255, 255, 255, 0.20);
+		backdrop-filter: blur(4px);
+		width: 100%;
+		height: 100%;
+		justify-content: center;
+		// margin-top: -150%;
+		opacity: 0;
+		transition-property: all;
+		transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+		transition-duration: 500ms;
+	}
+	.nav_bar_link_p {
+		margin-top: 8px;
+		font-size: 2em;
+	}
+	.nav_bar_link_a {
+		margin-top: 8px;
+		font-size: 2em;
+		color: black; // Suppr
+	}
+	.nav_bar_avatar_p {
+		margin-top: 8px;
+		font-size: 2em;
+		display: none;
+	}
+	.nav_bar_avatar_a {
+		margin-top: 8px;
+		font-size: 2em;
+		display: none;
+	}
+}
+
+.mobile_menu {
+	opacity: 100;
+}

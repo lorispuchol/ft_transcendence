@@ -1,4 +1,3 @@
-import { Navigate } from "react-router-dom";
 import { client_url } from "./Request";
 
 export default function ErrorHandling(params: any)
