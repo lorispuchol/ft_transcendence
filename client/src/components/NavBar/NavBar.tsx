@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import './NavBar.scss'
 import { useState } from 'react';
 
@@ -9,11 +9,10 @@ import { defaultAvatar } from '../../user/Profile';
 
 export const NavBar = () => {
 	const pages = [['GAMING', '/game'], ['EVERYONE', '/everyone'], ['CHAT', '/chat'], ['404', '/ratio']];
-	const [select, setSelect]: [string, any] = useState("");
-	// const [open, setOpen]: [number, any] = useState(0);
+	const [select, setSelect]: [string, any] = useState(useLocation().pathname);
 
-	function hanldeClick(name: string) {
-		setSelect(name);
+	function hanldeClick(path: string) {
+		setSelect(path);
 	}
 
 	function openMenu() {
@@ -33,7 +32,7 @@ export const NavBar = () => {
 				<div className='title'>EL PONGO</div>
 				<nav className='nav_bar_link'>
 					{pages.map((page) => (
-						<NavLink key={page[0]} className={select === page[0] ? 'nav_bar_link_a' : 'nav_bar_link_p'} onClick={() => hanldeClick(page[0])} to={page[1]}>{page[0]}</NavLink>
+						<NavLink key={page[0]} className={select === page[1] ? 'nav_bar_link_a' : 'nav_bar_link_p'} onClick={() => hanldeClick(page[1])} to={page[1]}>{page[0]}</NavLink>
 					))}
 					<NavLink to={'/profile'} onClick={() => hanldeClick("profile")}>
 						<Avatar className={select === "profile" ? 'nav_bar_avatar_a' : 'nav_bar_avatar_p'}  src={defaultAvatar} alt="TEST"></Avatar>

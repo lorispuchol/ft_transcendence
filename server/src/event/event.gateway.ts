@@ -61,7 +61,8 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 		};
   
 		this.messages.add(message);
-		this.sendMessage(client, message);
+		this.users.forEach((login, socket) => socket.emit('message', message));
+		//this.sendMessage(client, message);
   
 	}
   
