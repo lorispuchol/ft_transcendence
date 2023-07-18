@@ -17,7 +17,11 @@ export class UserService {
 	}
 
 	async deleteOne(login: string) {
+		if (! await this.findOneByLogin(login)) {
+			return `Error: User ${login} doesn't exist`
+		}
 		this.userRepository.delete({login});
+		return `User ${login} deleted`;
 	}
 
 	async findOneById(id: number): Promise<User | undefined> {
@@ -30,6 +34,7 @@ export class UserService {
 	}
 
 	async findOneByUsername(username: string): Promise<User | undefined> {
+		// console.log("find " + username)
 		return this.userRepository.findOneBy({username});
 	}
 

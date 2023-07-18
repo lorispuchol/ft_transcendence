@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Request } from "@nestjs/common";
+import { Body, Controller, Get, Logger, Param, Patch, Request } from "@nestjs/common";
 import { RelationshipService } from "../relationship/relationship.service";
 import { UserService } from "./user.service";
 import { Public } from "src/auth/constants";
@@ -11,11 +11,12 @@ export class UserController {
 		private userService: UserService
 	) {}
 	
-	
+	@Public()
 	@Get('me')
 	async getMeData(
 		@Request() req: any
 		) {
+		// console.log("me " + req.login)
 		return await this.userService.findOneByUsername(req.username);
 	}
 
@@ -47,8 +48,7 @@ export class UserController {
 	@Public()
 	@Get('delete/:login')
 	deleteFakeUser(@Param('login') login: string) {
-		this.userService.deleteOne(login);
-		return `User ${login} deleted`;
+		return this.userService.deleteOne(login);
 	}
 
 	@Get(':username')

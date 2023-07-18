@@ -17,23 +17,22 @@ export class RelationshipController {
 		return await this.relationshipService.getAllRelationship();
 	}
 
-	//dev 
-	@Delete('delete/') 
-	async deleteRelation(
+	@Delete('removeFriend/:recipient') 
+	async removeFriend(
 		@Request() req: any,
-		@Body('login') login: string
+		@Param('recipient') recipient: string
 		) {
-			return (this.relationshipService.delete(
+			return (this.relationshipService.removeFriend(
 				await this.userService.findOneById(req.user.id),
-				await this.userService.findOneByLogin(login)
+				await this.userService.findOneByLogin(recipient)
 			));
 	}
-
+	
 	@Get('ask/:recipient')
 	async askFriend(
 		@Request() req: any,
 		@Param('recipient') recipient: string ) {
-			return this.relationshipService.askFriend (
+			return this.relationshipService.ask (
 				await this.userService.findOneById(req.user.id),
 				await this.userService.findOneByUsername(recipient)
 			)
@@ -42,11 +41,41 @@ export class RelationshipController {
 	@Patch('accept/:user')
 	async acceptFriend(
 		@Request() req: any,
-		@Param('recipient') recipient: string ) {
+		@Param('user') user: string ) {
+			return this.relationshipService.accept (
+				await this.userService.findOneById(req.user.id),
+				await this.userService.findOneByUsername(user)
+			)
+	}
+
+	@Delete('refuse/:user')
+	async refuseFriend(
+		@Request() req: any,
+		@Param('user') user: string ) {
+			return this.relationshipService.refuse (
+				await this.userService.findOneById(req.user.id),
+				await this.userService.findOneByUsername(user)
+			)
+	}
+
+	@Delete('unblock/:recipient') 
+	async unblockRelation(
+		@Request() req: any,
+		@Param('recipient') recipient: string
+		) {
+			return (this.relationshipService.unblock(
+				await this.userService.findOneById(req.user.id),
+				await this.userService.findOneByLogin(recipient)
+			));
 	}
 
 	@Get('block/:recipient')
-	blockSomeone() {
-
+	async blockSomeone( 
+		@Request() req: any,
+		@Param('recipient') recipient: string ) {
+			return this.relationshipService.block (
+				await this.userService.findOneById(req.user.id),
+				await this.userService.findOneByUsername(recipient)
+			)
 	}
 }
