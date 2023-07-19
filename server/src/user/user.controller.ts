@@ -29,7 +29,7 @@ export class UserController {
 		return {status: status, user: user};
 	}
 
-  // dev
+	//dev
 	@Public()
 	@Get('all')
 	async getAllUsers() {
