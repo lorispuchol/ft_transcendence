@@ -11,7 +11,7 @@ export class UserController {
 		private userService: UserService
 	) {}
 	
-	@Public()
+
 	@Get('me')
 	async getMeData(
 		@Request() req: any

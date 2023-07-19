@@ -27,19 +27,30 @@ export class RelationshipController {
 				await this.userService.findOneByLogin(recipient)
 			));
 	}
+
+	@Delete('removeInvitation/:recipient') 
+	async removeInvitation(
+		@Request() req: any,
+		@Param('recipient') recipient: string
+		) {
+			return (this.relationshipService.removeInvitation(
+				await this.userService.findOneById(req.user.id),
+				await this.userService.findOneByLogin(recipient)
+			));
+	}
 	
-	@Get('ask/:recipient')
-	async askFriend(
+	@Get('invite/:recipient')
+	async inviteSomeone(
 		@Request() req: any,
 		@Param('recipient') recipient: string ) {
-			return this.relationshipService.ask (
+			return this.relationshipService.invite (
 				await this.userService.findOneById(req.user.id),
 				await this.userService.findOneByUsername(recipient)
 			)
 	}
 
 	@Patch('accept/:user')
-	async acceptFriend(
+	async acceptInvitation(
 		@Request() req: any,
 		@Param('user') user: string ) {
 			return this.relationshipService.accept (
@@ -49,7 +60,7 @@ export class RelationshipController {
 	}
 
 	@Delete('refuse/:user')
-	async refuseFriend(
+	async refuseInvitation(
 		@Request() req: any,
 		@Param('user') user: string ) {
 			return this.relationshipService.refuse (
@@ -59,7 +70,7 @@ export class RelationshipController {
 	}
 
 	@Delete('unblock/:recipient') 
-	async unblockRelation(
+	async unblockSomeone(
 		@Request() req: any,
 		@Param('recipient') recipient: string
 		) {

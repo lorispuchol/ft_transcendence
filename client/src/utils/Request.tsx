@@ -35,3 +35,35 @@ export async function PostRequest(path: string, data: JSON) {
 	}
 	return (res);
 }
+
+export async function PatchRequest(path: string, data: JSON) {
+	const token = localStorage.getItem("token");
+	let res: any;
+	try { 
+		const response = await axios.patch(server_url + path, data, { headers: { authorization: "Bearer " + token } });
+		res = { status: "OK", data: response.data };
+	}
+	catch (error: any) {
+		if (error.code === "ERR_NETWORK")
+			res = { status: "ERR_NETWORK", error: error.message };
+		else
+			res = { status: error.response.status, error: error.message };
+	}
+	return (res);
+}
+
+export async function DeleteRequest(path: string, data: JSON) {
+	const token = localStorage.getItem("token");
+	let res: any;
+	try { 
+		const response = await axios.delete(server_url + path, { headers: { authorization: "Bearer " + token } });
+		res = { status: "OK", data: response.data };
+	}
+	catch (error: any) {
+		if (error.code === "ERR_NETWORK")
+			res = { status: "ERR_NETWORK", error: error.message };
+		else
+			res = { status: error.response.status, error: error.message };
+	}
+	return (res);
+}

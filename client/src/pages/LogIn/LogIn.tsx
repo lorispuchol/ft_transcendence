@@ -8,7 +8,7 @@ import { ChangeEvent, useState } from "react";
 
 export default function LogIn() {
 
-	const [username, setUsername] = useState('username')
+	const [username, setUsername] = useState('')
 
 
 	const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -29,11 +29,24 @@ export default function LogIn() {
 		window.location.href=url;
 	}
 
+	function clickSend(e: any) {
+		e.preventDefault();
+		const url = server_url + "/auth/LoginByUsername/" + username;
+		window.location.href=url;
+	}
+
 	return (
 		<div className="box_login background_box_login">
 			<div className="title_box">EL PONGO</div>
 			<div className="button_box">
-				<button className="button_login active:scale-110" onClick={clickButton}>LOG IN</button>
+				<button className="button_login active:scale-110" onClick={clickButton}>LOG IN WITH 42</button>
+			</div>
+			<div className="text_box">Or by username</div>
+			<div className="button_box">
+				<form className="form_box" onSubmit={clickSend}>
+					<input className="input_box" type="text"  value={username} placeholder="username" onChange={handleChange} />
+				</form>
+				<button className="button_send active:scale-110" onClick={clickSend}>SEND</button>
 			</div>
 		</div>
 	);
