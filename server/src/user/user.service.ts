@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "./user.entity";
 import { Repository } from "typeorm";
@@ -16,8 +16,17 @@ export class UserService {
 		return await this.userRepository.save(newUser);
 	}
 
+	async deleteOne(login: string) {
+		if (! await this.findOneByLogin(login)) {
+			return `Error: User ${login} doesn't exist`
+		}
+		this.userRepository.delete({login});
+		return `User ${login} deleted`;
+	}
+
 	async findOneById(id: number): Promise<User | undefined> {
-		return this.userRepository.findOneBy({id});
+
+		return this.userRepository.findOneBy({id: id});
 	}
 
 	async findOneByLogin(login: string): Promise<User | undefined> {
@@ -25,6 +34,7 @@ export class UserService {
 	}
 
 	async findOneByUsername(username: string): Promise<User | undefined> {
+		// console.log("find " + username)
 		return this.userRepository.findOneBy({username});
 	}
 
