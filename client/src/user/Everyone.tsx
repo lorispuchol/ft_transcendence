@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { GetRequest } from "../utils/Request";
 import Loading from "../utils/Loading";
 import ErrorHandling from "../utils/Error";
+import EventList from "../components/event/EventList";
 
 export default function Everyone()
 {
@@ -20,8 +21,9 @@ export default function Everyone()
 			<ul>
 				{users.map((user: any) => (
 					<li key={user.id} >{user.login}</li>
-				))}
+					))}
 			</ul>
+			<EventList />
 		</>
 	);
 }
