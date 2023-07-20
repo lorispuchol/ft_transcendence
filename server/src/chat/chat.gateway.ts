@@ -1,6 +1,6 @@
 
 import { JwtService } from "@nestjs/jwt";
-import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
+import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 import { client_url } from "src/auth/constants";
 import { v4 as uuidv4 } from 'uuid';
@@ -21,7 +21,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		private jwtService: JwtService
 	) {}
 
-	@WebSocketServer( )	wss: Server;
 	private messages: Set<Message> = new Set();
 	private users: Map<Socket, string> = new Map();
 

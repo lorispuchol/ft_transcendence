@@ -4,7 +4,7 @@ import Loading from "../../utils/Loading";
 import './LogIn.scss'
 import '../../fonts/Poppins/Poppins-Regular.ttf';
 
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 
 export default function LogIn() {
 
@@ -29,7 +29,7 @@ export default function LogIn() {
 		window.location.href=url;
 	}
 
-	function clickSend(e: any) {
+	function clickSend(e: FormEvent) {
 		e.preventDefault();
 		const url = server_url + "/auth/LoginByUsername/" + username;
 		window.location.href=url;

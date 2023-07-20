@@ -5,8 +5,22 @@ import ErrorHandling from "../utils/Error";
 import NoRouteFound from "../pages/Error/NoRouteFound";
 import Loading from "../utils/Loading";
 
+interface UserData {
+	avatar: string,
+	login: string,
+	username: string,
+	nb_victory: number,
+	nb_defeat: number,
+}
+
+interface Response {
+	status: string,
+	data?: UserData,
+	error?: string,
+}
+
 export function RedirectToOwnProfile() {
-	const [response, setResponse]: [any, any] = useState({status: "loading"});
+	const [response, setResponse]: [Response, Function] = useState({status: "loading"});
 	useEffect(() => {
 			GetRequest("/user/me").then((response) => setResponse(response));
 	}, []);
@@ -14,7 +28,7 @@ export function RedirectToOwnProfile() {
 		return (<Loading />);
 	if (response.status !== "OK")
 		return (<ErrorHandling status={response.status} message={response.error} />);
-	return (<Navigate to={"/profile/" + response.data.username} />)
+	return (<Navigate to={"/profile/" + response.data?.username} />);
 }
 
 export const defaultAvatar = "https://cdn.intra.42.fr/users/292c41c82eeb97e81e28e35d25405eb8/kmammeri.jpg";
@@ -22,7 +36,7 @@ export const defaultAvatar = "https://cdn.intra.42.fr/users/292c41c82eeb97e81e28
 export default function Profile() {
 	const param = useParams();
 
-	const [response, setResponse]: [any, any] = useState({status: "loading"});
+	const [response, setResponse]: [Response, Function] = useState({status: "loading"});
 	useEffect(() => {
 			GetRequest("/user/" + param.username).then((response) => setResponse(response));
 	}, [param.username]);
@@ -30,7 +44,7 @@ export default function Profile() {
 		return (<Loading />);
 	if (response.status !== "OK")
 		return (<ErrorHandling status={response.status} message={response.error} />);
-	if (!response.data.username)
+	if (!response.data?.username)
 		return (<NoRouteFound />)
 	const profile = {
 		avatar: response.data.avatar? response.data.avatar : defaultAvatar,

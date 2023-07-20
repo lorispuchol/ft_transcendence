@@ -9,7 +9,7 @@ import { defaultAvatar } from '../../user/Profile';
 
 export const NavBar = () => {
 	const pages = [['GAMING', '/game'], ['EVERYONE', '/everyone'], ['CHAT', '/chat'], ['404', '/ratio']];
-	const [select, setSelect]: [string, any] = useState(useLocation().pathname);
+	const [select, setSelect]: [string, Function] = useState(useLocation().pathname);
 
 	function hanldeClick(path: string) {
 		setSelect(path);

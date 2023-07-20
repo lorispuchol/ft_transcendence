@@ -2,6 +2,12 @@ import { JwtService } from "@nestjs/jwt";
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 import { client_url } from "src/auth/constants";
+import { RelationshipService } from "src/relationship/relationship.service";
+
+interface Event {
+	type: string,
+	sender: string,
+}
 
 @WebSocketGateway({
 	namespace: "event",
@@ -9,10 +15,10 @@ import { client_url } from "src/auth/constants";
 })
 export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 	constructor(
-		private jwtService: JwtService
+		private jwtService: JwtService,
+		private relationshipService: RelationshipService,
 	) {}
 	
-	@WebSocketServer() wss: Server;
 	private users: Map<Socket, string> = new Map();
 
 	afterInit(server: Server) {}
@@ -20,21 +26,27 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 	handleConnection(client: Socket, ...args: any[]) {
 		const decoded: any = this.jwtService.decode(<string>client.handshake.headers.token);
 		this.users.set(client, decoded.login);
-		//console.log(decoded.login + ' connected to event');
 	}
 
 	handleDisconnect(client: Socket) {
 		this.users.delete(client);
-		//console.log(' disconneted to event');
 	}
 
 	@SubscribeMessage('getEvents')
-	getEvents(client: Socket) {
-		client.emit("event", {id: 1, login: "loris la merde"})
-		client.emit("event", {id: 2, login: "oui"})
+	async getEvents(client: Socket) {
+		const login: string = this.users.get(client);
+		const events: Event[] = [];
+		
+		const friendReq: string[] = await this.relationshipService.getPendingInvitations(login);
+		friendReq.push("mario")
+		friendReq.map((login: string) => events.push({type: "friendRequest", sender: login}));
+		events.map((event) => client.emit("event", event));
 	}
 
-	@SubscribeMessage('event')
-	newEvent(client: Socket) {
+	newEvent(login: string, event: Event) {
+		const client = [...this.users].find(([key, value]) => (login === value))[0];
+		client.emit("event", event);
 	}
 }
+
+//format event = {type,sender}

@@ -5,12 +5,16 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { RelationshipController } from "./relationship.controller";
 import { RelationshipService } from "./relationship.service";
 import { UserService } from "src/user/user.service";
+import { UserModule } from "src/user/user.module";
 
 
 @Module({
-	imports: [TypeOrmModule.forFeature([User, Relationship], 'lorisforever')],
+	imports: [
+		TypeOrmModule.forFeature([User, Relationship], 'lorisforever'),
+		UserModule
+	],
 	controllers: [RelationshipController],
-	providers: [RelationshipService, UserService],
-	exports: []
+	providers: [RelationshipService],
+	exports: [RelationshipService]
 })
 export class RelationshipModule {}
