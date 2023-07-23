@@ -19,6 +19,9 @@ export class RelationshipService{
 			return ({status: "KO", description: "Request impossible"})
 		if (!recipient)
 			return ({status: "KO", description: "User not found"})
+		if (requester.login === recipient.login)
+			return ({status: "KO", description: "Impossible to invite yourself"})
+
 
 		const relation = await this.getRelationship(requester, recipient);
 		const reverseRelation = await this.getRelationship(recipient, requester);
@@ -95,6 +98,10 @@ export class RelationshipService{
 			return ({status: "KO", description: "Request impossible"})
 		if (!recipient)
 			return ({status: "KO", description: "User not found"})
+		
+		if (requester.login === recipient.login)
+			return ({status: "KO", description: "Impossible to block yourself"})
+
 
 		const relation = await this.getRelationship(requester, recipient);
 		const reverseRelation = await this.getRelationship(recipient, requester);

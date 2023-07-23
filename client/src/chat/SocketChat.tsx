@@ -28,17 +28,17 @@ function Messages({ socket }: any) {
 
 	return (
 		<div>
-				  <List
-		sx={{
-		  width: '100%',
-		  maxWidth: 800,
-		  bgcolor: 'background.paper',
-		  position: 'relative',
-		  overflow: 'auto',
-		  maxHeight: 600,
-		  '& ul': { padding: 0 },
-		}}
-	  >
+			<List
+				sx={{
+				width: '100%',
+				maxWidth: 800,
+				bgcolor: 'background.paper',
+				position: 'relative',
+				overflow: 'auto',
+				maxHeight: 600,
+				'& ul': { padding: 0 },
+				}}
+	 		>
 			{[...Object.values(messages)]
        		.sort((a: any, b: any) => a.time - b.time)
 			   .map((message: any) => (

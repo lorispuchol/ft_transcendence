@@ -21,7 +21,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		private jwtService: JwtService
 	) {}
 
-	@WebSocketServer( )	wss: Server;
 	private messages: Set<Message> = new Set();
 	private users: Map<Socket, string> = new Map();
 
@@ -56,6 +55,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		};
   
 		this.messages.add(message);
-		this.users.forEach((login, socket) => socket.emit('message', message));
+		this.users.forEach((login, cli) => cli.emit('message', message));
 	}
 }

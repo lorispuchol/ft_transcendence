@@ -3,6 +3,7 @@ import { GetRequest } from "../utils/Request";
 import Loading from "../utils/Loading";
 import ErrorHandling from "../utils/Error";
 import EventList from "../components/event/EventList";
+import FriendInvitation from "../components/Relationship/FriendInvitation";
 
 export default function Everyone()
 {
@@ -20,7 +21,7 @@ export default function Everyone()
 		<>
 			<ul>
 				{users.map((user: any) => (
-					<li key={user.id} >{user.login}</li>
+					<li key={user.id} >{user.login} <FriendInvitation login={user.login}/></li>
 					))}
 			</ul>
 			<EventList />
