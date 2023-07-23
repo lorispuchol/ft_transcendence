@@ -1,36 +1,59 @@
 import { useEffect, useState } from "react";
 import { server_url } from "../../utils/Request";
-import { io } from "socket.io-client";
+import { Socket, io } from "socket.io-client";
 import Loading from "../../utils/Loading";
+import { Avatar, List, ListItem, ListItemAvatar } from "@mui/material";
+import { Diversity1Rounded } from "@mui/icons-material";
 
-function Events({ socket }: any) {
-	const [events, setEvents]: [any, any] = useState({});
-	
+interface Event {
+	type: string,
+	sender: string,
+}
+
+interface SocketProps {
+	socket: Socket,
+}
+
+function renderIcon(type: string) {
+	switch(type) {
+		case 'friendRequest':
+			return (<Diversity1Rounded />);
+		default:
+			return (<strong>error: type not found</strong>)
+	}
+}
+
+function Events({ socket }: SocketProps) {
+	const [events, setEvents]: [Event[], Function] = useState([]);
+	console.log(typeof(socket));
+
 	useEffect(() => {
-		function eventListener(event: any) {
-			setEvents((prevEvents: any) => {
-				const newEvents: any = {...prevEvents};
-				newEvents[event.id] = event;
+		function eventListener(event: Event) {
+			setEvents((prevEvents: Event[]) => {
+				const newEvents: Event[] = [...prevEvents, event];
 				return newEvents;
 			});
 		}
 		socket.on('event', eventListener);
 		socket.emit('getEvents');
-		return () => socket.off('event', eventListener);
+		return () => {socket.off('event', eventListener)};
 	}, [socket]);
 
 	return (
-		<ul>
-			{[...Object.values(events)].map((event: any) => (
-				<li key={event.id}>{event.login}</li>
+		<List>
+			{events.map((event: Event) => (
+				<ListItem key={event.sender}>
+					<ListItemAvatar><Avatar>{renderIcon(event.type)}</Avatar></ListItemAvatar>
+					{event.sender}
+				</ListItem>
 			))}
-		</ul>
+		</List>
 	);
 }
 
 export default function EventList() {
 
-	const [socket, setSocket]: [any, any] = useState(null);
+	const [socket, setSocket]: [Socket | null, Function] = useState(null);
 
 	useEffect(() => {
 		const token = localStorage.getItem("token");

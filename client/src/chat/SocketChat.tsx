@@ -1,18 +1,28 @@
 import { List, ListItem, ListItemText } from "@mui/material";
-import { useEffect, useRef, useState } from "react";
-import { io } from "socket.io-client";
+import { FormEvent, useEffect, useRef, useState } from "react";
+import { Socket, io } from "socket.io-client";
 import "./chat.css";
 import { server_url } from "../utils/Request";
 import Loading from "../utils/Loading";
 
-function Messages({ socket }: any) {
-	const [messages, setMessages] = useState({});
+interface Message {
+	id: number;
+	user: string;
+	value: string;
+	time: number;
+}
+
+interface SocketProps {
+	socket: Socket,
+}
+
+function Messages({ socket }: SocketProps) {
+	const [messages, setMessages]: [Message[], Function] = useState([]);
 
 	useEffect(() => {
-		function messageListener(message: any) {
-			setMessages((prevMessages) => {
-				const newMessages: any = {...prevMessages};
-				newMessages[message.id] = message;
+		function messageListener(message: Message) {
+			setMessages((prevMessages: Message[]) => {
+				const newMessages: Message[] = [...prevMessages, message];
 				return newMessages;
 			});
 		};
@@ -30,18 +40,15 @@ function Messages({ socket }: any) {
 		<div>
 			<List
 				sx={{
-				width: '100%',
-				maxWidth: 800,
-				bgcolor: 'background.paper',
-				position: 'relative',
-				overflow: 'auto',
-				maxHeight: 600,
-				'& ul': { padding: 0 },
-				}}
-	 		>
-			{[...Object.values(messages)]
-       		.sort((a: any, b: any) => a.time - b.time)
-			   .map((message: any) => (
+		  			width: '100%',
+		  			maxWidth: 800,
+		  			bgcolor: 'background.paper',
+		  			position: 'relative',
+		  			overflow: 'auto',
+		  			maxHeight: 600,
+		  			'& ul': { padding: 0 },
+				}}>
+			{messages.map((message: Message) => (
 				<ListItem key={message.id}	title={`Sent at ${new Date(message.time).toLocaleTimeString()}`}>
 					<div className="user-column">
         				<span className="user">{message.user + " :"}</span>
@@ -56,10 +63,10 @@ function Messages({ socket }: any) {
 	)
 }
 
-function MessageInput({ socket }: any) {
+function MessageInput({ socket }: SocketProps) {
 	const [value, setValue] = useState('');
 
-	function submitForm(e: any) {
+	function submitForm(e: FormEvent) {
 		e.preventDefault();
 		socket.emit('message', value);
 		setValue('');
@@ -74,7 +81,7 @@ function MessageInput({ socket }: any) {
 
 export default function SocketChat() {
 
-	const [socket, setSocket]: [any, any] = useState(null);
+	const [socket, setSocket]: [Socket | null, Function] = useState(null);
 
 	useEffect(() => {
 		const token = localStorage.getItem("token");
