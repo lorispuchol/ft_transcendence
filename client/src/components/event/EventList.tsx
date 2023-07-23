@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { server_url } from "../../utils/Request";
 import { Socket, io } from "socket.io-client";
 import Loading from "../../utils/Loading";
+import { Avatar, List, ListItem, ListItemAvatar } from "@mui/material";
+import { Diversity1Rounded } from "@mui/icons-material";
 
 interface Event {
 	type: string,
@@ -10,6 +12,15 @@ interface Event {
 
 interface SocketProps {
 	socket: Socket,
+}
+
+function renderIcon(type: string) {
+	switch(type) {
+		case 'friendRequest':
+			return (<Diversity1Rounded />);
+		default:
+			return (<strong>error: type not found</strong>)
+	}
 }
 
 function Events({ socket }: SocketProps) {
@@ -29,11 +40,14 @@ function Events({ socket }: SocketProps) {
 	}, [socket]);
 
 	return (
-		<ul>
+		<List>
 			{events.map((event: Event) => (
-				<li key={event.sender}>{event.sender + " " + event.type}</li>
+				<ListItem key={event.sender}>
+					<ListItemAvatar><Avatar>{renderIcon(event.type)}</Avatar></ListItemAvatar>
+					{event.sender}
+				</ListItem>
 			))}
-		</ul>
+		</List>
 	);
 }
 
