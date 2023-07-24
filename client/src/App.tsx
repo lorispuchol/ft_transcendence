@@ -50,7 +50,7 @@ export default function App() {
 	if (response.status !== "OK")
 		return (<ErrorHandling status={response.status} message={response.error} />);
 	return (
-		<UserContext.Provider value={response.data?.login}>
+		<UserContext.Provider value={response.data?.username}>
 			<div className='background_primary w-screen h-screen px-5 py-5 flex-wrap'>
 				<NavBar />
 				<Routes>
