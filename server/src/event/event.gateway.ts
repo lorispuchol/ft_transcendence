@@ -38,7 +38,9 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 		const events: Event[] = [];
 		
 		const friendReq: string[] = await this.relationshipService.getPendingInvitations(login);
-		friendReq.push("mario")
+		friendReq.push("mario");
+		friendReq.push("luigi");
+		friendReq.push("fernando");
 		friendReq.map((login: string) => events.push({type: "friendRequest", sender: login}));
 	
 		events.map((event) => client.emit("event", event));
@@ -49,5 +51,3 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 		client.emit("event", event);
 	}
 }
-
-//format event = {type,sender}

@@ -35,10 +35,9 @@ export default function Everyone()
 		<>
 			<ul>
 				{users?.map((user: UserData) => (
-					<li key={user.id} >{user.login}</li>
+					<li key={user.id} >{user.username}</li>
 					))}
 			</ul>
-			<EventList />
 		</>
 	);
 }
