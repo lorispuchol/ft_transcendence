@@ -52,6 +52,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		};
   
 		this.messages.add(message);
-		this.users.forEach((login, socket) => socket.emit('message', message));
+		this.users.forEach((login, cli) => cli.emit('message', message));
 	}
 }
