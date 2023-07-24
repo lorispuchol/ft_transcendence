@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { server_url } from "../../utils/Request";
 import { Socket, io } from "socket.io-client";
 import Loading from "../../utils/Loading";
-import { Avatar, List, ListItem, ListItemAvatar } from "@mui/material";
-import { Diversity1Rounded } from "@mui/icons-material";
+import { Badge, Button, ClickAwayListener, Divider, IconButton, List, ListItem, ListItemAvatar, Paper, Popper } from "@mui/material";
+import { Close, Done, EmojiPeople, Message, Notifications, VideogameAsset } from "@mui/icons-material";
 
 interface Event {
 	type: string,
@@ -14,10 +14,19 @@ interface SocketProps {
 	socket: Socket,
 }
 
+interface EventWrapperProps {
+	children: ReactElement,
+	numberOfEvent: number,
+}
+
 function renderIcon(type: string) {
 	switch(type) {
 		case 'friendRequest':
-			return (<Diversity1Rounded />);
+			return (<EmojiPeople />);
+		case 'gameRequest':
+			return (<VideogameAsset />);
+		case 'privateMessage':
+			return (<Message />)
 		default:
 			return (<strong>error: type not found</strong>)
 	}
@@ -25,7 +34,6 @@ function renderIcon(type: string) {
 
 function Events({ socket }: SocketProps) {
 	const [events, setEvents]: [Event[], Function] = useState([]);
-	console.log(typeof(socket));
 
 	useEffect(() => {
 		function eventListener(event: Event) {
@@ -40,15 +48,49 @@ function Events({ socket }: SocketProps) {
 	}, [socket]);
 
 	return (
-		<List>
-			{events.map((event: Event) => (
-				<ListItem key={event.sender}>
-					<ListItemAvatar><Avatar>{renderIcon(event.type)}</Avatar></ListItemAvatar>
-					{event.sender}
-				</ListItem>
-			))}
-		</List>
+		<EventWrapper numberOfEvent={events.length}>
+			<Paper><List>
+				{events.map((event: Event, index: number) => (
+					<>
+						<ListItem key={event.type + event.sender}>
+							<ListItemAvatar>{renderIcon(event.type)}</ListItemAvatar>
+							{event.sender}
+						</ListItem>
+						<Button color="success"><Done/></Button>
+						<Button color="error"><Close/></Button>
+						{index + 1 !== events.length? <Divider /> : null}
+					</>
+				))}
+			</List></Paper>
+		</EventWrapper>
 	);
+}
+
+function EventWrapper({ children, numberOfEvent } : EventWrapperProps) {
+	const [open, setOPen]: [boolean, Function] = useState(false);
+	const [anchor, setAnchor]: [HTMLElement | null, Function] = useState(null);
+
+	function handleClick(event: React.MouseEvent) {
+		setOPen((prevOpen: boolean) => !prevOpen);
+		setAnchor(event.currentTarget);
+	}
+
+	function handleClose() {
+		setOPen(false);
+	}
+
+	return (
+		<>
+			<IconButton onClick={handleClick}>
+				<Badge badgeContent={numberOfEvent} color='error'><Notifications /></Badge>
+			</IconButton>
+			<Popper open={open} anchorEl={anchor}>
+				<ClickAwayListener onClickAway={handleClose}>
+					{children}
+				</ClickAwayListener>
+			</Popper>
+		</>
+	)
 }
 
 export default function EventList() {
@@ -67,9 +109,6 @@ export default function EventList() {
 		return (<Loading />);
 
 	return (
-		<>
-			<strong><u>event:</u></strong>
 			<Events socket={socket} />
-		</>
 	);
 }

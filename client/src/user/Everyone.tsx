@@ -45,7 +45,6 @@ export default function Everyone()
 						:	<li key={user.id} >{user.username} <FriendInvitation login={user.login}/></li>
 				))}
 			</ul>
-			<EventList />
 		</>
 	);
 }

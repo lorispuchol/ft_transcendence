@@ -29,12 +29,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	handleConnection(client: Socket, ...args: any[]) {
 		const decoded: any = this.jwtService.decode(<string>client.handshake.headers.token);
 		this.users.set(client, decoded.login);
-		//console.log(decoded.login + ' conneted to chat');
 	}
 
 	handleDisconnect(client: Socket) {
 		this.users.delete(client);
-		//console.log('disconneted to chat');
 	}
 
 	@SubscribeMessage('getMessages')
@@ -46,7 +44,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	handleMessage(client: Socket, value: string) {
 
 		const user = this.users.get(client);
-		console.log(user + " sended message");
 		const message: Message = {
 			id: uuidv4(),
 			user,
