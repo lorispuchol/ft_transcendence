@@ -21,11 +21,11 @@ export const NavBar = () => {
 	function openMenu() {
 		const menu_btn = document.querySelector(".menu_btn");
 		const nav_links = document.querySelector(".nav_bar_link");
+
 		if (menu_btn) {
 				if (nav_links)
 					nav_links.classList.toggle('mobile_menu');
 		}
-
 	}
 
 	return (
@@ -37,11 +37,12 @@ export const NavBar = () => {
 					{pages.map((page) => (
 						<NavLink key={page[0]} className={select === page[1] ? 'nav_bar_link_a' : 'nav_bar_link_p'} onClick={() => hanldeClick(page[1])} to={page[1]}>{page[0]}</NavLink>
 					))}
-					<EventList />
+					<EventList className='nav_bar_link_p'/>
 					<NavLink to={'/profile'} onClick={() => hanldeClick("profile")}>
 						<Avatar className={select === "profile" ? 'nav_bar_avatar_a' : 'nav_bar_avatar_p'}  src={defaultAvatar} alt="TEST"></Avatar>
 					</NavLink>
 				</nav>
+				<div className='mobile_notif'><EventList className=''/></div>
 				<img onClick={() => openMenu()} className='menu_btn' src={menu_btn} alt='menu_btn'/>
 			</div>
 		</div>

@@ -37,16 +37,23 @@ export default function LogIn() {
 
 	return (
 		<div className="box_login background_box_login">
-			<div className="title_box">EL PONGO</div>
-			<div className="button_box">
-				<button className="button_login active:scale-110" onClick={clickButton}>LOG IN WITH 42</button>
+			<div>
+				<div className="title_box">EL PONGO</div>
+				<div className="button_box">
+					<button className="button_login active:scale-110" onClick={clickButton}>LOG IN WITH 42</button>
+				</div>
 			</div>
-			<div className="text_box">Or by username</div>
-			<div className="button_box">
+			<hr className="divider" />
+			<div>
 				<form className="form_box" onSubmit={clickSend}>
-					<input className="input_box" type="text"  value={username} placeholder="username" onChange={handleChange} />
+					<input className="input_box" type="text"  value={username} placeholder="USERNAME" onChange={handleChange} />
 				</form>
-				<button className="button_send active:scale-110" onClick={clickSend}>SEND</button>
+				<form className="form_box" onSubmit={clickSend}>
+					<input className="input_box" type="text"  value={username} placeholder="PASSWORD" onChange={handleChange} />
+				</form>
+				<div className="button_box">
+					<button className="button_login button_login_bis active:scale-110" onClick={clickSend}>LOG IN</button>
+				</div>
 			</div>
 		</div>
 	);

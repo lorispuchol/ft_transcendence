@@ -31,14 +31,14 @@ $primary_color: #fad390;
 .nav_bar_link_a {
 	color: $primary_color;
 	margin-right: 12px;
-	transition-property: all;
+	transition-property: opacity, scale;
 	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 	transition-duration: 300ms;
 }
 
 .nav_bar_link_p {
 	margin-right: 12px;
-	transition-property: all;
+	transition-property: opacity, scale;
 	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 	transition-duration: 300ms;
 }
@@ -46,7 +46,7 @@ $primary_color: #fad390;
 .nav_bar_link_p:hover {
 	opacity: 0.6;
 	scale: (1.1);
-	transition-property: all;
+	transition-property: opacity, scale;
 	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 	transition-duration: 300ms;
 }
@@ -57,14 +57,14 @@ $primary_color: #fad390;
 	border-width: 2px;
 	border-radius: 9999px;
 	margin-right: 12px;
-	transition-property: all;
+	transition-property: opacity, scale;
 	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 	transition-duration: 300ms;
 }
 
 .nav_bar_avatar_p {
 	margin-right: 12px;
-	transition-property: all;
+	transition-property: opacity, scale;
 	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 	transition-duration: 300ms;
 }
@@ -72,7 +72,7 @@ $primary_color: #fad390;
 .nav_bar_avatar_p:hover {
 	opacity: 0.6;
 	scale: (1.1);
-	transition-property: all;
+	transition-property: opacity, scale;
 	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 	transition-duration: 300ms;
 }
@@ -83,13 +83,20 @@ $primary_color: #fad390;
 	margin-right: 12px;
 }
 
-@media screen and (max-width: 586px) {
-	.title {
-		display: none;
-	}
+.mobile_notif {
+	display: none;
+	margin-right: 12px;
+}
+
+@media screen and (max-width: 637px) {
 	.menu_btn {
 		display: block;
 		filter: blur(0);
+	}
+	.mobile_notif {
+		display: block;
+		justify-content: center;
+		align-items: center;
 	}
 	.nav_bar_link {
 		display: flex;
@@ -103,10 +110,11 @@ $primary_color: #fad390;
 		height: 100%;
 		justify-content: center;
 		// margin-top: -150%;
-		opacity: 0;
-		transition-property: all;
-		transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-		transition-duration: 500ms;
+		visibility: collapse;
+		// opacity: 0;
+		// transition-property: opacity;
+		// transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+		// transition-duration: 500ms;
 	}
 	.nav_bar_link_p {
 		margin-top: 8px;
@@ -129,6 +137,17 @@ $primary_color: #fad390;
 	}
 }
 
+@media screen and (min-width: 587px){
+	.nav_bar_link {
+		transition-property: none;
+	}
+	// transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+	// transition-duration: 500ms;
+}
+
 .mobile_menu {
-	opacity: 100;
+	visibility: visible;
+	transition-property: visible;
+	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+	transition-duration: 500ms;
 }

@@ -93,7 +93,7 @@ function EventWrapper({ children, numberOfEvent } : EventWrapperProps) {
 	)
 }
 
-export default function EventList() {
+export default function EventList({ className }: any) {
 
 	const [socket, setSocket]: [Socket | null, Function] = useState(null);
 
@@ -109,6 +109,8 @@ export default function EventList() {
 		return (<Loading />);
 
 	return (
+		<div className={className}>
 			<Events socket={socket} />
+		</div>
 	);
 }
