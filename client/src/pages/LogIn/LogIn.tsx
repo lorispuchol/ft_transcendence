@@ -52,7 +52,10 @@ export default function LogIn() {
 					<input className="input_box" type="text"  value={username} placeholder="PASSWORD" onChange={handleChange} />
 				</form>
 				<div className="button_box">
-					<button className="button_login button_login_bis active:scale-110" onClick={clickSend}>LOG IN</button>
+					<button className="button_login active:scale-110" onClick={clickSend}>LOG IN</button>
+				</div>
+				<div className="button_box">
+					<button className="button_login button_login_bis active:scale-110" onClick={clickSend}>SIGN IN</button>
 				</div>
 			</div>
 		</div>
