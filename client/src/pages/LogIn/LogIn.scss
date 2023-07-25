@@ -37,17 +37,6 @@ $primary_color: #fad390;
 	margin-bottom: 32px;
 }
 
-.text_box {
-	display: flex;
-	justify-content: center;
-	font-size: 1.225rem; /* 30px */
-	line-height: 2.25rem; /* 36px */
-	font-family: 'Poppins';
-	font-weight: 700;
-	margin-top: 24px;
-	margin-bottom: 24px;
-}
-
 .form_box {
 	display: flex;
 	justify-content: center;
@@ -55,8 +44,10 @@ $primary_color: #fad390;
 	line-height: 2.25rem; /* 36px */
 	font-family: 'Poppins';
 	font-weight: 700;
-	margin-top: 24px;
-	margin-bottom: 24px;
+	margin-bottom: 32px;
+	::placeholder {
+		text-align: center; 
+	}
 }
 
 .input_box {
@@ -66,8 +57,14 @@ $primary_color: #fad390;
 	line-height: 2.25rem; /* 36px */
 	font-family: 'Poppins';
 	font-weight: 700;
-	margin-top: 24px;
-	margin-bottom: 24px;
+	border-radius: 0.25rem; /* 4px */
+	box-shadow: 0 0 0 0.100rem rgba(0, 0, 0, 1);
+}
+
+.input_box:focus {
+	outline: black;
+	box-shadow: 0 0 0 0.150rem rgba(0, 0, 0, 1);
+	caret-color: transparent;
 }
 
 .button_box {
@@ -91,18 +88,13 @@ $primary_color: #fad390;
 	font-family: 'Poppins';
 }
 
-.button_send {
-	background-color: $primary_color;
-	display: flex;
-	justify-content: center;
-	font-size: 1.5rem; /* 24px */
-	line-height: 2rem;	/* 32px */
-	border-radius: 0.25rem; /* 4px */
-	box-shadow: 0 0 0 0.200rem rgba(0, 0, 0, 1);
-	width: 140px;
+.button_login_bis {
+	margin-bottom: 0;
+}
+
+.divider {
+	border: none;
+  	height: 0.200rem;
+ 	background-color: black;
 	margin-bottom: 32px;
-	transition-property: all;
-	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-	transition-duration: 300ms;
-	font-family: 'Poppins';
 }
