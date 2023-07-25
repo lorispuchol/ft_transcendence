@@ -15,4 +15,8 @@ export class EventService {
 	newEvent(login: string, event: Event) {
 		this.eventGateway.newEvent(login, event);
 	}
+
+	deleteEvent(login: string, event: Event) {
+		this.eventGateway.deleteEvent(login, event);
+	}
 }

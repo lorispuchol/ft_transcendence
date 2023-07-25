@@ -4,8 +4,8 @@ import Home from './home/Home';
 import Profile, { RedirectToOwnProfile } from './user/Profile';
 import LogIn from './pages/LogIn/LogIn';
 import NoRouteFound from './pages/Error/NoRouteFound';
-import { useEffect, useState } from 'react';
-import { GetRequest } from './utils/Request';
+import { ReactElement, useEffect, useState } from 'react';
+import { GetRequest, server_url } from './utils/Request';
 import ErrorHandling from './utils/Error';
 import Loading from './utils/Loading';
 import Chat from './chat/Chat';
@@ -13,7 +13,8 @@ import Everyone from './user/Everyone';
 import Game from './game/Game';
 import Loader from './components/Loading/Loader'
 import { NavBar } from './components/NavBar/NavBar';
-import { UserContext } from './utils/UserContext';
+import { EventContext, UserContext } from './utils/Context';
+import { Socket, io } from 'socket.io-client';
 
 interface UserData {
 	avatar: string,
@@ -27,6 +28,31 @@ interface Response {
 	status: string | number,
 	data?: UserData,
 	error?: string,
+}
+
+interface WebSocketProps {
+	children: ReactElement,
+}
+
+function WebSocket({ children }: WebSocketProps) {
+	const [socket, setSocket]: [Socket | null, Function] = useState(null);
+
+	useEffect(() => {
+		const token = localStorage.getItem("token");
+		const option = { transportOptions: { polling: { extraHeaders: { token: token }}}};
+		const newSocket = io(server_url + "/event", option);
+		setSocket(newSocket);
+		return () => {newSocket.close()};
+	}, [setSocket]);
+
+	if (!socket)
+		return (<Loading />);
+	
+	return (
+		<EventContext.Provider value={socket}>
+			{children}
+		</EventContext.Provider>
+	)
 }
 
 export default function App() {
@@ -50,22 +76,24 @@ export default function App() {
 	if (response.status !== "OK")
 		return (<ErrorHandling status={response.status} message={response.error} />);
 	return (
-		<UserContext.Provider value={response.data?.username}>
-			<div className='background_primary w-screen h-screen px-5 py-5 flex-wrap'>
-				<NavBar />
-				<Routes>
-					<Route path='*' element={<NoRouteFound />} />
-					<Route path='/' element={<Home />} />
-					<Route path='/profile' element={<RedirectToOwnProfile />} />
-					<Route path='/profile/:username' element={<Profile />} />
-					<Route path='/everyone' element={<Everyone />} />
-					<Route path='/login' element={<Navigate to='/' />} />
-					<Route path='/chat' element={<Chat />} />
-					<Route path='/game' element={<Game />} />
-					<Route path='/loader' element={<Loader />} />
-				</Routes>
-			</div>
-		</UserContext.Provider>
+		<WebSocket>
+			<UserContext.Provider value={response.data?.username}>
+				<div className='background_primary w-screen h-screen px-5 py-5 flex-wrap'>
+					<NavBar />
+					<Routes>
+						<Route path='*' element={<NoRouteFound />} />
+						<Route path='/' element={<Home />} />
+						<Route path='/profile' element={<RedirectToOwnProfile />} />
+						<Route path='/profile/:username' element={<Profile />} />
+						<Route path='/everyone' element={<Everyone />} />
+						<Route path='/login' element={<Navigate to='/' />} />
+						<Route path='/chat' element={<Chat />} />
+						<Route path='/game' element={<Game />} />
+						<Route path='/loader' element={<Loader />} />
+					</Routes>
+				</div>
+			</UserContext.Provider>
+		</WebSocket>
 	);
 }
 

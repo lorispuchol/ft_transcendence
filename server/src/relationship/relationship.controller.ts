@@ -45,7 +45,7 @@ export class RelationshipController {
 		@Param('recipient') recipient: string ) {
 			return this.relationshipService.invite (
 				await this.userService.findOneById(req.user.id),
-				await this.userService.findOneByUsername(recipient)
+				await this.userService.findOneByLogin(recipient)
 			)
 	}
 
@@ -55,7 +55,7 @@ export class RelationshipController {
 		@Param('user') user: string ) {
 			return this.relationshipService.accept (
 				await this.userService.findOneById(req.user.id),
-				await this.userService.findOneByUsername(user)
+				await this.userService.findOneByLogin(user)
 			)
 	}
 
@@ -65,7 +65,7 @@ export class RelationshipController {
 		@Param('user') user: string ) {
 			return this.relationshipService.refuse (
 				await this.userService.findOneById(req.user.id),
-				await this.userService.findOneByUsername(user)
+				await this.userService.findOneByLogin(user)
 			)
 	}
 
@@ -86,7 +86,7 @@ export class RelationshipController {
 		@Param('recipient') recipient: string ) {
 			return this.relationshipService.block (
 				await this.userService.findOneById(req.user.id),
-				await this.userService.findOneByUsername(recipient)
+				await this.userService.findOneByLogin(recipient)
 			)
 	}
 }
