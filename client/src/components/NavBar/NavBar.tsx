@@ -6,8 +6,6 @@ import menu_btn from './img/menu_btn.png'
 
 import Avatar from '@mui/material/Avatar';
 import { defaultAvatar } from '../../user/Profile';
-import { Badge, IconButton } from '@mui/material';
-import { Notifications } from '@mui/icons-material';
 import EventList from '../event/EventList';
 
 export const NavBar = () => {
@@ -37,7 +35,7 @@ export const NavBar = () => {
 					{pages.map((page) => (
 						<NavLink key={page[0]} className={select === page[1] ? 'nav_bar_link_a' : 'nav_bar_link_p'} onClick={() => hanldeClick(page[1])} to={page[1]}>{page[0]}</NavLink>
 					))}
-					<EventList />
+					<EventList className='nav_bar_link_p' />
 					<NavLink to={'/profile'} onClick={() => hanldeClick("profile")}>
 						<Avatar className={select === "profile" ? 'nav_bar_avatar_a' : 'nav_bar_avatar_p'}  src={defaultAvatar} alt="TEST"></Avatar>
 					</NavLink>

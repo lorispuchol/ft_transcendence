@@ -22,24 +22,16 @@ export default function FriendInvitation ({login}: FriendInvitationProps) {
 	const [open, setOpen]: [boolean, Function] = useState(false);
 	const [response, setResponse]: [Response, Function] = useState({status: "loading"});
 
-	useEffect(() => {
-		console.log(response.status)
-		if (response.status !== "loading")
-			setOpen(true)
-	}
-	, [response.data?.status])
-
 	return (
 		<>
 			<IconButton onClick={() => {
-					GetRequest("/relationship/invite/" + login).then((response) => setResponse(response));
-					//setOpen(true);
+					GetRequest("/relationship/invite/" + login).then((response) => {setResponse(response); setOpen(true);});
 				}}>
 				<PersonAddIcon />
 			</IconButton>
 			{
 				open
-					?	<Alert onClose={() => {setOpen(false)}} severity = {response.data?.status === "OK" ? "success" : "error"}>
+					?	<Alert className="w-2/6" onClose={() => {setOpen(false)}} severity = {response.data?.status === "OK" ? "success" : "error"}>
 							{response.data?.description}
 						</Alert> 
 					: null

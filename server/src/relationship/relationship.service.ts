@@ -3,7 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Relationship, RelationshipStatus } from "./relationship.entity";
 import { FindOptionsWhere, Repository } from "typeorm";
 import { User } from "../user/user.entity";
-import { UserService } from "src/user/user.service";
+import { EventService } from "src/event/event.service";
 
 
 
@@ -12,7 +12,7 @@ export class RelationshipService{
 	constructor(
 		@InjectRepository(Relationship, 'lorisforever')
 		private relationshipRepository: Repository<Relationship>,
-		private userService: UserService,
+		private	eventService: EventService,
 	) {}
 	
 	async invite(requester: User, recipient: User): Promise<any> {
@@ -43,6 +43,7 @@ export class RelationshipService{
 		
 		// if status === blocked  --> it change it
 		this.saveRelationship(requester, recipient, RelationshipStatus.INVITED);
+		this.eventService.newEvent(recipient.login, {type: "friendRequest", sender: requester.username})
 		return ({status: "OK", description: `Invitation send to ${recipient.username}`})
 	}
 
@@ -224,18 +225,4 @@ export class RelationshipService{
 		return false;
 	}
 
-	async getPendingInvitations(login: string) {
-		
-		const user: User = await this.userService.findOneByLogin(login);
-		const pendingInvitations: Relationship[] = await this.relationshipRepository.find({
-			where: {
-				requester: user.id,
-				status: RelationshipStatus.INVITED
-			} as FindOptionsWhere<User>
-		});
-
-		const logins: string[] = [];
-		pendingInvitations.forEach((invitation) => logins.push(invitation.requester.username))
-		return logins;
-	}
 }
