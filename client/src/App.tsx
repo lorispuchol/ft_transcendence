@@ -1,7 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import './App.css'
 import Home from './home/Home';
-import Profile, { RedirectToOwnProfile } from './user/Profile';
+import Profile, { RedirectToOwnProfile } from './pages/Profile/Profile';
 import LogIn from './pages/LogIn/LogIn';
 import NoRouteFound from './pages/Error/NoRouteFound';
 import { useEffect, useState } from 'react';

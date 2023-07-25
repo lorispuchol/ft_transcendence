@@ -5,7 +5,7 @@ import { useState } from 'react';
 import menu_btn from './img/menu_btn.png'
 
 import Avatar from '@mui/material/Avatar';
-import { defaultAvatar } from '../../user/Profile';
+import { defaultAvatar } from '../../pages/Profile/Profile';
 import EventList from '../event/EventList';
 import { Paper } from '@mui/material';
 
