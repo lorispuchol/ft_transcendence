@@ -4,6 +4,7 @@ import { Socket, io } from "socket.io-client";
 import Loading from "../../utils/Loading";
 import { Badge, Button, ClickAwayListener, Divider, IconButton, List, ListItem, ListItemAvatar, Paper, Popper } from "@mui/material";
 import { Close, Done, EmojiPeople, Message, Notifications, VideogameAsset } from "@mui/icons-material";
+import EventButton from "./EventButton";
 
 interface Event {
 	type: string,
@@ -49,15 +50,18 @@ function Events({ socket }: SocketProps) {
 
 	return (
 		<EventWrapper numberOfEvent={events.length}>
-			<Paper><List>
+			<Paper><List sx={{
+		  			overflow: 'auto',
+		  			maxHeight: 244,
+		  			'& ul': { padding: 0 },
+				}}>
 				{events.map((event: Event, index: number) => (
 					<>
 						<ListItem key={event.type + event.sender}>
 							<ListItemAvatar>{renderIcon(event.type)}</ListItemAvatar>
 							{event.sender}
 						</ListItem>
-						<Button color="success"><Done/></Button>
-						<Button color="error"><Close/></Button>
+						<EventButton event={event}/>
 						{index + 1 !== events.length? <Divider /> : null}
 					</>
 				))}
