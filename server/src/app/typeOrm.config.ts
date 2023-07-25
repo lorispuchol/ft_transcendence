@@ -2,9 +2,9 @@ import { ConfigService } from "@nestjs/config";
 import { TypeOrmModuleAsyncOptions } from "@nestjs/typeorm";
 import { User } from "../user/user.entity";
 import { Relationship } from "../relationship/relationship.entity";
-import { Message } from "src/chat/message.entity";
-import { Channel } from "src/chat/channel.entity";
-import { Participant } from "src/chat/participant_chan_x_user";
+import { Message } from "src/chat/entities/message.entity";
+import { Channel } from "src/chat/entities/channel.entity";
+import { Participant } from "src/chat/entities/participant_chan_x_user.entity";
 import { Match } from "src/game/match.entity";
 
 
