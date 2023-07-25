@@ -1,5 +1,6 @@
 .centered {
-	position: fixed;
+	display: flex;
+	position: absolute;
 	margin-top: 10%;
 	margin-bottom: 10%;
 	padding-bottom: 10%;
@@ -9,6 +10,7 @@
 }
 
 .block_404 {
+	position: relative;
 	display: flex;
 	flex-direction: column;
 	flex-wrap: wrap;
