@@ -11,7 +11,6 @@ interface Response {
 
 export async function GetRequest(path: string) {
 	const token = localStorage.getItem("token");
-	console.log("token: " + token);
 	let res: Response;
 	try { 
 		const response = await axios.get(server_url + path, { headers: { authorization: "Bearer " + token } });
@@ -26,7 +25,7 @@ export async function GetRequest(path: string) {
 	return (res);
 }
 
-export async function PostRequest(path: string, data: JSON) {
+export async function PostRequest(path: string, data: Object) {
 	const token = localStorage.getItem("token");
 	let res: Response;
 	try { 
@@ -42,7 +41,7 @@ export async function PostRequest(path: string, data: JSON) {
 	return (res);
 }
 
-export async function PatchRequest(path: string, data: JSON) {
+export async function PatchRequest(path: string, data: Object) {
 	const token = localStorage.getItem("token");
 	let res: Response;
 	try { 
@@ -58,7 +57,7 @@ export async function PatchRequest(path: string, data: JSON) {
 	return (res);
 }
 
-export async function DeleteRequest(path: string, data: JSON) {
+export async function DeleteRequest(path: string) {
 	const token = localStorage.getItem("token");
 	let res: Response;
 	try { 
