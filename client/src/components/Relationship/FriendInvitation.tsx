@@ -42,10 +42,13 @@ export default function FriendInvitation ({ login }: FriendInvitationProps) {
 			</IconButton>
 			{
 				open
-					?	<Alert className="w-2/6" onClose={() => {setOpen(false)}} severity = {response.data?.status === "OK" ? "success" : "error"}>
-							{response.data?.description}
-						</Alert> 
-					: null
+				?
+				<Snackbar open={open} autoHideDuration={4000} onClose={() => {setOpen(false)}}>
+					<Alert className="w-fit" onClose={() => {setOpen(false)}} severity = {response.data?.status === "OK" ? "success" : "error"}>
+						{response.data?.description}
+					</Alert> 
+				</Snackbar>
+				: null
 			}
 		</>
 	)
