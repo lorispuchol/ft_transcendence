@@ -89,4 +89,15 @@ export class RelationshipController {
 				await this.userService.findOneByLogin(recipient)
 			)
 	}
+
+	@Get(':recipient')
+	async getRelation(
+		@Request() req: any,
+		@Param('recipient') recipient: string ) {
+		return this.relationshipService.getRelation(
+			await this.userService.findOneById(req.user.id),
+			await this.userService.findOneByLogin(recipient)
+		);
+	}
+
 }

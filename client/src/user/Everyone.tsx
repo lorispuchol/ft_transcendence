@@ -2,12 +2,12 @@ import { useContext, useEffect, useState } from "react";
 import { GetRequest } from "../utils/Request";
 import Loading from "../utils/Loading";
 import ErrorHandling from "../utils/Error";
-import FriendInvitation from "../components/Relationship/FriendInvitation";
 import { EventContext, UserContext } from "../utils/Context";
 import { Avatar, List, Paper } from "@mui/material";
 import { defaultAvatar } from "./Profile";
 import { Socket } from "socket.io-client";
 import { Circle } from "@mui/icons-material";
+import Friendbutton from "../components/Relationship/Friendbutton";
 
 interface ProfileElementProps {
 	user: UserData,
@@ -63,7 +63,7 @@ function ProfileElement({ user }: ProfileElementProps) {
 			{renderStatus(user.status)}
 			<Avatar src={avatar} alt={user.username}/>
 			<Paper sx={{bgcolor: "#fad390"}}>{user.username}</Paper>
-			<div><FriendInvitation login={user.login}/></div>
+			<div><Friendbutton login={user.login}/></div>
 		</Paper>
 	)
 }
@@ -73,7 +73,6 @@ function ProfileElement({ user }: ProfileElementProps) {
 export default function Everyone()
 {
 	
-	const username: string = useContext(UserContext)!;
 	const socket: Socket = useContext(EventContext)!;
 	const [userStatus, setUserStatus]: [Map<string,string>, Function] = useState(new Map());
 	const [response, setResponse]: [Response, Function] = useState({status: "loading"});
