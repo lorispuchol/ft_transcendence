@@ -36,13 +36,27 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 
 	afterInit(server: Server) {}
 
-	handleConnection(client: Socket, ...args: any[]) {
+	async handleConnection(client: Socket, ...args: any[]) {
 		const decoded: any = this.jwtService.decode(<string>client.handshake.headers.token);
-		this.users.set(client, decoded.login);
+		const newLogin: string = decoded.login;
+		this.users.set(client, newLogin);
+		
+		this.users.forEach(async (login, cli) => {
+			if (await this.isBlocked(login, newLogin))
+				return ;
+			cli.emit("status", {login: newLogin, status: "online"});
+		});
 	}
 
 	handleDisconnect(client: Socket) {
+		const offLogin: string = this.users.get(client);
 		this.users.delete(client);
+
+		this.users.forEach(async (login, cli) => {
+			if (await this.isBlocked(login, offLogin))
+				return ;
+			cli.emit("status", {login: offLogin, status: "offline"});
+		})
 	}
 
 	@SubscribeMessage('getEvents')
@@ -102,8 +116,23 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 				status: RelationshipStatus.BLOCKED,
 			} as FindOptionsWhere<User>
 		});
-		
 		return blockeds;
+	}
+
+	async isBlocked(login: string, blocker: string) {
+		const requester: User = await this.userService.findOneByLogin(blocker);
+		const recipient: User = await this.userService.findOneByLogin(login);
+
+		const relation: Relationship = await this.relationshipRepository.findOne({
+			relations: ["requester", "recipient"],
+			where: {
+				requester: requester.id,
+				recipient: recipient.id
+			} as FindOptionsWhere<User>
+		});
+		if (relation && relation.status === RelationshipStatus.BLOCKED)
+			return true;
+		return false;
 	}
 
 }

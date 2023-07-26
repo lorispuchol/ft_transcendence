@@ -66,14 +66,14 @@ function Events({ socket }: SocketProps) {
 		  			'& ul': { padding: 0 },
 				}}>
 				{events.map((event: Event, index: number) => (
-					<>
-						<ListItem key={event.type + event.sender}>
+					<div key={event.type + event.sender}>
+						<ListItem>
 							<ListItemAvatar>{renderIcon(event.type)}</ListItemAvatar>
 							{event.sender}
 						</ListItem>
 						<EventButton event={event}/>
 						{index + 1 !== events.length? <Divider /> : null}
-					</>
+					</div>
 				))}
 			</List></Paper>
 		</EventWrapper>

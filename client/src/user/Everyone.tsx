@@ -2,13 +2,12 @@ import { useContext, useEffect, useState } from "react";
 import { GetRequest } from "../utils/Request";
 import Loading from "../utils/Loading";
 import ErrorHandling from "../utils/Error";
-import EventList from "../components/event/EventList";
 import FriendInvitation from "../components/Relationship/FriendInvitation";
 import { EventContext, UserContext } from "../utils/Context";
-import { Avatar, List, ListItem, Paper } from "@mui/material";
+import { Avatar, List, Paper } from "@mui/material";
 import { defaultAvatar } from "./Profile";
 import { Socket } from "socket.io-client";
-import { Circle, CircleOutlined, CircleTwoTone } from "@mui/icons-material";
+import { Circle } from "@mui/icons-material";
 
 interface ProfileElementProps {
 	user: UserData,
@@ -35,12 +34,13 @@ interface Status {
 	status: string,
 }
 
+
 function renderStatus(status: string) {
 	switch(status) {
 		case 'online':
 			return (<Circle sx={{color:"green"}} />);
 		case 'blocked':
-			return (<Circle sx={{color:"error"}} />);
+			return (<Circle sx={{color:"orange"}} />);
 		case 'offline':
 			return (<Circle sx={{color:"red"}} />)
 		default:
@@ -50,12 +50,19 @@ function renderStatus(status: string) {
 
 function ProfileElement({ user }: ProfileElementProps) {
 	const avatar: any = user.avatar ? user.avatar : defaultAvatar;
+
 	
 	return (
-		<Paper key={user.id} sx={{marginBottom: 2, display: "flex", alignItems: "center", height: 50}}>
+		<Paper sx={{
+			marginBottom: 2,
+			display: "flex",
+			alignItems: "center",
+			justifyContent: 'space-evenly',
+			height: 50
+		}}>
 			{renderStatus(user.status)}
 			<Avatar src={avatar} alt={user.username}/>
-			<div className="ml-4">{user.username}</div>
+			<Paper sx={{bgcolor: "#fad390"}}>{user.username}</Paper>
 			<div><FriendInvitation login={user.login}/></div>
 		</Paper>
 	)
@@ -68,19 +75,20 @@ export default function Everyone()
 	
 	const username: string = useContext(UserContext)!;
 	const socket: Socket = useContext(EventContext)!;
-	const [status, setStatus]: [Map<string,string>, Function] = useState(new Map());
+	const [userStatus, setUserStatus]: [Map<string,string>, Function] = useState(new Map());
 	const [response, setResponse]: [Response, Function] = useState({status: "loading"});
 
 	useEffect(() => {
 		function statusListener(status: Status) {
-			setStatus((prevStatus: Map<string, string>) => {
-				prevStatus.set(status.login, status.status);
-				return (new Map(prevStatus));
+			setUserStatus((prevUserStatus: Map<string, string>) => {
+				prevUserStatus.set(status.login, status.status);
+				return (new Map(prevUserStatus));
 			})
 		}
 
 		socket.on('status', statusListener);
 		socket.emit('getStatus');
+		return () => {socket.off('status')};
 	}, [socket]);
 
 	useEffect(() => {
@@ -94,8 +102,8 @@ export default function Everyone()
 	
 	const users: UserData[] = response.data!;
 	users.forEach((element: UserData) => {
-		const userStatus: string | undefined = status.get(element.login);
-		element.status = userStatus ? userStatus : "offline";
+		const status: string | undefined = userStatus.get(element.login);
+		element.status = status ? status : "offline";
 	});
 	return (
 		<>
@@ -104,7 +112,7 @@ export default function Everyone()
 		  			maxHeight: 1000,
 				}}>
 				{users?.map((user: UserData) => (
-					<div className="px-4">
+					<div key={user.id} className="px-4">
 						<ProfileElement user={user} />
 					</div>
 				))}

@@ -1,4 +1,4 @@
-import { Alert, Button, IconButton } from "@mui/material";
+import { Alert, Button, IconButton, Snackbar } from "@mui/material";
 import { GetRequest, server_url } from "../../utils/Request";
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { useEffect, useState } from "react";
@@ -42,7 +42,7 @@ export default function FriendInvitation ({ login }: FriendInvitationProps) {
 			</IconButton>
 			{
 				open
-					?	<Alert className="w-fit" onClose={() => {setOpen(false)}} severity = {response.data?.status === "OK" ? "success" : "error"}>
+					?	<Alert className="w-2/6" onClose={() => {setOpen(false)}} severity = {response.data?.status === "OK" ? "success" : "error"}>
 							{response.data?.description}
 						</Alert> 
 					: null
