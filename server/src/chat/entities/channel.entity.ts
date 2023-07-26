@@ -3,9 +3,10 @@ import { Message } from "./message.entity";
 import { User } from "src/user/user.entity";
 
 export enum ChanMode {
-	PRIVATE = "private",
 	PUBLIC = "public",
-	PROTECTED = "protected"
+	PROTECTED = "protected",
+	PRIVATE = "private",
+	MP = "mp"
 }
 
 @Entity()
@@ -17,7 +18,7 @@ export class Channel extends BaseEntity {
 
 	@Column({
 		type: 'varchar',
-		length: 32,
+		length: 65,
 		unique: true
 	})
 	name: string
