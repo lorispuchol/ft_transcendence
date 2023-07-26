@@ -211,6 +211,21 @@ export class RelationshipService{
 		return relation;
 	}
 
+	async getRelation(user1: User, user2: User) {
+
+		const relation1: Relationship = await this.getRelationship(user1, user2);
+		if (relation1 && relation1.status === RelationshipStatus.BLOCKED)
+			return ({status: "blocked"});
+		
+		const relation2: Relationship = await this.getRelationship(user2, user1);
+		if (relation2 && relation2.status === RelationshipStatus.BLOCKED)
+			return ({status: "blockedYou"});
+		
+		if (relation1)
+			return ({status: relation1.status});
+		return ({status: "noRelation"});
+	}
+
 	async saveRelationship(requester: User, recipient: User, status: string) {
 		
 		const newRelationship: Relationship = new Relationship();
