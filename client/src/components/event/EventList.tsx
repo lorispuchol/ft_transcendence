@@ -1,9 +1,7 @@
 import { ReactElement, useContext, useEffect, useState } from "react";
-import { server_url } from "../../utils/Request";
-import { Socket, io } from "socket.io-client";
-import Loading from "../../utils/Loading";
-import { Badge, Button, ClickAwayListener, Divider, IconButton, List, ListItem, ListItemAvatar, Paper, Popper } from "@mui/material";
-import { Close, Done, EmojiPeople, Message, Notifications, VideogameAsset } from "@mui/icons-material";
+import { Socket } from "socket.io-client";
+import { Badge, ClickAwayListener, Divider, IconButton, List, ListItem, ListItemAvatar, Paper, Popper } from "@mui/material";
+import { EmojiPeople, Message, Notifications, VideogameAsset } from "@mui/icons-material";
 import EventButton from "./EventButton";
 import { EventContext } from "../../utils/Context";
 
@@ -108,20 +106,8 @@ function EventWrapper({ children, numberOfEvent } : EventWrapperProps) {
 }
 
 export default function EventList({ className }: any) {
-
-	// const [socket, setSocket]: [Socket | null, Function] = useState(null);
-
-	// useEffect(() => {
-	// 	const token = localStorage.getItem("token");
-	// 	const option = { transportOptions: { polling: { extraHeaders: { token: token }}}};
-	// 	const newSocket = io(server_url + "/event", option);
-	// 	setSocket(newSocket);
-	// 	return () => {newSocket.close()};
-	// }, [setSocket]);
-
-	// if (!socket)
-	// 	return (<Loading />);
 	const socket = useContext(EventContext);
+
 	return (
 		<div className={className}>
 			<Events socket={socket!}/>

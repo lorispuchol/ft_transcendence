@@ -1,9 +1,8 @@
 import { Close, Done } from "@mui/icons-material";
 import { Button } from "@mui/material";
-import { DeleteRequest, GetRequest, PatchRequest } from "../../utils/Request";
+import { DeleteRequest, PatchRequest } from "../../utils/Request";
 import ErrorHandling from "../../utils/Error";
 import { useState } from "react";
-import Loading from "../../utils/Loading";
 
 interface Event {
 	type: string,
@@ -46,7 +45,7 @@ function AcceptFriend({ login }: ButtonProps) {
 	function handleClick() {
 		PatchRequest("/relationship/accept/" + login, {}).then((response) => {setResponse(response)});
 	}
-	if (response.status == "KO")
+	if (response.status === "KO")
 			return (<ErrorHandling status={response.status} message={response.error} />);
 	if (response.data?.status === "KO")
 		return (<strong>{response.data.description}</strong>);
