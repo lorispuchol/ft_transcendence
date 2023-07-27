@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { Socket } from "socket.io-client";
 import { EventContext } from "../utils/Context";
 import { Circle } from "@mui/icons-material";
-import Loader from "../components/Loading/Loader";
+import { CircularProgress } from "@mui/material";
 
 interface UserStatusprops {
 	login: string
@@ -31,7 +31,7 @@ export default function UserStatus({ login }: UserStatusprops) {
 	}, [socket, login])
 
 	if (userStatus === "loading")
-		return (<Loader />);
+		return (<CircularProgress size="20px" />);
 
 	return (
 		<Circle sx={{color:renderColor(userStatus)}} />

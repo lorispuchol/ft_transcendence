@@ -6,6 +6,10 @@ import { Avatar, List, Paper } from "@mui/material";
 import { defaultAvatar } from "./Profile";
 import Friendbutton from "../components/Relationship/Friendbutton";
 import UserStatus from "./UserStatus";
+import { NavLink } from "react-router-dom";
+import GamingButton from "../components/game/GamingButton";
+import { primaryColor } from "../fonts/color";
+import BlockButton from "../components/Relationship/BlockButton";
 
 interface ProfileElementProps {
 	user: UserData,
@@ -36,13 +40,15 @@ function ProfileElement({ user }: ProfileElementProps) {
 			marginBottom: 2,
 			display: "flex",
 			alignItems: "center",
-			justifyContent: 'space-evenly',
+			justifyContent: "space-between",
 			height: 50
 		}}>
-			<UserStatus login={user.login} />
+			<div className="px-2"><UserStatus login={user.login} /></div>
 			<Avatar src={avatar} alt={user.username}/>
-			<Paper sx={{bgcolor: "#fad390"}}>{user.username}</Paper>
+			<NavLink to={'/profile/' + user.login}><Paper sx={{bgcolor: primaryColor, p:1}}>{user.username}</Paper></NavLink>
+			<GamingButton login={user.login}/>
 			<div><Friendbutton login={user.login}/></div>
+			<div><BlockButton login={user.login} /></div>
 		</Paper>
 	)
 }

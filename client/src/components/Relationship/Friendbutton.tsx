@@ -1,24 +1,20 @@
 import { Alert, CircularProgress, IconButton, Snackbar } from "@mui/material";
 import { DeleteRequest, GetRequest } from "../../utils/Request";
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import ErrorHandling from "../../utils/Error";
 import Loading from "../../utils/Loading";
 import { CancelScheduleSend, PersonRemove } from "@mui/icons-material";
+import { primaryColor } from "../../fonts/color";
 
 interface FriendButtonProps {
 	login: string
 }
 
-interface FriendProps {
-	login: string,
-	update: Function
-}
-
-interface RemoveProps {
-	login: string,
-	type: string,
-	update: Function
+interface RelationButtonProps {
+	path: string,
+	update: Function,
+	icon: ReactNode,
 }
 
 interface FriendshipData {
@@ -32,12 +28,12 @@ interface Response {
 	error?: string,
 }
 
-function FriendInvitation ({ login, update }: FriendProps) {
+export function RelationButtonGet({path, update, icon}: RelationButtonProps) {
 	const [open, setOpen]: [boolean, Function] = useState(false);
 	const [response, setResponse]: [Response, Function] = useState({status: "inactive"});
 	
 	function handleClick() {
-		GetRequest("/relationship/invite/" + login).then((response) => {setResponse(response); setOpen(true);});
+		GetRequest("/relationship" + path).then((response) => {setResponse(response); setOpen(true);});
 	}
 	if (response.status === "KO")
 		return (<ErrorHandling status={response.status} message={response.error} />);
@@ -49,14 +45,14 @@ function FriendInvitation ({ login, update }: FriendProps) {
 
 	return (
 		<>
-			<CircularProgress sx={{position:"absolute", display:open? "unset": "none"}} color="warning" />
+			<CircularProgress sx={{color: primaryColor, position:"absolute", display:open? "unset": "none"}} />
 			<IconButton onClick={handleClick}>
-						<PersonAddIcon />
+						{icon}
 			</IconButton>
 			{
 				open &&
 					<Snackbar open={open} autoHideDuration={2000} onClose={handleClose}>
-						<Alert className="w-fit" onClose={handleClose} severity = {response.data?.status === "OK" ? "success" : "error"}>
+						<Alert className="w-fit" onClose={handleClose} severity={response.data?.status === "OK" ? "success" : "error"}>
 							{response.data?.description}
 						</Alert> 
 					</Snackbar>
@@ -65,16 +61,16 @@ function FriendInvitation ({ login, update }: FriendProps) {
 	)
 }
 
-function RemoveRelation({login, type, update}: RemoveProps) {
+export function RelationButtonDelete({path, update, icon}: RelationButtonProps) {
 	const [open, setOpen]: [boolean, Function] = useState(false);
 	const [response, setResponse]: [Response, Function] = useState({status: "inactive"});
 	
 	function handleClick() {
-		DeleteRequest("/relationship/remove" + type + "/" + login).then((response) => {setResponse(response); setOpen(true);});
+		DeleteRequest("/relationship" + path).then((response) => {setResponse(response); setOpen(true);});
 	}
 	if (response.status === "KO")
 		return (<ErrorHandling status={response.status} message={response.error} />);
-
+	
 	function handleClose() {
 		setOpen(false);
 		update();
@@ -82,17 +78,17 @@ function RemoveRelation({login, type, update}: RemoveProps) {
 
 	return (
 		<>
-			<CircularProgress sx={{position:"absolute", display:open? "unset": "none"}} color="warning" />
+			<CircularProgress sx={{color: primaryColor, position:"absolute", display:open? "unset": "none"}} />
 			<IconButton onClick={handleClick}>
-					{type === "Friend" ? <PersonRemove /> : <CancelScheduleSend />}
+						{icon}
 			</IconButton>
 			{
 				open &&
-						<Snackbar open={open} autoHideDuration={2000} onClose={handleClose}>
-							<Alert className="w-fit" onClose={handleClose} severity = {response.data?.status === "OK" ? "success" : "error"}>
-								{response.data?.description}
-							</Alert> 
-						</Snackbar>
+					<Snackbar open={open} autoHideDuration={2000} onClose={handleClose}>
+						<Alert className="w-fit" onClose={handleClose} severity={response.data?.status === "OK" ? "success" : "error"}>
+							{response.data?.description}
+						</Alert> 
+					</Snackbar>
 			}
 		</>
 	)
@@ -101,17 +97,13 @@ function RemoveRelation({login, type, update}: RemoveProps) {
 function renderFriendButton(login: string, status: string, update: Function) {
 	switch(status) {
 		case 'invited':
-			return (<RemoveRelation login={login} type="Invitation" update={update}/>);
+			return (<RelationButtonDelete path={"/removeInvitation/" + login} update={update} icon={<CancelScheduleSend />}/>);
 		case 'accepted':
-			return (<RemoveRelation login={login} type="Friend" update={update}/>);
+			return (<RelationButtonDelete path={"/removeFriend/" + login} update={update} icon={<PersonRemove />}/>);
 		case 'noRelation':
-			return (<FriendInvitation login={login} update={update}/>)
+			return (<RelationButtonGet path={"/invite/" + login} update={update} icon={<PersonAddIcon />}/>)
 		default:
-			return (
-				<IconButton disabled>
-					<PersonAddIcon />
-				</IconButton>
-			);
+			return (<IconButton disabled><PersonAddIcon /></IconButton>);
 	}
 }
 
