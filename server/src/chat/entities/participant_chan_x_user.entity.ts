@@ -4,10 +4,10 @@ import { Channel } from "./channel.entity";
 
 
 export enum MemberDistinc {
-	INVITED = "invited",
-	MEMBER = "member",
-	ADMIN = "admin",
-	OWNER = "owner",
+	INVITED = 0,
+	MEMBER = 1,
+	ADMIN = 2,
+	OWNER = 3,
 }
 
 @Entity()

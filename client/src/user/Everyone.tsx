@@ -10,6 +10,7 @@ import { NavLink } from "react-router-dom";
 import GamingButton from "../components/game/GamingButton";
 import { primaryColor } from "../fonts/color";
 import BlockButton from "../components/Relationship/BlockButton";
+import MessageButton from "../chat/MessageButton";
 
 interface ProfileElementProps {
 	user: UserData,
@@ -48,6 +49,7 @@ function ProfileElement({ user }: ProfileElementProps) {
 			<NavLink to={'/profile/' + user.login}><Paper sx={{bgcolor: primaryColor, p:1}}>{user.username}</Paper></NavLink>
 			<GamingButton login={user.login}/>
 			<div><Friendbutton login={user.login}/></div>
+      <div><MessageButton receiver={user.login}/></div>
 			<div><BlockButton login={user.login} /></div>
 		</Paper>
 	)
