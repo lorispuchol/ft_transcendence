@@ -1,5 +1,5 @@
-import { Alert, Button, ClickAwayListener, IconButton, Snackbar } from "@mui/material";
-import { DeleteRequest, GetRequest, server_url } from "../../utils/Request";
+import { Alert, CircularProgress, IconButton, Snackbar } from "@mui/material";
+import { DeleteRequest, GetRequest } from "../../utils/Request";
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { useEffect, useState } from "react";
 import ErrorHandling from "../../utils/Error";
@@ -49,19 +49,18 @@ function FriendInvitation ({ login, update }: FriendProps) {
 
 	return (
 		<>
+			<CircularProgress sx={{position:"absolute", display:open? "unset": "none"}} color="warning" />
 			<IconButton onClick={handleClick}>
-				<PersonAddIcon />
+						<PersonAddIcon />
 			</IconButton>
 			{
-				open
-					?
-					<Snackbar open={open} autoHideDuration={4000} onClose={handleClose}>
+				open &&
+					<Snackbar open={open} autoHideDuration={2000} onClose={handleClose}>
 						<Alert className="w-fit" onClose={handleClose} severity = {response.data?.status === "OK" ? "success" : "error"}>
 							{response.data?.description}
 						</Alert> 
 					</Snackbar>
-					: null
-				}
+			}
 		</>
 	)
 }
@@ -83,19 +82,18 @@ function RemoveRelation({login, type, update}: RemoveProps) {
 
 	return (
 		<>
+			<CircularProgress sx={{position:"absolute", display:open? "unset": "none"}} color="warning" />
 			<IconButton onClick={handleClick}>
-				{type === "Friend" ? <PersonRemove /> : <CancelScheduleSend />}
+					{type === "Friend" ? <PersonRemove /> : <CancelScheduleSend />}
 			</IconButton>
 			{
-				open
-					?
-					<Snackbar open={open} autoHideDuration={4000} onClose={handleClose}>
-						<Alert className="w-fit" onClose={handleClose} severity = {response.data?.status === "OK" ? "success" : "error"}>
-							{response.data?.description}
-						</Alert> 
-					</Snackbar>
-					: null
-				}
+				open &&
+						<Snackbar open={open} autoHideDuration={2000} onClose={handleClose}>
+							<Alert className="w-fit" onClose={handleClose} severity = {response.data?.status === "OK" ? "success" : "error"}>
+								{response.data?.description}
+							</Alert> 
+						</Snackbar>
+			}
 		</>
 	)
 }
@@ -123,7 +121,7 @@ export default function Friendbutton ({ login }: FriendButtonProps) {
 
 	useEffect(() => {
 		GetRequest("/relationship/" + login).then((response) => setResponse(response));
-	}, [update]);
+	}, [update, login]);
 	if (response.status === "loading")
 		return (<Loading />);
 	if (response.status !== "OK")

@@ -1,13 +1,11 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { GetRequest } from "../utils/Request";
 import Loading from "../utils/Loading";
 import ErrorHandling from "../utils/Error";
-import { EventContext, UserContext } from "../utils/Context";
 import { Avatar, List, Paper } from "@mui/material";
 import { defaultAvatar } from "./Profile";
-import { Socket } from "socket.io-client";
-import { Circle } from "@mui/icons-material";
 import Friendbutton from "../components/Relationship/Friendbutton";
+import UserStatus from "./UserStatus";
 
 interface ProfileElementProps {
 	user: UserData,
@@ -29,25 +27,6 @@ interface Response {
 	error?: string,
 }
 
-interface Status {
-	login: string,
-	status: string,
-}
-
-
-function renderStatus(status: string) {
-	switch(status) {
-		case 'online':
-			return (<Circle sx={{color:"green"}} />);
-		case 'blocked':
-			return (<Circle sx={{color:"orange"}} />);
-		case 'offline':
-			return (<Circle sx={{color:"red"}} />)
-		default:
-			return (<strong>error status:{status}</strong>)
-	}
-}
-
 function ProfileElement({ user }: ProfileElementProps) {
 	const avatar: any = user.avatar ? user.avatar : defaultAvatar;
 
@@ -60,7 +39,7 @@ function ProfileElement({ user }: ProfileElementProps) {
 			justifyContent: 'space-evenly',
 			height: 50
 		}}>
-			{renderStatus(user.status)}
+			<UserStatus login={user.login} />
 			<Avatar src={avatar} alt={user.username}/>
 			<Paper sx={{bgcolor: "#fad390"}}>{user.username}</Paper>
 			<div><Friendbutton login={user.login}/></div>
@@ -72,23 +51,7 @@ function ProfileElement({ user }: ProfileElementProps) {
 
 export default function Everyone()
 {
-	
-	const socket: Socket = useContext(EventContext)!;
-	const [userStatus, setUserStatus]: [Map<string,string>, Function] = useState(new Map());
 	const [response, setResponse]: [Response, Function] = useState({status: "loading"});
-
-	useEffect(() => {
-		function statusListener(status: Status) {
-			setUserStatus((prevUserStatus: Map<string, string>) => {
-				prevUserStatus.set(status.login, status.status);
-				return (new Map(prevUserStatus));
-			})
-		}
-
-		socket.on('status', statusListener);
-		socket.emit('getStatus');
-		return () => {socket.off('status')};
-	}, [socket]);
 
 	useEffect(() => {
 			GetRequest("/user/all").then((response) => setResponse(response));
@@ -100,10 +63,6 @@ export default function Everyone()
 
 	
 	const users: UserData[] = response.data!;
-	users.forEach((element: UserData) => {
-		const status: string | undefined = userStatus.get(element.login);
-		element.status = status ? status : "offline";
-	});
 	return (
 		<>
 			<List sx={{

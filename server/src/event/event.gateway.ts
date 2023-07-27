@@ -1,6 +1,6 @@
 
 import { JwtService } from "@nestjs/jwt";
-import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
+import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 import { client_url } from "src/auth/constants";
 import { EventService } from "./event.service";
@@ -44,7 +44,7 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 		this.users.forEach(async (login, cli) => {
 			if (await this.isBlocked(login, newLogin))
 				return ;
-			cli.emit("status", {login: newLogin, status: "online"});
+			cli.emit("status/" + newLogin, "online");
 		});
 	}
 
@@ -55,7 +55,7 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 		this.users.forEach(async (login, cli) => {
 			if (await this.isBlocked(login, offLogin))
 				return ;
-			cli.emit("status", {login: offLogin, status: "offline"});
+				cli.emit("status/" + offLogin, "offline");
 		})
 	}
 
@@ -96,14 +96,17 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 	}
 
 	@SubscribeMessage('getStatus')
-	async getStatus(client: Socket) {
-		const usersStatus: Map<string, string> = new Map();
-		const blockeds: Relationship[] = await this.getBlockeds(this.users.get(client));
-		
-		this.users.forEach((login) => usersStatus.set(login, "online"));
-		blockeds.forEach((relation: Relationship) => usersStatus.set(relation.requester.login, "blocked"));
+	async getStatus(@MessageBody() userLogin: string, @ConnectedSocket() client: Socket) {
+		const login: string = this.users.get(client);
+		let userOnline: boolean = false;
+		this.users.forEach((value) => value === userLogin ? userOnline = true : null);
 
-		usersStatus.forEach((status: string, login: string) => client.emit('status', {login: login, status: status}));
+		let userStatus: string;
+		if ( await this.isBlocked(login, userLogin)) {userStatus = "blocked";}
+		else if (userOnline) {userStatus = "online";}
+		else {userStatus = "offline";}
+
+		client.emit("status/" + userLogin, userStatus);
 	}
 
 	async getBlockeds(login: string) {
