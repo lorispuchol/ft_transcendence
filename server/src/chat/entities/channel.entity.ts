@@ -19,7 +19,8 @@ export class Channel extends BaseEntity {
 	@Column({
 		type: 'varchar',
 		length: 65,
-		unique: true
+		unique: true,
+		nullable: false
 	})
 	name: string
 

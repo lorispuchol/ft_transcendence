@@ -8,6 +8,7 @@ import { defaultAvatar } from "./Profile";
 import { Socket } from "socket.io-client";
 import { Circle } from "@mui/icons-material";
 import Friendbutton from "../components/Relationship/Friendbutton";
+import MessageButton from "../chat/MessageButton";
 
 interface ProfileElementProps {
 	user: UserData,
@@ -64,6 +65,7 @@ function ProfileElement({ user }: ProfileElementProps) {
 			<Avatar src={avatar} alt={user.username}/>
 			<Paper sx={{bgcolor: "#fad390"}}>{user.username}</Paper>
 			<div><Friendbutton login={user.login}/></div>
+			<div><MessageButton receiver={user.login}/></div>
 		</Paper>
 	)
 }
