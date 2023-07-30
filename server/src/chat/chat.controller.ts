@@ -16,11 +16,11 @@ export class ChatController {
 		)
 	}
 
-	@Get('getMp/:receiver')
-	async getMp(
+	@Get('getDm/:receiver')
+	async getDm(
 		@Request() req: any,
 		@Param('receiver') receiver: string) {
-			return this.chatService.getMp(
+			return this.chatService.getDm(
 				await this.userService.findOneByLogin(req.user.login),
 				await this.userService.findOneByLogin(receiver))
 		}

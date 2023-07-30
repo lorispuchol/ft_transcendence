@@ -88,7 +88,7 @@ export default function App() {
 						<Route path='/everyone' element={<Everyone />} />
 						<Route path='/login' element={<Navigate to='/' />} />
 						<Route path='/chat' element={<Chat />} />
-						<Route path='/chat/:username' element={<Chat />} />
+						{/* <Route path='/chat/:channel' element={<Chating />} /> */}
 						<Route path='/game' element={<Game />} />
 						<Route path='/loader' element={<Loader />} />
 					</Routes>

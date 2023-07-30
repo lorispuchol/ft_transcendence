@@ -4,6 +4,7 @@ import { UserContext } from "../utils/Context";
 import { GetRequest } from "../utils/Request";
 import Loading from "../utils/Loading";
 import ErrorHandling from "../utils/Error";
+import { useLocation } from "react-router-dom";
 
 interface ChannelData {
 	id: number, 
@@ -18,6 +19,7 @@ interface Response {
 }
 
 export default function Chat() {
+	const location = useLocation()
 
 	const [response, setResponse]: [Response, Function] = useState({status: "loading"});
 	useEffect(() => {
@@ -28,6 +30,9 @@ export default function Chat() {
 		return (<Loading />);
 	if (response.status !== "OK")
 		return (<ErrorHandling status={response.status} message={response.error} />);
+
+	if (location.state)
+		return (<strong>{location.state.to}</strong>)
 	return (
 		<div>
 			<header>

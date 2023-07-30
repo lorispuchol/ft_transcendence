@@ -6,7 +6,7 @@ export enum ChanMode {
 	PUBLIC = "public",
 	PROTECTED = "protected",
 	PRIVATE = "private",
-	MP = "mp"
+	DM = "dm"
 }
 
 @Entity()
