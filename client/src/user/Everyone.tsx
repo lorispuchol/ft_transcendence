@@ -32,12 +32,19 @@ interface Response {
 	error?: string,
 }
 
+
 function ProfileElement({ user }: ProfileElementProps) {
 	const avatar: any = user.avatar ? user.avatar : defaultAvatar;
-
+	const [render, setRender]: [number, Function] = useState(0);
 	
+	//useEffect(() => {}, [render])
+	
+	function rerender() {
+		setRender(render + 1);
+	}
+
 	return (
-		<Paper sx={{
+		<Paper key={render} sx={{
 			marginBottom: 2,
 			display: "flex",
 			alignItems: "center",
@@ -46,11 +53,13 @@ function ProfileElement({ user }: ProfileElementProps) {
 		}}>
 			<div className="px-2"><UserStatus login={user.login} /></div>
 			<Avatar src={avatar} alt={user.username}/>
-			<NavLink to={'/profile/' + user.login}><Paper sx={{bgcolor: primaryColor, p:1}}>{user.username}</Paper></NavLink>
+			<NavLink to={'/profile/' + user.login}>
+				<Paper sx={{bgcolor: primaryColor, p:1}}>{user.username}</Paper>
+			</NavLink>
 			<GamingButton login={user.login}/>
-			<div><Friendbutton login={user.login}/></div>
-      <div><MessageButton receiver={user.login}/></div>
-			<div><BlockButton login={user.login} /></div>
+      		<div><MessageButton receiver={user.login}/></div>
+			<div><Friendbutton login={user.login} render={rerender} /></div>
+			<div><BlockButton login={user.login} render={rerender} /></div>
 		</Paper>
 	)
 }

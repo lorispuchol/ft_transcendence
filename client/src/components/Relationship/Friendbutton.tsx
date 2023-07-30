@@ -8,7 +8,8 @@ import { CancelScheduleSend, PersonRemove } from "@mui/icons-material";
 import { primaryColor } from "../../fonts/color";
 
 interface FriendButtonProps {
-	login: string
+	login: string,
+	render?: Function
 }
 
 interface RelationButtonProps {
@@ -101,13 +102,14 @@ function renderFriendButton(login: string, status: string, update: Function) {
 		case 'accepted':
 			return (<RelationButtonDelete path={"/removeFriend/" + login} update={update} icon={<PersonRemove />}/>);
 		case 'noRelation':
-			return (<RelationButtonGet path={"/invite/" + login} update={update} icon={<PersonAddIcon />}/>)
+		case 'blocked':
+			return (<RelationButtonGet path={"/invite/" + login} update={update} icon={<PersonAddIcon />}/>);
 		default:
 			return (<IconButton disabled><PersonAddIcon /></IconButton>);
 	}
 }
 
-export default function Friendbutton ({ login }: FriendButtonProps) {
+export default function Friendbutton ({ login, render }: FriendButtonProps) {
 	const [response, setResponse]: [Response, Function] = useState({status: "loading"});
 	const [update, setUpdate]: [number, Function] = useState(0);
 
@@ -121,6 +123,7 @@ export default function Friendbutton ({ login }: FriendButtonProps) {
 
 	function handleUpdate() {
 		setUpdate(update + 1);
+		if(render) {render();}
 	}
 
 	return (

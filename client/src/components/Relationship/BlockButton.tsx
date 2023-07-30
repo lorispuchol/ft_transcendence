@@ -2,13 +2,12 @@ import { useEffect, useState } from "react";
 import { GetRequest } from "../../utils/Request";
 import Loader from "../Loading/Loader";
 import ErrorHandling from "../../utils/Error";
-import { Alert, CircularProgress, IconButton, Snackbar } from "@mui/material";
-import { Block, DoDisturbOff, DoDisturbOn } from "@mui/icons-material";
-import { primaryColor } from "../../fonts/color";
+import { DoDisturbOff, DoDisturbOn } from "@mui/icons-material";
 import { RelationButtonDelete, RelationButtonGet } from "./Friendbutton";
 
-interface LoginProps {
-	login: string
+interface BlockProps {
+	login: string,
+	render?: Function
 }
 
 interface FriendshipData {
@@ -22,7 +21,7 @@ interface Response {
 	error?: string,
 }
 
-export default function BlockButton({ login }: LoginProps) {
+export default function BlockButton({ login, render }: BlockProps) {
 	const [response, setResponse]: [Response, Function] = useState({status: "loading"});
 	const [update, setUpdate]: [number, Function] = useState(0);
 
@@ -36,6 +35,7 @@ export default function BlockButton({ login }: LoginProps) {
 
 	function handleUpdate() {
 		setUpdate(update + 1);
+		if (render) {render();}
 	}
 	
 	if (response.data!.status === "blocked")
