@@ -3,7 +3,6 @@ import { DeleteRequest, GetRequest } from "../../utils/Request";
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { ReactNode, useEffect, useState } from "react";
 import ErrorHandling from "../../utils/Error";
-import Loading from "../../utils/Loading";
 import { CancelScheduleSend, PersonRemove } from "@mui/icons-material";
 import { primaryColor } from "../../fonts/color";
 
@@ -52,7 +51,7 @@ export function RelationButtonGet({path, update, icon}: RelationButtonProps) {
 			</IconButton>
 			{
 				open &&
-					<Snackbar open={open} autoHideDuration={2000} onClose={handleClose}>
+					<Snackbar open={open} autoHideDuration={1000} onClose={handleClose}>
 						<Alert className="w-fit" onClose={handleClose} severity={response.data?.status === "OK" ? "success" : "error"}>
 							{response.data?.description}
 						</Alert> 
@@ -85,7 +84,7 @@ export function RelationButtonDelete({path, update, icon}: RelationButtonProps) 
 			</IconButton>
 			{
 				open &&
-					<Snackbar open={open} autoHideDuration={2000} onClose={handleClose}>
+					<Snackbar open={open} autoHideDuration={1000} onClose={handleClose}>
 						<Alert className="w-fit" onClose={handleClose} severity={response.data?.status === "OK" ? "success" : "error"}>
 							{response.data?.description}
 						</Alert> 
@@ -117,7 +116,7 @@ export default function Friendbutton ({ login, render }: FriendButtonProps) {
 		GetRequest("/relationship/" + login).then((response) => setResponse(response));
 	}, [update, login]);
 	if (response.status === "loading")
-		return (<Loading />);
+		return (<IconButton><PersonAddIcon /></IconButton>);
 	if (response.status !== "OK")
 		return (<ErrorHandling status={response.status} message={response.error} />);
 

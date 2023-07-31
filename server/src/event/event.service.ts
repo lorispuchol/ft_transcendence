@@ -28,6 +28,10 @@ export class EventService {
 		this.eventGateway.deleteEvent(login, event);
 	}
 
+	async getUserData(login: string) {
+		return await this.userService.findOneByLogin(login);
+	}
+
 	async getPendingInvitations(login: string): Promise<string[]> {
 		
 		const user: User = await this.userService.findOneByLogin(login);

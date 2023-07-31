@@ -5,6 +5,7 @@ import { Server, Socket } from "socket.io";
 import { client_url } from "src/auth/constants";
 import { EventService } from "./event.service";
 import { Inject, forwardRef } from "@nestjs/common";
+import { User } from "src/user/user.entity";
 
 interface Event {
 	type: string,
@@ -29,12 +30,15 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 	async handleConnection(client: Socket, ...args: any[]) {
 		const decoded: any = this.jwtService.decode(<string>client.handshake.headers.token);
 		const newLogin: string = decoded.login;
+		const newUser: User = await this.eventService.getUserData(newLogin);
 		this.users.set(client, newLogin);
 		
 		this.users.forEach(async (login, cli) => {
 			if (await this.eventService.isBlocked(login, newLogin))
 				return ;
 			cli.emit("status/" + newLogin, "online");
+			if (newLogin !== login)
+				cli.emit("everyone", newUser);
 		});
 	}
 
@@ -45,7 +49,7 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 		this.users.forEach(async (login, cli) => {
 			if (await this.eventService.isBlocked(login, offLogin))
 				return ;
-				cli.emit("status/" + offLogin, "offline");
+			cli.emit("status/" + offLogin, "offline");
 		})
 	}
 

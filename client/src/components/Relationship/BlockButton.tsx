@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { GetRequest } from "../../utils/Request";
-import Loader from "../Loading/Loader";
 import ErrorHandling from "../../utils/Error";
 import { DoDisturbOff, DoDisturbOn } from "@mui/icons-material";
 import { RelationButtonDelete, RelationButtonGet } from "./Friendbutton";
+import { IconButton } from "@mui/material";
 
 interface BlockProps {
 	login: string,
@@ -29,7 +29,7 @@ export default function BlockButton({ login, render }: BlockProps) {
 		GetRequest("/relationship/" + login).then((response) => setResponse(response));
 	}, [update, login]);
 	if (response.status === "loading")
-		return (<Loader />);
+		return (<IconButton><DoDisturbOn /></IconButton>);
 	if (response.status !== "OK")
 		return (<ErrorHandling status={response.status} message={response.error} />);
 

@@ -3,7 +3,6 @@ import { Button } from "@mui/material"
 import { primaryColor } from "../../fonts/color"
 import { useEffect, useState } from "react";
 import { GetRequest } from "../../utils/Request";
-import Loader from "../Loading/Loader";
 import ErrorHandling from "../../utils/Error";
 
 interface GamingButtonProps {
@@ -28,11 +27,12 @@ export default function GamingButton({ login }: GamingButtonProps) {
 		GetRequest("/relationship/" + login).then((response) => setResponse(response));
 	}, [login]);
 	if (response.status === "loading")
-		return (<Loader />);
+		return (<Button sx={{backgroundColor: primaryColor}} color="error" variant="outlined" startIcon={<VideogameAsset />}>challenge</Button>);
 	if (response.status !== "OK")
 		return (<ErrorHandling status={response.status} message={response.error} />);
 
-	if (response.data!.status === "blocked")
+	const status: string = response.data!.status;
+	if (status === "blocked" || status === "blockedYou")
 		return (<Button disabled sx={{backgroundColor: primaryColor}} variant="outlined" startIcon={<VideogameAsset />}>challenge</Button>);
 	return (
 		<>
