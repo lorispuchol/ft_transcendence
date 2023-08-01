@@ -4,6 +4,9 @@ import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessa
 import { Server, Socket } from "socket.io";
 import { client_url } from "src/auth/constants";
 import { v4 as uuidv4 } from 'uuid';
+import { ChatService } from "./chat.service";
+import { UserService } from "src/user/user.service";
+import { Channel } from "./entities/channel.entity";
 
 interface Message {
 	id: string;
@@ -11,14 +14,15 @@ interface Message {
 	value: string;
 	time: number;
 }
-
 @WebSocketGateway({
 	namespace: "chat",
 	cors: { origin: [client_url] },
 })
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect{
 	constructor(
-		private jwtService: JwtService
+		private jwtService: JwtService,
+		private chatService: ChatService,
+		private userService: UserService,
 	) {}
 
 	private messages: Set<Message> = new Set();
@@ -54,4 +58,17 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		this.messages.add(message);
 		this.users.forEach((login, cli) => cli.emit('message', message));
 	}
+
+	@SubscribeMessage('getDiscussions')
+	async getDiscussions(client: Socket) {
+		
+		const decoded: any = this.jwtService.decode(<string>client.handshake.headers.token);
+		const discussions: Channel[] = await this.chatService.getAllDiscuss(await this.userService.findOneByLogin(decoded.login))
+		
+		
+		discussions.forEach((discussion) => client.emit('discussion', discussion));
+	}
+
+	// @SubscribeMessage('discussion')
+	// handleDiscussion(){}	
 }

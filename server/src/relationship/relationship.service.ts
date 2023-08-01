@@ -74,6 +74,7 @@ export class RelationshipService{
 		
 		relation.status = RelationshipStatus.ACCEPTED
 		await this.relationshipRepository.save(relation);
+		this.eventService.deleteEvent(acceptor.login, {type: "friendRequest", sender: inviter.login});
 		return ({status: "OK", description: `You accepted ${inviter.username} as friend`})
 	}
 
@@ -91,7 +92,8 @@ export class RelationshipService{
 
 		if (relation.status !== RelationshipStatus.INVITED)
 			return ({status: "KO", description: `Impossible to refuse ${inviter.username}`});
-		this.deleteRelationship(inviter, refusor)
+		this.deleteRelationship(inviter, refusor);
+		this.eventService.deleteEvent(refusor.login, {type: "friendRequest", sender: inviter.login});
 		return ({status: "OK", description: `Invitation from ${inviter.username} has been refused`})
 	}
 
@@ -123,6 +125,8 @@ export class RelationshipService{
 		relation.status = RelationshipStatus.BLOCKED
 
 		await this.relationshipRepository.save(relation);
+		this.eventService.deleteEvent(recipient.login, {type: "friendRequest", sender: requester.username});
+		this.eventService.deleteEvent(requester.login, {type: "friendRequest", sender: recipient.username});
 		return ({status: "OK", description: `You successfully blocked ${recipient.username}`})
 
 	}
@@ -155,6 +159,7 @@ export class RelationshipService{
 			return ({status: "KO", description: `Impossible to remove invitation to ${recipient.username}`})
 		
 		this.deleteRelationship(requester, recipient);
+		this.eventService.deleteEvent(recipient.login, {type: "friendRequest", sender: requester.username});
 		return ({status: "OK", description: `Invitation to ${recipient.username} has been removed`})
 	}
 
@@ -204,6 +209,21 @@ export class RelationshipService{
 		});
 		
 		return relation;
+	}
+
+	async getRelation(user1: User, user2: User) {
+
+		const relation1: Relationship = await this.getRelationship(user1, user2);
+		if (relation1 && relation1.status === RelationshipStatus.BLOCKED)
+			return ({status: "blocked"});
+		
+		const relation2: Relationship = await this.getRelationship(user2, user1);
+		if (relation2 && relation2.status === RelationshipStatus.BLOCKED)
+			return ({status: "blockedYou"});
+		
+		if (relation1)
+			return ({status: relation1.status});
+		return ({status: "noRelation"});
 	}
 
 	async saveRelationship(requester: User, recipient: User, status: string) {

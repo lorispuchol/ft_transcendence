@@ -1,5 +1,8 @@
 import { Column, Entity, PrimaryGeneratedColumn, OneToMany, BaseEntity } from "typeorm";
 import { Relationship } from "../relationship/relationship.entity";
+import { Message } from "src/chat/entities/message.entity";
+import { Channel } from "src/chat/entities/channel.entity";
+import { Match } from "src/game/match.entity";
 
 export enum UserStatus {
     OFFLINE = "offline",
@@ -21,7 +24,7 @@ export class User extends BaseEntity {
 	
 	@Column({
 		type: 'varchar',
-		length: 64,
+		length: 16,
 		nullable: true,
 		unique: true,
 	})
@@ -55,4 +58,17 @@ export class User extends BaseEntity {
 
 	@OneToMany(() => Relationship, (relationship) => relationship)
 	relationships: Relationship[];
+	
+	@OneToMany(() => Message, (message) => message.sender)
+	sendMessages: Message[];
+
+	
+	@OneToMany(() => Message, (message) => message.receiver)
+	recvMessages: Message[];
+
+	@OneToMany(() => Channel, (channel) => channel)
+	channels: Channel[]
+
+	@OneToMany(() => Match, (match) => match)
+	matches: Match[]
 }

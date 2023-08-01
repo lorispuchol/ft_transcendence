@@ -11,7 +11,7 @@ import { UserModule } from "src/user/user.module";
 		TypeOrmModule.forFeature([User, Relationship], 'lorisforever'),
 		UserModule,
 	],
-	providers: [EventGateway, EventService],
+	providers: [EventService, EventGateway],
 	exports: [EventService],
 })
 export class EventModule {}

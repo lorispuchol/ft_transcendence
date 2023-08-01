@@ -1,10 +1,9 @@
-import { ReactElement, useEffect, useState } from "react";
-import { server_url } from "../../utils/Request";
-import { Socket, io } from "socket.io-client";
-import Loading from "../../utils/Loading";
-import { Badge, Button, ClickAwayListener, Divider, IconButton, List, ListItem, ListItemAvatar, Paper, Popper } from "@mui/material";
-import { Close, Done, EmojiPeople, Message, Notifications, VideogameAsset } from "@mui/icons-material";
+import { ReactElement, useContext, useEffect, useState } from "react";
+import { Socket } from "socket.io-client";
+import { Badge, ClickAwayListener, Divider, IconButton, List, ListItem, ListItemAvatar, Paper, Popper } from "@mui/material";
+import { EmojiPeople, Message, Notifications, VideogameAsset } from "@mui/icons-material";
 import EventButton from "./EventButton";
+import { EventContext } from "../../utils/Context";
 
 interface Event {
 	type: string,
@@ -43,7 +42,16 @@ function Events({ socket }: SocketProps) {
 				return newEvents;
 			});
 		}
+		function eventDeleter(event: Event) {
+			setEvents((prevEvents: Event[]) => {
+				const index = prevEvents.indexOf(event);
+				prevEvents.splice(index, 1);
+				return [...prevEvents];
+			});
+		}
+
 		socket.on('event', eventListener);
+		socket.on('deleteEvent', eventDeleter);
 		socket.emit('getEvents');
 		return () => {socket.off('event', eventListener)};
 	}, [socket]);
@@ -56,14 +64,14 @@ function Events({ socket }: SocketProps) {
 		  			'& ul': { padding: 0 },
 				}}>
 				{events.map((event: Event, index: number) => (
-					<>
-						<ListItem key={event.type + event.sender}>
+					<div key={event.type + event.sender}>
+						<ListItem>
 							<ListItemAvatar>{renderIcon(event.type)}</ListItemAvatar>
 							{event.sender}
 						</ListItem>
 						<EventButton event={event}/>
 						{index + 1 !== events.length? <Divider /> : null}
-					</>
+					</div>
 				))}
 			</List></Paper>
 		</EventWrapper>
@@ -98,23 +106,11 @@ function EventWrapper({ children, numberOfEvent } : EventWrapperProps) {
 }
 
 export default function EventList({ className }: any) {
-
-	const [socket, setSocket]: [Socket | null, Function] = useState(null);
-
-	useEffect(() => {
-		const token = localStorage.getItem("token");
-		const option = { transportOptions: { polling: { extraHeaders: { token: token }}}};
-		const newSocket = io(server_url + "/event", option);
-		setSocket(newSocket);
-		return () => {newSocket.close()};
-	}, [setSocket]);
-
-	if (!socket)
-		return (<Loading />);
+	const socket = useContext(EventContext);
 
 	return (
 		<div className={className}>
-			<Events socket={socket} />
+			<Events socket={socket!}/>
 		</div>
 	);
 }
