@@ -7,27 +7,74 @@ $primary_color: #fad390;
 
 .profile_top {
 	margin-top: 32px;
-	padding-right: 0.600rem;
+	// padding-right: 0.600rem;
 	margin-bottom: 32px;
 }
 
 .profile_image {
-	margin-left: 0.300rem;
-	margin-left: 0.300rem;
+	// margin-left: 0.300rem;
+	margin-right: 0.300rem;
 	width: 512px;
-	box-shadow: 1px 2px 4px 0.100rem black;
+	// min-width: 512px;
+	// box-shadow: 0px 0px 4px 0.100rem black;
 	border-radius: 0.25rem;
-	border-color: white;
+	// border-color: white;
 }
 
 .profile_username {
 	font-family: 'Poppins';
 	font-size: 3rem;
-	padding-right: 15%;
-	padding-left: 128px;
-	background-color: white;
-	border-radius: 0.25rem;
-	border-color: white;
-	box-shadow: 1px 2px 4px 0.100rem black;
+	// padding-right: 15%;
+	// padding-left: 128px;
+	// background-color: white;
+	// border-radius: 0.25rem;
+	// border-color: white;
+	// box-shadow: 0 0 4px 0.100rem black;
 	justify-self: center;
+}
+
+.profile_score {
+	// background-color: white;
+	// box-shadow: 0 0 4px 0.100rem black;
+	// border-radius: 0.25rem;
+	margin-bottom: 32px;
+	height: 96px;
+	// justify-items: center;
+	place-items: center;
+}
+
+.victory {
+	color: green;
+	font-family: 'Poppins';
+	font-size: 2rem;
+}
+
+.defeat {
+	color: red;
+	font-family: 'Poppins';
+	font-size: 2rem;
+}
+
+.score {
+	font-size: 2rem;
+}
+
+.profile_mh {
+	background-color: white;
+	justify-items: center;
+	margin-bottom: 32px;
+}
+
+.profile_mh_header {
+	font-family: 'Poppins';
+	font-size: 2rem;
+	display: flex;
+	justify-content: center;
+}
+
+.profile_mh_score {
+	font-family: 'Poppins';
+	font-size: 1.5rem;
+	display: flex;
+	justify-content: center;
 }
