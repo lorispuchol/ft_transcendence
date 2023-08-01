@@ -10,8 +10,8 @@ RUN apk update
 
 WORKDIR '/app'
 
-RUN npm init -y
-RUN npm install .
+#RUN npm init -y
+#RUN npm install .
 #RUN npm audit fix
 
 # CMD ["npm", "start"]

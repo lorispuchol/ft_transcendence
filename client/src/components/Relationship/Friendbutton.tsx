@@ -3,12 +3,12 @@ import { DeleteRequest, GetRequest } from "../../utils/Request";
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { ReactNode, useEffect, useState } from "react";
 import ErrorHandling from "../../utils/Error";
-import Loading from "../../utils/Loading";
 import { CancelScheduleSend, PersonRemove } from "@mui/icons-material";
 import { primaryColor } from "../../fonts/color";
 
 interface FriendButtonProps {
-	login: string
+	login: string,
+	render?: Function
 }
 
 interface RelationButtonProps {
@@ -51,7 +51,7 @@ export function RelationButtonGet({path, update, icon}: RelationButtonProps) {
 			</IconButton>
 			{
 				open &&
-					<Snackbar open={open} autoHideDuration={2000} onClose={handleClose}>
+					<Snackbar open={open} autoHideDuration={1000} onClose={handleClose}>
 						<Alert className="w-fit" onClose={handleClose} severity={response.data?.status === "OK" ? "success" : "error"}>
 							{response.data?.description}
 						</Alert> 
@@ -84,7 +84,7 @@ export function RelationButtonDelete({path, update, icon}: RelationButtonProps) 
 			</IconButton>
 			{
 				open &&
-					<Snackbar open={open} autoHideDuration={2000} onClose={handleClose}>
+					<Snackbar open={open} autoHideDuration={1000} onClose={handleClose}>
 						<Alert className="w-fit" onClose={handleClose} severity={response.data?.status === "OK" ? "success" : "error"}>
 							{response.data?.description}
 						</Alert> 
@@ -101,13 +101,14 @@ function renderFriendButton(login: string, status: string, update: Function) {
 		case 'accepted':
 			return (<RelationButtonDelete path={"/removeFriend/" + login} update={update} icon={<PersonRemove />}/>);
 		case 'noRelation':
-			return (<RelationButtonGet path={"/invite/" + login} update={update} icon={<PersonAddIcon />}/>)
+		case 'blocked':
+			return (<RelationButtonGet path={"/invite/" + login} update={update} icon={<PersonAddIcon />}/>);
 		default:
 			return (<IconButton disabled><PersonAddIcon /></IconButton>);
 	}
 }
 
-export default function Friendbutton ({ login }: FriendButtonProps) {
+export default function Friendbutton ({ login, render }: FriendButtonProps) {
 	const [response, setResponse]: [Response, Function] = useState({status: "loading"});
 	const [update, setUpdate]: [number, Function] = useState(0);
 
@@ -115,12 +116,13 @@ export default function Friendbutton ({ login }: FriendButtonProps) {
 		GetRequest("/relationship/" + login).then((response) => setResponse(response));
 	}, [update, login]);
 	if (response.status === "loading")
-		return (<Loading />);
+		return (<IconButton><PersonAddIcon /></IconButton>);
 	if (response.status !== "OK")
 		return (<ErrorHandling status={response.status} message={response.error} />);
 
 	function handleUpdate() {
 		setUpdate(update + 1);
+		if(render) {render();}
 	}
 
 	return (

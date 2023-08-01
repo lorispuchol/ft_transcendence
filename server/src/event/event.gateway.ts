@@ -1,23 +1,15 @@
 
 import { JwtService } from "@nestjs/jwt";
-import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
+import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 import { client_url } from "src/auth/constants";
 import { EventService } from "./event.service";
-import { Relationship, RelationshipStatus } from "src/relationship/relationship.entity";
-import { InjectRepository } from "@nestjs/typeorm";
-import { FindOptionsWhere, Repository } from "typeorm";
-import { UserService } from "src/user/user.service";
+import { Inject, forwardRef } from "@nestjs/common";
 import { User } from "src/user/user.entity";
 
 interface Event {
 	type: string,
 	sender: string,
-}
-
-interface Status {
-	login: string,
-	status: string,
 }
 
 @WebSocketGateway({
@@ -26,9 +18,8 @@ interface Status {
 })
 export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 	constructor(
-		@InjectRepository(Relationship, 'lorisforever')
-		private relationshipRepository: Repository<Relationship>,
-		private userService: UserService,
+		@Inject(forwardRef(() => EventService))
+			private eventService: EventService,
 		private jwtService: JwtService,
 	) {}
 	
@@ -39,12 +30,15 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 	async handleConnection(client: Socket, ...args: any[]) {
 		const decoded: any = this.jwtService.decode(<string>client.handshake.headers.token);
 		const newLogin: string = decoded.login;
+		const newUser: User = await this.eventService.getUserData(newLogin);
 		this.users.set(client, newLogin);
 		
 		this.users.forEach(async (login, cli) => {
-			if (await this.isBlocked(login, newLogin))
+			if (await this.eventService.isBlocked(login, newLogin))
 				return ;
 			cli.emit("status/" + newLogin, "online");
+			if (newLogin !== login)
+				cli.emit("everyone", newUser);
 		});
 	}
 
@@ -53,9 +47,9 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 		this.users.delete(client);
 
 		this.users.forEach(async (login, cli) => {
-			if (await this.isBlocked(login, offLogin))
+			if (await this.eventService.isBlocked(login, offLogin))
 				return ;
-				cli.emit("status/" + offLogin, "offline");
+			cli.emit("status/" + offLogin, "offline");
 		})
 	}
 
@@ -64,7 +58,7 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 		const login: string = this.users.get(client);
 		const events: Event[] = [];
 		
-		const friendReq: string[] = await this.getPendingInvitations(login);
+		const friendReq: string[] = await this.eventService.getPendingInvitations(login);
 		friendReq.map((login: string) => events.push({type: "friendRequest", sender: login}));
 	
 		events.map((event) => client.emit("event", event));
@@ -79,21 +73,6 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 		const client: Socket = [...this.users.entries()].filter(({ 1: value}) => login === value).map(([key]) => key)[0];
 		client?.emit("deleteEvent", event);
 	}
-	
-	async getPendingInvitations(login: string): Promise<string[]> {
-		
-		const user: User = await this.userService.findOneByLogin(login);
-		const pendingInvitations: Relationship[] = await this.relationshipRepository.find({
-			where: {
-				recipient: user.id,
-				status: RelationshipStatus.INVITED
-			} as FindOptionsWhere<User>
-		});
-
-		const logins: string[] = [];
-		pendingInvitations.forEach((invitation) => logins.push(invitation.requester.username))
-		return logins;
-	}
 
 	@SubscribeMessage('getStatus')
 	async getStatus(@MessageBody() userLogin: string, @ConnectedSocket() client: Socket) {
@@ -102,40 +81,11 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 		this.users.forEach((value) => value === userLogin ? userOnline = true : null);
 
 		let userStatus: string;
-		if ( await this.isBlocked(login, userLogin)) {userStatus = "blocked";}
+		if ( await this.eventService.isBlocked(login, userLogin)) {userStatus = "blocked";}
 		else if (userOnline) {userStatus = "online";}
 		else {userStatus = "offline";}
 
 		client.emit("status/" + userLogin, userStatus);
-	}
-
-	async getBlockeds(login: string) {
-		const user: User = await this.userService.findOneByLogin(login);
-		const id: number = user.id;
-		const blockeds: Relationship[] = await this.relationshipRepository.find({
-			relations: ["requester", "recipient"],
-			where: {
-				recipient: id,
-				status: RelationshipStatus.BLOCKED,
-			} as FindOptionsWhere<User>
-		});
-		return blockeds;
-	}
-
-	async isBlocked(login: string, blocker: string) {
-		const requester: User = await this.userService.findOneByLogin(blocker);
-		const recipient: User = await this.userService.findOneByLogin(login);
-
-		const relation: Relationship = await this.relationshipRepository.findOne({
-			relations: ["requester", "recipient"],
-			where: {
-				requester: requester.id,
-				recipient: recipient.id
-			} as FindOptionsWhere<User>
-		});
-		if (relation && relation.status === RelationshipStatus.BLOCKED)
-			return true;
-		return false;
 	}
 
 }
