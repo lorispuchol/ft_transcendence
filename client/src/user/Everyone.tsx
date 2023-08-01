@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { EventContext } from "../utils/Context";
+import { EventContext, UserContext } from "../utils/Context";
 import { GetRequest } from "../utils/Request";
 import { Avatar, List, Paper } from "@mui/material";
 import { defaultAvatar } from "./Profile";
@@ -72,6 +72,7 @@ export default function Everyone() {
 	const [response, setResponse]: [Response, Function] = useState({status: "loading"});
 	const [users, setUsers]: [UserData[], Function] = useState([]);
 	const socket = useContext(EventContext);
+	const username = useContext(UserContext);
 
 	useEffect(() => {
 			GetRequest("/user/all").then((response) => {
@@ -100,7 +101,9 @@ export default function Everyone() {
 			<List className="everyone_list">
 				{users!.map((user: UserData) => (
 					<div key={user.id} className="px-4">
-						<ProfileElement user={user} />
+						{username === user.username
+							? null
+							: <ProfileElement user={user} />}
 					</div>
 				))}
 			</List>

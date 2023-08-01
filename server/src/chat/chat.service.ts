@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "src/user/user.entity";
 import { FindOptionsWhere, Repository } from "typeorm";
-import { Participant } from "./entities/participant_chan_x_user.entity";
+import { MemberDistinc, Participant } from "./entities/participant_chan_x_user.entity";
 import { ChanMode, Channel } from "./entities/channel.entity";
 
 @Injectable()
@@ -14,7 +14,7 @@ export class ChatService {
 		private channelRepository: Repository<Channel>
 	) {}
 	
-	async getAllDiscuss(user: User): Promise<Channel[]> {
+	async getConvs(user: User): Promise<Channel[]> {
 		const chans: Channel[] = [];
 		const parts: Participant[] = await this.participantRepository.find({
 			where: {
@@ -25,12 +25,27 @@ export class ChatService {
 		return chans;
 	}
 
-	async createMp(user1: User, user2: User) {
+	async createDm(user1: User, user2: User) {
 		const newMp: Channel = await this.channelRepository.create({
 			name: user1.login + "+" + user2.login,
 			mode: ChanMode.DM
 		})
-		return await this.channelRepository.save(newMp);
+
+		
+		const newPart1: Participant = new Participant()
+		newPart1.channel = newMp;
+		newPart1.distinction = MemberDistinc.OWNER;
+		newPart1.user = user1;
+
+		const newPart2: Participant = new Participant()
+		newPart2.channel = newMp;
+		newPart2.distinction = MemberDistinc.OWNER;
+		newPart2.user = user2;
+
+		await this.channelRepository.save(newMp);
+		await this.participantRepository.save(newPart1);
+		await this.participantRepository.save(newPart2);
+		return newMp
 	}
 
 	async getDm(user1: User, user2: User): Promise<Channel> {
@@ -54,7 +69,7 @@ export class ChatService {
 		}
 
 		if (!dm)
-			return await this.createMp(user1, user2)
+			return await this.createDm(user1, user2)
 		return dm
 	}
 }

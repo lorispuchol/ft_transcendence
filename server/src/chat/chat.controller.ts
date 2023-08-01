@@ -9,9 +9,9 @@ export class ChatController {
 		private userService: UserService
 	) {}
 
-	@Get('allDiscuss')
-	async getAllDiscuss( @Request() req: any ) {
-		return this.chatService.getAllDiscuss(
+	@Get('getConvs')
+	async getConvs( @Request() req: any ) {
+		return this.chatService.getConvs(
 			await this.userService.findOneByLogin(req.user.login)
 		)
 	}

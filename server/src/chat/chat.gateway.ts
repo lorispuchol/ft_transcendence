@@ -58,17 +58,4 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		this.messages.add(message);
 		this.users.forEach((login, cli) => cli.emit('message', message));
 	}
-
-	@SubscribeMessage('getDiscussions')
-	async getDiscussions(client: Socket) {
-		
-		const decoded: any = this.jwtService.decode(<string>client.handshake.headers.token);
-		const discussions: Channel[] = await this.chatService.getAllDiscuss(await this.userService.findOneByLogin(decoded.login))
-		
-		
-		discussions.forEach((discussion) => client.emit('discussion', discussion));
-	}
-
-	// @SubscribeMessage('discussion')
-	// handleDiscussion(){}	
 }

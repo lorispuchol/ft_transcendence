@@ -26,5 +26,5 @@ export class Participant extends BaseEntity {
 		enum: MemberDistinc,
 		default: MemberDistinc.OWNER
 	})
-	distinction: string;
+	distinction: number;
 }

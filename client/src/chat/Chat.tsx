@@ -18,27 +18,42 @@ interface Response {
 	error?: string,
 }
 
-export default function Chat() {
-	const location = useLocation()
+interface focusConvProps {
+	focusConv: string,
+}
 
+
+function ListConv({focusConv}: focusConvProps) {
 	const [response, setResponse]: [Response, Function] = useState({status: "loading"});
 	useEffect(() => {
-			GetRequest("/chat/allDiscuss").then((response) => setResponse(response));
-	}, []);
-	
+			GetRequest("/chat/getConvs").then((response) => setResponse(response));
+	}, [focusConv]);
+
+	console.log(response)
+
 	if (response.status === "loading")
 		return (<Loading />);
 	if (response.status !== "OK")
 		return (<ErrorHandling status={response.status} message={response.error} />);
 
-	if (location.state)
-		return (<strong>{location.state.to}</strong>)
+	return (
+		<>
+			<strong>{focusConv}</strong>
+			{response.data?.map((chan) => chan.name)}
+		</>
+	) 
+}
+
+export default function Chat() {
+	const location = useLocation();
+	const to: string = location.state ? location.state.to : null;
+
 	return (
 		<div>
 			<header>
 				Chat
 			</header>
-			{response.data?.map((dt) => dt.name)}
+			<ListConv focusConv={location.state?.to}/>
 			<SocketChat />
 		</div>
 	  );

@@ -86,27 +86,7 @@ function MessageInput({ socket }: SocketProps) {
 	);
 }
 
-// function Discussions({ socket }: SocketProps) {
-	
-// 	const [discussions, setDiscussions]: [Channel[], Function] = useState([]);
 
-// 	useEffect(() => {
-// 		function discussionGetter(discussion: Channel) {
-// 			setDiscussions((prevDiscussions: Channel[]) => {
-// 				const newDiscussion: Channel[] = [...prevDiscussions, discussion];
-// 				return newDiscussion;
-// 			});
-// 		};
-// 		socket.on('discussions', discussionGetter);
-// 		socket.emit('getDiscussions');
-// 		return () => {socket.off('discussions', discussionGetter);};
-// 	}, [socket]);
-// 	return (
-// 		<div>
-// 			{discussions.map((discussion) => discussion.name)}
-// 		</div>
-// 	)
-// }
 
 export default function SocketChat() {
 
@@ -128,7 +108,7 @@ export default function SocketChat() {
 			<div>
 				<Messages socket={socket} />
 				<MessageInput socket={socket} />
-				{/* <Discussions socket={socket} /> */}
+				{/* <Convs socket={socket} /> */}
 			</div>
 		</>
 	);
