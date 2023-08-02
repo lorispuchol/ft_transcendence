@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { EventContext } from "../utils/Context";
 import { GetRequest } from "../utils/Request";
 import { Avatar, List, Paper } from "@mui/material";
-import { defaultAvatar } from "./Profile";
+import { defaultAvatar } from "../pages/Profile/Profile";
 import { NavLink } from "react-router-dom";
 import Friendbutton from "../components/Relationship/Friendbutton";
 import UserStatus from "./UserStatus";

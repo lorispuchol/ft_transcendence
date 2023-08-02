@@ -1,7 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import './App.css'
 import Home from './home/Home';
-import Profile, { RedirectToOwnProfile } from './user/Profile';
+import Profile, { RedirectToOwnProfile } from './pages/Profile/Profile';
 import LogIn from './pages/LogIn/LogIn';
 import NoRouteFound from './pages/Error/NoRouteFound';
 import { ReactElement, useEffect, useState } from 'react';
@@ -78,7 +78,7 @@ export default function App() {
 	return (
 		<WebSocket>
 			<UserContext.Provider value={response.data?.username}>
-				<div className='background_primary w-screen h-screen px-5 py-5 flex-wrap'>
+				<div className='background_primary w-screen px-5 py-5'>
 					<NavBar />
 					<Routes>
 						<Route path='*' element={<NoRouteFound />} />
