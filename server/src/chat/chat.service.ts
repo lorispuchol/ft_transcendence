@@ -30,7 +30,6 @@ export class ChatService {
 			name: user1.login + "+" + user2.login,
 			mode: ChanMode.DM
 		})
-
 		
 		const newPart1: Participant = new Participant()
 		newPart1.channel = newMp;

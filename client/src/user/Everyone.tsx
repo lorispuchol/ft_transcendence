@@ -82,7 +82,6 @@ export default function Everyone() {
 			});
 
 			function everyoneListener(newUser: UserData) {
-				console.log(newUser);
 				setUsers((prev: UserData[]) => {
 						if (!prev.some((user: UserData) => (user.login === newUser.login)))
 							return [...prev, newUser];
@@ -101,9 +100,8 @@ export default function Everyone() {
 			<List className="everyone_list">
 				{users!.map((user: UserData) => (
 					<div key={user.id} className="px-4">
-						{username === user.username
-							? null
-							: <ProfileElement user={user} />}
+						{username !== user.username &&
+							<ProfileElement user={user} />}
 					</div>
 				))}
 			</List>

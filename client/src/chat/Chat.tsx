@@ -1,11 +1,18 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import SocketChat from "./SocketChat";
-import { UserContext } from "../utils/Context";
 import { GetRequest } from "../utils/Request";
 import Loading from "../utils/Loading";
 import ErrorHandling from "../utils/Error";
 import { useLocation } from "react-router-dom";
+import { Button } from "@mui/material";
 
+
+export enum ChanMode {
+	PUBLIC = "public",
+	PROTECTED = "protected",
+	PRIVATE = "private",
+	DM = "dm"
+}
 interface ChannelData {
 	id: number, 
 	name: string,
@@ -19,42 +26,76 @@ interface Response {
 }
 
 interface focusConvProps {
+	chanName?: string;
+	chans?: ChannelData[]
 	focusConv: string,
+	setFocusConv: Function,
 }
 
+function handleClick(chanName: string, setfocusConv: Function) {
+	setfocusConv(chanName);
+}
 
-function ListConv({focusConv}: focusConvProps) {
+function ListConv({focusConv, setFocusConv}: focusConvProps) {
 	const [response, setResponse]: [Response, Function] = useState({status: "loading"});
 	useEffect(() => {
 			GetRequest("/chat/getConvs").then((response) => setResponse(response));
 	}, [focusConv]);
-
-	console.log(response)
 
 	if (response.status === "loading")
 		return (<Loading />);
 	if (response.status !== "OK")
 		return (<ErrorHandling status={response.status} message={response.error} />);
 
+	const dms: ChannelData[] | undefined  = response.data?.filter((conv) => conv.mode === ChanMode.DM)
+	const chans: ChannelData[] | undefined  = response.data?.filter((conv) => conv.mode !== ChanMode.DM)
 	return (
 		<>
 			<strong>{focusConv}</strong>
-			{response.data?.map((chan) => chan.name)}
+			
+			<div className="list-button-conv">
+
+					{
+						dms?.map((chan) => (
+							<Button
+								onClick={() => handleClick(chan.name, setFocusConv)}
+							>
+								{chan.name}
+							</Button>
+						))
+					}
+				
+			
+					{
+						chans?.map((chan) => (
+							<Button 
+								onClick={() => handleClick(chan.name, setFocusConv)}
+							>
+								{chan.name}
+							</Button>
+						))
+						
+					}
+			</div>
 		</>
-	) 
+	)
 }
 
 export default function Chat() {
 	const location = useLocation();
-	const to: string = location.state ? location.state.to : null;
+	const [focusConv, setFocusConv]: [string, Function] = useState(location.state?.to);
+
 
 	return (
 		<div>
 			<header>
 				Chat
 			</header>
-			<ListConv focusConv={location.state?.to}/>
-			<SocketChat />
+			<div className="chat-page">
+				<ListConv focusConv={focusConv} setFocusConv={setFocusConv} />
+				<SocketChat />
+			</div>
 		</div>
+
 	  );
 }

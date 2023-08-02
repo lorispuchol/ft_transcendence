@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
 import { GetRequest } from "../utils/Request";
-import Loading from "../utils/Loading";
-import ErrorHandling from "../utils/Error";
-import { Button, IconButton } from "@mui/material";
+import { IconButton } from "@mui/material";
 import { Message } from "@mui/icons-material";
-import { NavLink, useNavigate} from "react-router-dom";
+import { useNavigate} from "react-router-dom";
 
 
 interface RelationData{
@@ -23,23 +21,24 @@ interface MessageButtonProps {
 
 export default function MessageButton({receiver}: MessageButtonProps) {
 
-	const [response, setResponse]: [Res, Function] = useState({status: "loading"});
+	const [relationRes, setRelationRes]: [Res, Function] = useState({status: "loading"});
+	
 	let block: boolean = false;
-
 	const navigate = useNavigate();
+	
 	useEffect(() => {
-		GetRequest("/relationship/" + receiver).then((res) => setResponse(res));
+		GetRequest("/relationship/" + receiver).then((res) => setRelationRes(res));
 	}, [receiver])
-	if (response.data?.status === "blockedYou" || response.data?.status === "blocked") {
+	if (relationRes.data?.status === "blockedYou" || relationRes.data?.status === "blocked") {
 		block = true;
 	}
 
 	function handleClick() {
-		
-		GetRequest("/chat/getDm/" + receiver)
-			.then(() => navigate("/chat", {replace: true, state: {to: receiver}}))
-	}
 
+		GetRequest("/chat/getDm/" + receiver)
+			.then((res) => navigate("/chat", {replace: true, state: {to: (res as any).data?.name}}))
+	}
+	
 	return (
 		<>
 			<IconButton onClick={handleClick} disabled={block}>
