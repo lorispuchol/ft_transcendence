@@ -78,7 +78,7 @@ export default function App() {
 	return (
 		<WebSocket>
 			<UserContext.Provider value={response.data?.username}>
-				<div className='background_primary w-screen h-screen px-5 py-5 flex-wrap'>
+				<div className='background_primary w-screen px-5 py-5'>
 					<NavBar />
 					<Routes>
 						<Route path='*' element={<NoRouteFound />} />

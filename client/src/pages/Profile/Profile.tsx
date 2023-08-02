@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import ErrorHandling from "../../utils/Error";
 import NoRouteFound from "../Error/NoRouteFound";
 import Loading from "../../utils/Loading";
+import UserStatus from "../../user/UserStatus";
+import { IoSettingsSharp } from 'react-icons/io5'
 
 import './Profile.scss'
 import { Paper } from "@mui/material";
@@ -58,10 +60,11 @@ export default function Profile() {
 	}
 
 	return (
-		<div>
-			<div className='profile_top items-center grid grid-cols-3'>
+		<div className="profile_page">
+			<div className='profile_top items-center grid grid-cols-3 py-4 px-4 relative'>
 				<Paper><img className='profile_image' src={profile.avatar} alt={profile.username + " pp"} /></Paper>
-				<Paper className='col-span-2 profile_username'>{profile.username}</Paper>
+				<Paper className='profile_username col-span-2 flex'><div className="pr-3">{profile.username}</div><UserStatus login={profile.login} /></Paper>
+				<button className="absolute top-0 end-0 pt-4 pr-4"><IoSettingsSharp size={32}/></button>
 			</div>
 			<Paper className='grid grid-cols-6 profile_score'>
 				<div className='flex col-span-2 victory'>VICTORY</div>

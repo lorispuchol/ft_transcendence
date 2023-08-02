@@ -5,6 +5,10 @@ $primary_color: #fad390;
 // 	width: 288px;
 // }
 
+.profile_page	{
+	overflow: auto;
+}
+
 .profile_top {
 	margin-top: 32px;
 	// padding-right: 0.600rem;
@@ -30,6 +34,10 @@ $primary_color: #fad390;
 	// border-radius: 0.25rem;
 	// border-color: white;
 	// box-shadow: 0 0 4px 0.100rem black;
+	padding-left: 8px;
+	padding-right: 8px;
+	padding-top: 8px;
+	padding-bottom: 8px;
 	justify-self: center;
 }
 
