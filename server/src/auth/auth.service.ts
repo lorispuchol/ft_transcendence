@@ -36,4 +36,8 @@ export class AuthService {
 
 		return await this.jwtService.signAsync(payload);
 	}
+
+	async createUserPassword(username: string, password: string): Promise<User> {
+		return (new User);
+	}
 }

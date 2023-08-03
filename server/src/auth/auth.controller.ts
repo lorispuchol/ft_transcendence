@@ -1,6 +1,7 @@
-import { Controller, Get, HttpCode, HttpStatus, Param, Query, Redirect, Request, Response } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, Redirect, Response } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { Public, client_url, ftConstants } from "./constants";
+import { UserWithPassword } from "./auth.dto";
 
 @Controller('auth')
 export class AuthController {
@@ -20,7 +21,7 @@ export class AuthController {
 	@Public()
 	@HttpCode(HttpStatus.OK)
 	@Get('login')
-	async signUp(
+	async signUpBy42(
 		@Query('code') code: string,
 		@Response() res: any,
 	) {
@@ -46,18 +47,25 @@ export class AuthController {
 		@Param('username') username: string,
 		@Response() res: any,
 	) {
-		try {
-			const token: string = await this.authService.logIn(username);
-			res.redirect(client_url + "/login?token=" + token);
-		}
-		catch (error) {
-			res.send("something went wrong at log");
-		}
+		const token: string = await this.authService.logIn(username);
+		res.redirect(client_url + "/login?token=" + token);
 	}
 
-	@Get('check_token')
-	getProfile() {
-		return {isGood: "true"};
-	}
+	@Public()
+	@Post('login')
+	async signUp(
+		@Body() userPassword: UserWithPassword
+	) {
+		console.log(userPassword);
+		return (userPassword)
+		//create user in database
+		// try {
+		// 	const user: User = await this.authService.createUserPassword(username, password);
+		// }
+		// catch (error) {
 
+		// }
+		//login to generate toke
+		//return token
+	}
 }

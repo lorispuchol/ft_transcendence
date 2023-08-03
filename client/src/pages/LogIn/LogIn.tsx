@@ -46,7 +46,7 @@ export default function LogIn() {
 			<hr className="divider" />
 			<div>
 				<form className="form_box" onSubmit={clickSend}>
-					<input className="input_box" type="text"  value={username} placeholder="USERNAME" onChange={handleChange} />
+					<input className="input_box" type="text"  value={username} autoFocus placeholder="USERNAME" onChange={handleChange} />
 				</form>
 				<form className="form_box" onSubmit={clickSend}>
 					<input className="input_box" type="text"  value={username} placeholder="PASSWORD" onChange={handleChange} />
