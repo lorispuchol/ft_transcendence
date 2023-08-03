@@ -14,11 +14,11 @@ export enum MemberDistinc {
 export class Participant extends BaseEntity {
 	
 	@PrimaryColumn({ type: 'integer', name: 'userId' })
-	@ManyToOne(() => User, (user) => user.channels, {eager : true})
+	@ManyToOne(() => User, (user) => user.participants, {eager : true})
 	user: User ;
 
 	@PrimaryColumn({ type: 'integer', name: 'channelId' })
-	@ManyToOne(() => Channel, (channel) => channel.users, {eager : true})
+	@ManyToOne(() => Channel, (channel) => channel.participants, {eager : true})
 	channel: Channel ;
 
 	@Column({
