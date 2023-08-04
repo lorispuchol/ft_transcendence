@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { EventContext, UserContext } from "../utils/Context";
 import { GetRequest } from "../utils/Request";
 import { Avatar, List, Paper } from "@mui/material";
-import { defaultAvatar } from "./Profile";
+import { defaultAvatar } from "../pages/Profile/Profile";
 import { NavLink } from "react-router-dom";
 import Friendbutton from "../components/Relationship/Friendbutton";
 import UserStatus from "./UserStatus";
@@ -44,20 +44,16 @@ function ProfileElement({ user }: ProfileElementProps) {
 	}
 
 	return (
-		<Paper key={render} sx={{
-			marginBottom: 2,
-			display: "flex",
-			alignItems: "center",
-			justifyContent: "space-between",
-			height: 50,
-		}}>
-			<div className="px-2"><UserStatus login={user.login} /></div>
-			<Avatar src={avatar} alt={user.username}/>
-			<NavLink to={'/profile/' + user.login}>
-				<Paper className="everyone_username">{user.username}</Paper>
-			</NavLink>
-			<GamingButton login={user.login}/>
-      		<div><MessageButton receiver={user.login}/></div>
+		<Paper key={render} className="profile_element">
+			<div className="status"><UserStatus login={user.login} /></div>
+			<div className="py-2"><Avatar src={avatar} alt={user.username}/></div>
+			<div className="px-4">
+				<NavLink to={'/profile/' + user.login}>
+					<Paper className="everyone_username">{user.username}</Paper>
+				</NavLink>
+			</div>
+			<div className="p-2"><GamingButton login={user.login}/></div>
+      		<div className="px-2"><MessageButton receiver={user.login}/></div>
 			<div className="grid grid-cols-2">
 				<div><Friendbutton login={user.login} render={rerender} /></div>
 				<div><BlockButton login={user.login} render={rerender} /></div>

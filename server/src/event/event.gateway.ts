@@ -4,7 +4,7 @@ import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect,
 import { Server, Socket } from "socket.io";
 import { client_url } from "src/auth/constants";
 import { EventService } from "./event.service";
-import { Inject, forwardRef } from "@nestjs/common";
+import { Inject, ParseIntPipe, forwardRef } from "@nestjs/common";
 import { User } from "src/user/user.entity";
 
 interface Event {

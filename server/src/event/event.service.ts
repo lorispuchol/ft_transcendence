@@ -64,6 +64,9 @@ export class EventService {
 		const requester: User = await this.userService.findOneByLogin(blocker);
 		const recipient: User = await this.userService.findOneByLogin(login);
 
+		if (!requester || !recipient)
+			return (false);
+
 		const relation: Relationship = await this.relationshipRepository.findOne({
 			relations: ["requester", "recipient"],
 			where: {
