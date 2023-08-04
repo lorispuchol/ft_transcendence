@@ -32,54 +32,42 @@ interface focusConvProps {
 	setFocusConv: Function,
 }
 
-function handleClick(chanName: string, setfocusConv: Function) {
-	setfocusConv(chanName);
-}
-
 function ListConv({focusConv, setFocusConv}: focusConvProps) {
 	const [response, setResponse]: [Response, Function] = useState({status: "loading"});
 	useEffect(() => {
 			GetRequest("/chat/getConvs").then((response) => setResponse(response));
-	}, [focusConv]);
-
+	}, []);
 	if (response.status === "loading")
 		return (<Loading />);
 	if (response.status !== "OK")
 		return (<ErrorHandling status={response.status} message={response.error} />);
 
-	const dms: ChannelData[] | undefined  = response.data?.filter((conv) => conv.mode === ChanMode.DM)
-	const chans: ChannelData[] | undefined  = response.data?.filter((conv) => conv.mode !== ChanMode.DM)
+	const dms: ChannelData[]  = response.data!.filter((conv) => conv.mode === ChanMode.DM)
+	const chans: ChannelData[]  = response.data!.filter((conv) => conv.mode !== ChanMode.DM)
 	return (
-		<>
-			<strong>{focusConv}</strong>
-			
-			<div className="list-button-conv">
-
-					{
-						dms?.map((chan) => (
-							<Button
-								key={chan.name}
-								onClick={() => handleClick(chan.name, setFocusConv)}
-							>
-								{chan.name}
-							</Button>
-						))
-					}
+		<div className="list-button-conv">
+			{
+				dms.map((chan) => (
+					<Button
+						key={chan.name}
+						onClick={() => setFocusConv(chan.name)}
+					>
+						{chan.name}
+					</Button>
+				))
+			}
+			{
+				chans.map((chan) => (
+					<Button
+						key={chan.name}
+						onClick={() => setFocusConv(chan.name)}
+					>
+						{chan.name}
+					</Button>
+				))
 				
-			
-					{
-						chans?.map((chan) => (
-							<Button
-								key={chan.name}
-								onClick={() => handleClick(chan.name, setFocusConv)}
-							>
-								{chan.name}
-							</Button>
-						))
-						
-					}
-			</div>
-		</>
+			}
+		</div>
 	)
 }
 

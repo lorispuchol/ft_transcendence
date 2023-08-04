@@ -109,18 +109,14 @@ function Messages({chan}: any) {
 		return null
 
 	return (
-		<>
-		<h1>
-			<strong>
-				{response.data[0]?.channel.name} 
-			</strong>
+		<div>
+			<strong>{chan}</strong>
 			<div>
 				<ul>
 					{response.data.map((msg) => <li>{msg.sender.username + ": " + msg.content}</li>)}
 				</ul>
 			</div>
-		</h1>
-		</>
+		</div>
 	)
 }
 
@@ -158,12 +154,9 @@ export default function Chatting({chan}: ChattingProps ) {
 		return (<Loading />)
 	
 	return (
-		<>
-			<div>
-
-				<Messages chan={chan} />
-				<MessageInput socket={socket} />
-			</div>
-		</>
+		<div>
+			<Messages chan={chan} />
+			<MessageInput socket={socket} />
+		</div>
 	);
 }
