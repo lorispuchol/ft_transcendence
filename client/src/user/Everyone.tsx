@@ -19,7 +19,7 @@ interface ProfileElementProps {
 
 interface UserData {
 	id: number,
-	avatar: string,
+	avatar: string | null,
 	login: string,
 	username: string,
 	nb_victory: number,
@@ -99,10 +99,10 @@ export default function Everyone() {
 	return (
 			<List className="everyone_list">
 				{users!.map((user: UserData) => (
-					<div key={user.id} className="px-4">
-						{username !== user.username &&
-							<ProfileElement user={user} />}
-					</div>
+					username !== user.username &&
+						<div key={user.id} className="px-4">
+								<ProfileElement user={user} />
+						</div>
 				))}
 			</List>
 	);

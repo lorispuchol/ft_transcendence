@@ -17,7 +17,7 @@ import { EventContext, UserContext } from './utils/Context';
 import { Socket, io } from 'socket.io-client';
 
 interface UserData {
-	avatar: string,
+	avatar: string | null,
 	login: string,
 	username: string,
 	nb_victory: number,

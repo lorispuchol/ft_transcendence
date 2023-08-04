@@ -6,7 +6,7 @@ import NoRouteFound from "../pages/Error/NoRouteFound";
 import Loading from "../utils/Loading";
 
 interface UserData {
-	avatar: string,
+	avatar: string | null,
 	login: string,
 	username: string,
 	nb_victory: number,

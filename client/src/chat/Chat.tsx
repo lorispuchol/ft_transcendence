@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import SocketChat from "./SocketChat";
+import Chatting from "./Chatting";
 import { GetRequest } from "../utils/Request";
 import Loading from "../utils/Loading";
 import ErrorHandling from "../utils/Error";
@@ -58,6 +58,7 @@ function ListConv({focusConv, setFocusConv}: focusConvProps) {
 					{
 						dms?.map((chan) => (
 							<Button
+								key={chan.name}
 								onClick={() => handleClick(chan.name, setFocusConv)}
 							>
 								{chan.name}
@@ -68,7 +69,8 @@ function ListConv({focusConv, setFocusConv}: focusConvProps) {
 			
 					{
 						chans?.map((chan) => (
-							<Button 
+							<Button
+								key={chan.name}
 								onClick={() => handleClick(chan.name, setFocusConv)}
 							>
 								{chan.name}
@@ -87,14 +89,13 @@ export default function Chat() {
 
 
 	return (
-		<div>
+		<div className="chat-page">
 			<header>
 				Chat
 			</header>
-			<div className="chat-page">
-				<ListConv focusConv={focusConv} setFocusConv={setFocusConv} />
-				<SocketChat />
-			</div>
+			
+			<ListConv focusConv={focusConv} setFocusConv={setFocusConv} />
+			<Chatting chan={focusConv} />
 		</div>
 
 	  );

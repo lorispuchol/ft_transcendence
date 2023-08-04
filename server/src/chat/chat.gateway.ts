@@ -6,7 +6,6 @@ import { client_url } from "src/auth/constants";
 import { v4 as uuidv4 } from 'uuid';
 import { ChatService } from "./chat.service";
 import { UserService } from "src/user/user.service";
-import { Channel } from "./entities/channel.entity";
 
 interface Message {
 	id: string;
@@ -14,6 +13,14 @@ interface Message {
 	value: string;
 	time: number;
 }
+
+// interface Message {
+// 	id: number;
+// 	sender: string;
+// 	channel: string;
+// 	content: string;
+// 	time: Date;
+// }
 @WebSocketGateway({
 	namespace: "chat",
 	cors: { origin: [client_url] },
@@ -54,7 +61,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			value,
 			time: Date.now(),
 		};
-  
 		this.messages.add(message);
 		this.users.forEach((login, cli) => cli.emit('message', message));
 	}

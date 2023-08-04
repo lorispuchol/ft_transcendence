@@ -4,14 +4,19 @@ import { User } from "src/user/user.entity";
 import { FindOptionsWhere, Repository } from "typeorm";
 import { MemberDistinc, Participant } from "./entities/participant_chan_x_user.entity";
 import { ChanMode, Channel } from "./entities/channel.entity";
+import { Message } from "./entities/message.entity";
 
 @Injectable()
 export class ChatService {
 	constructor (
 		@InjectRepository(Participant, 'lorisforever')
 		private participantRepository: Repository<Participant>,
+
 		@InjectRepository(Channel, 'lorisforever')
-		private channelRepository: Repository<Channel>
+		private channelRepository: Repository<Channel>,
+
+		@InjectRepository(Message, 'lorisforever')
+		private messagesRepository: Repository<Message>
 	) {}
 	
 	async getConvs(user: User): Promise<Channel[]> {
@@ -70,5 +75,24 @@ export class ChatService {
 		if (!dm)
 			return await this.createDm(user1, user2)
 		return dm
+	}
+
+	async getMessages(chan: string): Promise<Message[]> {
+		const channel = await this.channelRepository.findOne({
+			where: {
+				name: chan
+			}
+		})
+		if (!channel)
+			return null;
+		
+		const messages: Message[] = await this.messagesRepository.find({
+			where: {
+				channel: channel
+			} as FindOptionsWhere<Channel>
+		})
+		messages.forEach((msg) => {
+		})
+		return messages;
 	}
 }

@@ -23,5 +23,13 @@ export class ChatController {
 			return this.chatService.getDm(
 				await this.userService.findOneByLogin(req.user.login),
 				await this.userService.findOneByLogin(receiver))
-		}
+	}
+
+	@Get('getMessages/:chan')
+	async getMessages(
+		@Request() req: any,
+		@Param('chan') chan: string
+	) {
+		return this.chatService.getMessages(chan)
+	}
 }
