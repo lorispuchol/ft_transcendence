@@ -14,11 +14,11 @@ export class Relationship extends BaseEntity {
 	// @MTO create FK column automatically named as: <property> + "Id"
 	// Because this two columns have now the same name they are like 'merged' in only one 
 	@PrimaryColumn({ type: 'integer', name: 'requesterId' })
-	@ManyToOne(() => User, (recipient) => recipient.relationships, {eager : true})
+	@ManyToOne(() => User, (recipient) => recipient.recvRelationships, {eager : true})
 	requester: User ;
 
 	@PrimaryColumn({ type: 'integer', name: 'recipientId' })
-	@ManyToOne(() => User, (requester) => requester.relationships, {eager : true})
+	@ManyToOne(() => User, (requester) => requester.sendRelationships, {eager : true})
 	recipient: User ;
 
 	@Column({

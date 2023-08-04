@@ -1,22 +1,17 @@
 import { useEffect, useState } from "react";
 import { GetRequest } from "../utils/Request";
-import Loading from "../utils/Loading";
-import ErrorHandling from "../utils/Error";
 import { IconButton } from "@mui/material";
 import { Message } from "@mui/icons-material";
-import { NavLink, Navigate } from "react-router-dom";
+import { useNavigate} from "react-router-dom";
 
 
-interface ChannelData{
-	id: number,
-	name: string,
-	mode: string,
-	password: string
+interface RelationData{
+	status: string,
 }
 
 interface Res {
 	status: string | number,
-	data?: ChannelData | null,
+	data?: RelationData,
 	error?: string,
 }
 
@@ -25,29 +20,30 @@ interface MessageButtonProps {
 }
 
 export default function MessageButton({receiver}: MessageButtonProps) {
-	
-	const [res, setRes]: [Res, Function] = useState({status: "inactive"});
-	
-	function handleClick() {
-		GetRequest("/chat/getMp/" + receiver).then((res) => setRes(res))
-		if (res.status === "KO")
-			return (<ErrorHandling status={res.status} message={res.error} />);
-		if (res.data !== null && res.data?.mode === "mp") {
 
-			console.log("ouiiiiii");
-		}
+	const [relationRes, setRelationRes]: [Res, Function] = useState({status: "loading"});
+	
+	let block: boolean = false;
+	const navigate = useNavigate();
+	
+	useEffect(() => {
+		GetRequest("/relationship/" + receiver).then((res) => setRelationRes(res));
+	}, [receiver])
+	if (relationRes.data?.status === "blockedYou" || relationRes.data?.status === "blocked") {
+		block = true;
+	}
+
+	function handleClick() {
+
+		GetRequest("/chat/getDm/" + receiver)
+			.then((res) => navigate("/chat", {replace: true, state: {to: (res as any).data?.name}}))
 	}
 	
 	return (
 		<>
-			{/* <NavLink to={'/chat'} onClick={() => hanldeClick("profile")}>
-					<IconButton onClick={handleClick}>
-						<Message />
-					</IconButton>
-			<NavLink /> */}
-			<NavLink to={'/chat'} onClick={() => handleClick()}>
+			<IconButton onClick={handleClick} disabled={block}>
 				<Message />
-			</NavLink>
+			</IconButton>
 		</>
 	)
 }

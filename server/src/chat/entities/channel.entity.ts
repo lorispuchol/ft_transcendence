@@ -1,12 +1,12 @@
 import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Message } from "./message.entity";
-import { User } from "src/user/user.entity";
+import { Participant } from "./participant_chan_x_user.entity";
 
 export enum ChanMode {
 	PUBLIC = "public",
 	PROTECTED = "protected",
 	PRIVATE = "private",
-	MP = "mp"
+	DM = "dm"
 }
 
 @Entity()
@@ -31,15 +31,17 @@ export class Channel extends BaseEntity {
 	})
 	mode: string
 
+	
 	@Column({
 		type: 'varchar',
 		nullable: true
 	})
 	password: string
 
+	@OneToMany(() => Participant, (part) => part.user)
+	participants: Participant[]
+
 	@OneToMany(() => Message, (message) => message.channel)
 	messages: Message[]
 
-	@OneToMany(() => User, (user) => user)
-	users: User[]
 }

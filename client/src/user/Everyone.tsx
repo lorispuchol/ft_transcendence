@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { EventContext } from "../utils/Context";
+import { EventContext, UserContext } from "../utils/Context";
 import { GetRequest } from "../utils/Request";
 import { Avatar, List, Paper } from "@mui/material";
 import { defaultAvatar } from "../pages/Profile/Profile";
@@ -19,7 +19,7 @@ interface ProfileElementProps {
 
 interface UserData {
 	id: number,
-	avatar: string,
+	avatar: string | null,
 	login: string,
 	username: string,
 	nb_victory: number,
@@ -68,6 +68,7 @@ export default function Everyone() {
 	const [response, setResponse]: [Response, Function] = useState({status: "loading"});
 	const [users, setUsers]: [UserData[], Function] = useState([]);
 	const socket = useContext(EventContext);
+	const username = useContext(UserContext);
 
 	useEffect(() => {
 			GetRequest("/user/all").then((response) => {
@@ -77,7 +78,6 @@ export default function Everyone() {
 			});
 
 			function everyoneListener(newUser: UserData) {
-				console.log(newUser);
 				setUsers((prev: UserData[]) => {
 						if (!prev.some((user: UserData) => (user.login === newUser.login)))
 							return [...prev, newUser];
@@ -95,9 +95,10 @@ export default function Everyone() {
 	return (
 			<List className="everyone_list">
 				{users!.map((user: UserData) => (
-					<div key={user.id} className="px-4">
-						<ProfileElement user={user} />
-					</div>
+					username !== user.username &&
+						<div key={user.id} className="px-4">
+								<ProfileElement user={user} />
+						</div>
 				))}
 			</List>
 	);

@@ -8,10 +8,10 @@ export class Match extends BaseEntity {
 
 	// challenger is the inviter 
 	// or the user with smallest id
-	@ManyToOne(() => User, (user) => user.matches, {eager : true})
+	@ManyToOne(() => User, (user) => user.challengeMatches, {eager : true})
 	challenger: User
 
-	@ManyToOne(() => User, (user) => user.matches, {eager : true})
+	@ManyToOne(() => User, (user) => user.opponMatches, {eager : true})
 	opponent: User
 
 	@Column({ type: 'integer' })
