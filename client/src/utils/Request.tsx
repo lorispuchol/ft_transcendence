@@ -6,7 +6,7 @@ export const client_url = "http://" + process.env.REACT_APP_SERVER_HOST + ":" + 
 interface Response {
 	status: string,
 	data?: Object,
-	error?: string,
+	error?: string | Object,
 }
 
 export async function GetRequest(path: string) {
@@ -33,7 +33,9 @@ export async function PostRequest(path: string, data: Object) {
 		res = { status: "OK", data: response.data };
 	}
 	catch (error: any) {
-		if (error.code === "ERR_NETWORK")
+		if (error.response)
+		 	res = {status: error.response.status, error: error.response.data.message};
+		else if (error.code === "ERR_NETWORK")
 			res = { status: "ERR_NETWORK", error: error.message };
 		else
 			res = { status: error.response.status, error: error.message };

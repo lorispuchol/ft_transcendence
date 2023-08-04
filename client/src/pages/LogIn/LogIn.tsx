@@ -1,39 +1,84 @@
 import { useSearchParams } from "react-router-dom";
-import { client_url, server_url } from "../../utils/Request";
+import { PostRequest, client_url, server_url } from "../../utils/Request";
 import Loading from "../../utils/Loading";
 import './LogIn.scss'
 import '../../fonts/Poppins/Poppins-Regular.ttf';
-
 import { ChangeEvent, FormEvent, useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 function LogInput() {
 	const [username, setUsername] = useState('')
+	const [password, setPassword] = useState('');
 
-	const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+	function usernameChange(event: ChangeEvent<HTMLInputElement>) {
 		setUsername(event.target.value)
 	}
 
-	function clickSend(e: FormEvent) {
+	function passwordChange(event: ChangeEvent<HTMLInputElement>) {
+		setPassword(event.target.value);
+	}
+
+	function login(e: FormEvent) {
 		e.preventDefault();
-		const url = server_url + "/auth/LoginByUsername/" + username;
-		window.location.href=url;
+		PostRequest("/auth/login", {username, password})
+			.then((response: any) =>{
+				if (response.status === "OK" && response.data.status === "OK")
+					window.location.href= client_url + "/login?token=" + response.data.token;
+				else
+				{
+					const error = response.data ? response.data.error : response.error[0];
+					toast.error(error, {
+						position: "bottom-left",
+						autoClose: 2000,
+						hideProgressBar: true,
+						closeOnClick: true,
+						pauseOnHover: false,
+						draggable: false,
+						progress: undefined,
+						theme: "light",
+					});
+				}
+			});
+	}
+
+	function signup() {
+		PostRequest("/auth/signup", {username, password})
+			.then((response: any) =>{
+				if (response.status === "OK")
+					window.location.href= client_url + "/login?token=" + response.data;
+				else
+				{
+					toast.error(response.error[0], {
+						position: "bottom-left",
+						autoClose: 2000,
+						hideProgressBar: true,
+						closeOnClick: true,
+						pauseOnHover: false,
+						draggable: false,
+						progress: undefined,
+						theme: "light",
+					});
+				}
+			});
 	}
 
 	return (
-			<div>
-				<form className="form_box" onSubmit={clickSend}>
-					<input className="input_box" type="text"  value={username} autoFocus placeholder="USERNAME" onChange={handleChange} />
-				</form>
-				<form className="form_box" onSubmit={clickSend}>
-					<input className="input_box" type="text"  value={username} placeholder="PASSWORD" onChange={handleChange} />
-				</form>
-				<div className="button_box">
-					<button className="button_login active:scale-110" onClick={clickSend}>LOG IN</button>
-				</div>
-				<div className="button_box">
-					<button className="button_login button_login_bis active:scale-110" onClick={clickSend}>SIGN IN</button>
-				</div>
+		<div>
+			<form className="form_box" onSubmit={login}>
+				<input className="input_box" type="text"  value={username} autoFocus placeholder="USERNAME" onChange={usernameChange} />
+			</form>
+			<form className="form_box" onSubmit={login}>
+				<input className="input_box" type="password"  value={password} placeholder="PASSWORD" onChange={passwordChange} />
+			</form>
+			<div className="button_box">
+				<button className="button_login active:scale-110" onClick={login}>LOG IN</button>
 			</div>
+			<div className="button_box">
+				<button className="button_login button_login_bis active:scale-110" onClick={signup}>SIGN UP</button>
+			</div>
+			<ToastContainer />
+		</div>
 	)
 }
 
