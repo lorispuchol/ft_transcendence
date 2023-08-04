@@ -10,7 +10,7 @@ import ErrorHandling from './utils/Error';
 import Loading from './utils/Loading';
 import Chat from './chat/Chat';
 import Everyone from './user/Everyone';
-import Game from './game/Game';
+import Game from './pages/game/Game';
 import Loader from './components/Loading/Loader'
 import { NavBar } from './components/NavBar/NavBar';
 import { EventContext, UserContext } from './utils/Context';
