@@ -4,16 +4,11 @@ import { Socket, io } from "socket.io-client";
 import "./chat.css";
 import { GetRequest, server_url } from "../utils/Request";
 import Loading from "../utils/Loading";
-
-interface Message {
-	id: number;
-	user: string;
-	value: string;
-	time: number;
-}
+import ErrorHandling from "../utils/Error";
 
 interface ChattingProps {
-	chan: string | null;
+	chan: string;
+	socket: Socket
 }
 
 interface UserData {
@@ -48,79 +43,60 @@ interface Response {
 interface SocketProps {
 	socket: Socket,
 }
+interface MessagesProps {
+	chan: string,
+	socket: Socket,
+}
 
-// function Messages({ socket }: SocketProps) {
-// 	const [messages, setMessages]: [Message[], Function] = useState([]);
-
-// 	useEffect(() => {
-// 		function messageListener(message: Message) {
-// 			setMessages((prevMessages: Message[]) => {
-// 				const newMessages: Message[] = [...prevMessages, message];
-// 				return newMessages;
-// 			});
-// 		};
-// 		socket.on('message', messageListener);
-// 		socket.emit('getMessages');
-// 		return () => {socket.off('message', messageListener);};
-// 	}, [socket]);
-
-// 	const messageRef = useRef<null | HTMLDivElement>(null);
-// 	useEffect(() => {
-// 		messageRef.current?.scrollIntoView();
-// 	}, [messages]);
-
-// 	return (
-// 		<div>
-// 			<List
-// 				sx={{
-// 		  			width: '100%',
-// 		  			maxWidth: 800,
-// 		  			bgcolor: 'background.paper',
-// 		  			position: 'relative',
-// 		  			overflow: 'auto',
-// 		  			maxHeight: 600,
-// 		  			'& ul': { padding: 0 },
-// 				}}>
-// 			{messages.map((message: Message) => (
-// 				<ListItem key={message.id}	title={`Sent at ${new Date(message.time).toLocaleTimeString()}`}>
-// 					<div className="user-column">
-//         				<span className="user">{message.user + " :"}</span>
-// 					</div>
-//             		<ListItemText className="message">{message.value}</ListItemText>
-//             		<span className="date">{new Date(message.time).toLocaleTimeString()}</span>
-//           		</ListItem>
-//         	))}
-// 			<div ref={messageRef} />
-// 			</List>
-// 		</div>
-// 	)
-// }
-
-function Messages({chan}: any) {
-	
-	const [response, setResponse]: [Response, Function] = useState({status: "loading"});
+function ExMessages({ socket }: SocketProps) {
+	const [messages, setMessages]: [MessageData[], Function] = useState([]);
 
 	useEffect(() => {
-		if (chan)
-			GetRequest("/chat/getMessages/" + chan).then((res) => setResponse(res))
-	}, [chan])
+		function messageListener(message: MessageData) {
+			setMessages((prevMessages: MessageData[]) => {
+				const newMessages: MessageData[] = [...prevMessages, message];
+				return newMessages;
+			});
+		};
+		socket.on('message', messageListener);
+		socket.emit('getMessages');
+		return () => {socket.off('message', messageListener);};
+	}, [socket]);
 
-	if (!response.data)
-		return null
+	const messageRef = useRef<null | HTMLDivElement>(null);
+	useEffect(() => {
+		messageRef.current?.scrollIntoView();
+	}, [messages]);
 
 	return (
 		<div>
-			<strong>{chan}</strong>
-			<div>
-				<ul>
-					{response.data.map((msg) => <li>{msg.sender.username + ": " + msg.content}</li>)}
-				</ul>
-			</div>
+			<List
+				sx={{
+		  			width: '100%',
+		  			maxWidth: 800,
+		  			bgcolor: 'background.paper',
+		  			position: 'relative',
+		  			overflow: 'auto',
+		  			maxHeight: 600,
+		  			'& ul': { padding: 0 },
+				}}>
+			{messages.map((message: MessageData) => (
+				<ListItem key={message.id}	title={`Sent at ${new Date(message.time).toLocaleTimeString()}`}>
+					<div /*className="user-column"*/>
+        				<span className="user">{message.sender.username + " :"}</span>
+					</div>
+            		<ListItemText className="message">{message.content}</ListItemText>
+            		<span className="date">{new Date(message.time).toLocaleTimeString()}</span>
+          		</ListItem>
+        	))}
+			<div ref={messageRef} />
+			</List>
 		</div>
 	)
 }
 
-function MessageInput({ socket }: SocketProps) {
+
+function ExMessageInput({ socket }: SocketProps) {
 	const [value, setValue] = useState('');
 
 	function submitForm(e: FormEvent) {
@@ -136,9 +112,7 @@ function MessageInput({ socket }: SocketProps) {
 	);
 }
 
-
-export default function Chatting({chan}: ChattingProps ) {
-
+function ExSocketChat({chan}: ChattingProps ) {
 
 	const [socket, setSocket]: [Socket | null, Function] = useState(null);
 
@@ -155,8 +129,106 @@ export default function Chatting({chan}: ChattingProps ) {
 	
 	return (
 		<div>
-			<Messages chan={chan} />
-			<MessageInput socket={socket} />
+			{/* <ExMessages chan={chan} socket={socket} /> */}
+			{/* <ExMessageInput socket={socket} /> */}
+		</div>
+	);
+}
+
+
+function Messages({chan, socket}: MessagesProps) {
+	
+	const [response, setResponse]: [Response, Function] = useState({status: "loading"});
+	const [messages, setMessages]: [MessageData[], Function] = useState([]);
+
+	useEffect(() => {
+		GetRequest("/chat/getMessages/" + chan).then((res) => {setResponse(res); setMessages(res.data)})
+		function messageListener(message: MessageData) {
+			setMessages((prevMessages: MessageData[]) => {
+				const newMessages: MessageData[] = [...prevMessages, message];
+				return newMessages;
+			});
+		};
+		socket.on('message', messageListener);
+		return () => {socket.off('message', messageListener);};
+	}, [chan, socket])
+
+	const messageRef = useRef<null | HTMLDivElement>(null);
+	useEffect(() => {
+		messageRef.current?.scrollIntoView();
+	}, [messages]);
+
+	if (response.status === "loading")
+		return (<Loading />);
+	if (response.status !== "OK")
+		return (<ErrorHandling status={response.status} message={response.error} />);
+
+	return (
+		<div>
+			<List
+				sx={{
+		  			width: '100%',
+		  			maxWidth: 800,
+		  			bgcolor: 'background.paper',
+		  			position: 'relative',
+		  			overflow: 'auto',
+		  			maxHeight: 600,
+		  			'& ul': { padding: 0 },
+				}}>
+			{messages.map((message: MessageData) => (
+				<ListItem key={message.id}	title={`Sent at ${new Date(message.time).toLocaleTimeString()}`}>
+					<div /*className="user-column"*/>
+        				<span className="user">{message.sender.username + " :"}</span>
+					</div>
+            		<ListItemText className="message">{message.content}</ListItemText>
+            		<span className="date">{new Date(message.time).toLocaleTimeString()}</span>
+          		</ListItem>
+        	))}
+			<div ref={messageRef} />
+			</List>
+		</div>
+	)
+	// return (
+	// 	<div>
+	// 		<strong>{chan}</strong>
+	// 		<div>
+	// 			<ul>
+	// 				{response.data!.map((msg) => <li>{msg.sender.username + ": " + msg.content}</li>)}
+	// 			</ul>
+	// 		</div>
+	// 	</div>
+	// )
+}
+
+function MessageInput({ chan, socket }: MessagesProps) {
+	const [value, setValue] = useState('');
+	const [chanName, setChanName] = useState(chan);
+
+
+	console.log(value);
+	function submitForm(e: FormEvent) {
+		e.preventDefault();
+		socket.emit('message', value, chanName);
+		setValue('');
+	};
+
+	return (
+		<form onSubmit={submitForm}>
+			<input autoFocus value={value} placeholder="type" onChange={(e) => {setValue(e.currentTarget.value);}} />
+		</form>
+	);
+}
+
+
+
+
+export default function Chatting({chan, socket}: ChattingProps ) {
+
+	return (
+		<div>
+			<strong>chating to: {chan}</strong>
+			<Messages chan={chan} socket={socket} />
+			<MessageInput chan={chan} socket={socket} />
 		</div>
 	);
 }

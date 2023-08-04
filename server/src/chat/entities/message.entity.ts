@@ -16,6 +16,6 @@ export class Message extends BaseEntity {
 	@Column({ type: 'text' })
 	content: string;
 
-	@CreateDateColumn()
+	@CreateDateColumn() //timestamp in db
 	date: Date;
 }

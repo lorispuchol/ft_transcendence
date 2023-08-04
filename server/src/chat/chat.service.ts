@@ -52,6 +52,25 @@ export class ChatService {
 		return newMp
 	}
 
+	async findChanByName(name: string): Promise<Channel | undefined> {
+		return await this.channelRepository.findOneBy({name});
+	}
+
+	async getAllMembers(chanName: string) {
+		const channel: Channel = await this.findChanByName(chanName);
+
+		
+		console.log(channel.name);
+		// const participants: Participant[] = await this.participantRepository.find({
+		// 	where: {
+		// 		channel: {name: channel.name}
+		// 	} as FindOptionsWhere<Channel>
+		// })
+
+		// console.log(participants[0].user.username);
+		// return participants;
+	}
+
 	async getDm(user1: User, user2: User): Promise<Channel> {
 		
 		if (user1.login === user2.login)
@@ -71,7 +90,6 @@ export class ChatService {
 				}
 			})
 		}
-
 		if (!dm)
 			return await this.createDm(user1, user2)
 		return dm
@@ -90,8 +108,6 @@ export class ChatService {
 			where: {
 				channel: channel
 			} as FindOptionsWhere<Channel>
-		})
-		messages.forEach((msg) => {
 		})
 		return messages;
 	}
