@@ -56,7 +56,6 @@ export class AuthController {
 	async signUp(
 		@Body() userPassword: UserWithPassword
 	) {
-		console.log(userPassword);
 		return (userPassword)
 		//create user in database
 		// try {
