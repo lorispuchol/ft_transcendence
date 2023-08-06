@@ -98,7 +98,6 @@ export default function Chat() {
 			</header>
 			
 			<ListConv focusConv={focusConv} setFocusConv={setFocusConv} />
-			<strong>focus conv: {focusConv}</strong>
 			{focusConv ? 
 				<Chatting chan={focusConv} socket={socket} />
 				: null // return a big button to create a channel

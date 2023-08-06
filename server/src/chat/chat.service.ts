@@ -59,16 +59,22 @@ export class ChatService {
 	async getAllMembers(chanName: string) {
 		const channel: Channel = await this.findChanByName(chanName);
 
-		
-		console.log(channel.name);
-		// const participants: Participant[] = await this.participantRepository.find({
-		// 	where: {
-		// 		channel: {name: channel.name}
-		// 	} as FindOptionsWhere<Channel>
-		// })
+		const participants: Participant[] = await this.participantRepository.find({
+			where: {
+				channel: channel.id
+			} as FindOptionsWhere<Channel>
+		})
+		return participants;
+	}
 
-		// console.log(participants[0].user.username);
-		// return participants;
+	async saveNewMsg(sender: User, chan: Channel, content: string) {
+		const newMsg: Message = await this.messagesRepository.create({
+			sender: sender,
+			channel: chan,
+			content: content,
+		})
+		this.messagesRepository.save(newMsg)
+		return newMsg;
 	}
 
 	async getDm(user1: User, user2: User): Promise<Channel> {
