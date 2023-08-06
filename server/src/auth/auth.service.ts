@@ -4,7 +4,7 @@ import { User } from "src/user/user.entity";
 import { UserService } from "src/user/user.service";
 import { ftConstants } from "./constants";
 import axios, { AxiosResponse } from "axios";
-
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -33,11 +33,29 @@ export class AuthService {
 			user = await this.userService.createOne(login);
 	
 		const payload = {id: user.id, login: user.login};
-
 		return await this.jwtService.signAsync(payload);
 	}
 
-	async createUserPassword(username: string, password: string): Promise<User> {
-		return (new User);
+	async logInWithPassword(login: string, password: string): Promise<Object> {
+		const user: User = await this.userService.findOneByLogin(login);
+		if (!user)
+			return {status: "KO", error: "user do not exist"};
+
+		const isMatch = await bcrypt.compare(password, user.password);
+		if (!isMatch)
+			return {status: "KO", error: "wrong password"};
+		
+		console.log(user, isMatch)
+		const payload = {id: user.id, login: user.login};
+		return {status: "OK", token: await this.jwtService.signAsync(payload)};
+	}
+
+	async createUserWithPassword(username: string, password: string): Promise<string> {
+		const salt = await bcrypt.genSalt();
+		const hash = await bcrypt.hash(password, salt);
+		const user: User = await this.userService.createOne(username, hash);
+		
+		const payload = {id: user.id, login: user.login};
+		return this.jwtService.signAsync(payload);
 	}
 }
