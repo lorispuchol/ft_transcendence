@@ -17,6 +17,8 @@ export async function GetRequest(path: string) {
 		res = { status: "OK", data: response.data };
 	}
 	catch (error: any) {
+		if (error.response)
+		 	res = {status: error.response.status, error: error.response.data.message};
 		if (error.code === "ERR_NETWORK")
 			res = { status: "ERR_NETWORK", error: error.message };
 		else
@@ -51,6 +53,8 @@ export async function PatchRequest(path: string, data: Object) {
 		res = { status: "OK", data: response.data };
 	}
 	catch (error: any) {
+		if (error.response)
+		 	res = {status: error.response.status, error: error.response.data.message};
 		if (error.code === "ERR_NETWORK")
 			res = { status: "ERR_NETWORK", error: error.message };
 		else
@@ -67,6 +71,8 @@ export async function DeleteRequest(path: string) {
 		res = { status: "OK", data: response.data };
 	}
 	catch (error: any) {
+		if (error.response)
+		 	res = {status: error.response.status, error: error.response.data.message};
 		if (error.code === "ERR_NETWORK")
 			res = { status: "ERR_NETWORK", error: error.message };
 		else
