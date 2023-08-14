@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { EventContext, UserContext } from "../utils/Context";
 import { GetRequest } from "../utils/Request";
-import { Avatar, List, Paper } from "@mui/material";
+import { Alert, Avatar, List, Paper, Snackbar } from "@mui/material";
 import { defaultAvatar } from "../pages/Profile/Profile";
 import { NavLink } from "react-router-dom";
 import Friendbutton from "../components/Relationship/Friendbutton";
@@ -36,14 +36,19 @@ interface Response {
 function ProfileElement({ user }: ProfileElementProps) {
 	const avatar: any = user.avatar ? user.avatar : defaultAvatar;
 	const [render, setRender]: [number, Function] = useState(0);
-	
-	//useEffect(() => {}, [render])
-	
-	function rerender() {
+	const [open, setOpen]: [string | null, Function] = useState(null);
+
+	function handleClose() {
+		setOpen(null);
+	}
+
+	function rerender(message: string) {
 		setRender(render + 1);
+		setOpen(message);
 	}
 
 	return (
+		<>
 		<Paper key={render} className="profile_element">
 			<div className="status"><UserStatus login={user.login} /></div>
 			<div className="py-2"><Avatar src={avatar} alt={user.username}/></div>
@@ -59,6 +64,12 @@ function ProfileElement({ user }: ProfileElementProps) {
 				<div><BlockButton login={user.login} render={rerender} /></div>
 			</div>
 		</Paper>
+			<Snackbar open={open?true:false} autoHideDuration={1000} onClose={handleClose}>
+				<Alert className="w-fit" onClose={handleClose} severity="info">
+					{open}
+				</Alert> 
+			</Snackbar>
+		</>
 	)
 }
 

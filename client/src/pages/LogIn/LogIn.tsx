@@ -8,16 +8,10 @@ import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 
 function logError(error: string[]) {
-
 	toast.error(error[0], {
 		position: "bottom-left",
 		autoClose: 2000,
 		hideProgressBar: true,
-		closeOnClick: true,
-		pauseOnHover: true,
-		draggable: false,
-		progress: undefined,
-		theme: "light",
 	});
 }
 
