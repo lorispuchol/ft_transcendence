@@ -13,9 +13,9 @@ export class Message extends BaseEntity {
 	@ManyToOne(() => Channel, (channel) => channel.messages, {eager : true, nullable: false})
 	channel: Channel
 
-	@Column({ type: 'text' })
+	@Column({ type: 'text', nullable: true})
 	content: string;
 
-	@CreateDateColumn()
+	@CreateDateColumn() //timestamp in db
 	date: Date;
 }

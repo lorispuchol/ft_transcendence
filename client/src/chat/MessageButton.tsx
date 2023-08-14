@@ -3,6 +3,8 @@ import { GetRequest } from "../utils/Request";
 import { IconButton } from "@mui/material";
 import { Message } from "@mui/icons-material";
 import { useNavigate} from "react-router-dom";
+import Loading from "../utils/Loading";
+import ErrorHandling from "../utils/Error";
 
 
 interface RelationData{
@@ -21,15 +23,20 @@ interface MessageButtonProps {
 
 export default function MessageButton({receiver}: MessageButtonProps) {
 
-	const [relationRes, setRelationRes]: [Res, Function] = useState({status: "loading"});
+	const [res, setRes]: [Res, Function] = useState({status: "loading"});
 	
 	let block: boolean = false;
 	const navigate = useNavigate();
 	
 	useEffect(() => {
-		GetRequest("/relationship/" + receiver).then((res) => setRelationRes(res));
+		GetRequest("/relationship/" + receiver).then((res) => setRes(res));
 	}, [receiver])
-	if (relationRes.data?.status === "blockedYou" || relationRes.data?.status === "blocked") {
+	if (res.status === "loading")
+		return (<IconButton><Message /></IconButton>);
+	if (res.status !== "OK")
+		return (<ErrorHandling status={res.status} message={res.error} />);
+
+	if (res.data?.status === "blockedYou" || res.data?.status === "blocked") {
 		block = true;
 	}
 
