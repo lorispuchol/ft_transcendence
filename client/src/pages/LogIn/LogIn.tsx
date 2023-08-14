@@ -7,14 +7,9 @@ import { ChangeEvent, FormEvent, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 
-function logError(error: string | string[]) {
-	let message: string;	
-	if (typeof(error) === "string")
-		message = error;
-	else
-		message = error[0];
+function logError(error: string[]) {
 
-	toast.error(message, {
+	toast.error(error[0], {
 		position: "bottom-left",
 		autoClose: 2000,
 		hideProgressBar: true,
