@@ -33,9 +33,9 @@ export default function BlockButton({ login, render }: BlockProps) {
 	if (response.status !== "OK")
 		return (<ErrorHandling status={response.status} message={response.error} />);
 
-	function handleUpdate() {
+	function handleUpdate(message: string) {
 		setUpdate(update + 1);
-		if (render) {render();}
+		if (render) {render(message);}
 	}
 	
 	if (response.data!.status === "blocked")

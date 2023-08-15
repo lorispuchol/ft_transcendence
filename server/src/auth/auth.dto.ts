@@ -1,5 +1,5 @@
 import { IsNotEmpty, IsString, IsStrongPassword, MaxLength, MinLength, Validate } from "class-validator";
-import { IsUsernameAvailable } from "./auth.decorator";
+import { IsUsernameAvailable, Match } from "./auth.decorator";
 
 export class NewUserWithPassword {
 	
@@ -25,5 +25,6 @@ export class UserWithPassword {
 
 	@IsNotEmpty()
 	@IsString()
+	@Validate(Match)
 	password: string;
 }
