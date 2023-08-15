@@ -1,8 +1,8 @@
 import { List, ListItem, ListItemText } from "@mui/material";
 import { FormEvent, useEffect, useRef, useState } from "react";
-import { Socket, io } from "socket.io-client";
+import { Socket } from "socket.io-client";
 import "./chat.css";
-import { GetRequest, server_url } from "../utils/Request";
+import { GetRequest } from "../utils/Request";
 import Loading from "../utils/Loading";
 import ErrorHandling from "../utils/Error";
 
@@ -31,7 +31,7 @@ interface MessageData {
 	sender: UserData;
 	channel: ChannelData;
 	content: string;
-	time: Date;
+	date: Date;
 }
 
 interface Response {
@@ -71,6 +71,10 @@ function Messages({chan, socket}: MessagesProps) {
 		return (<Loading />);
 	if (response.status !== "OK")
 		return (<ErrorHandling status={response.status} message={response.error} />);
+	
+	messages.sort((a, b) =>
+		(new Date(a.date) as any) - (new Date(b.date) as any)
+	)
 
 	return (
 		<div>
@@ -85,12 +89,12 @@ function Messages({chan, socket}: MessagesProps) {
 		  			'& ul': { padding: 0 },
 				}}>
 			{messages.map((message: MessageData) => (
-				<ListItem key={message.id}	title={`Sent at ${new Date(message.time).toLocaleTimeString()}`}>
+				<ListItem key={message.id}	title={`Sent at ${new Date(message.date).toLocaleTimeString()}`}>
 					<div /*className="user-column"*/>
         				<span className="user">{message.sender.username + " :"}</span>
 					</div>
             		<ListItemText className="message">{message.content}</ListItemText>
-            		<span className="date">{new Date(message.time).toLocaleTimeString()}</span>
+            		<span className="date">{new Date(message.date).toLocaleTimeString()}</span>
           		</ListItem>
         	))}
 			<div ref={messageRef} />
@@ -118,7 +122,7 @@ function MessageInput({ chan, socket }: MessagesProps) {
 export default function Chatting({chan, socket}: ChattingProps ) {
 
 	return (
-		<div>
+		<div className="chatting">
 			<strong>chating in: {chan}</strong>
 			<Messages chan={chan} socket={socket} />
 			<MessageInput chan={chan} socket={socket} />

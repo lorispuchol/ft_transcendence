@@ -6,7 +6,7 @@ import ErrorHandling from "../utils/Error";
 import { useLocation } from "react-router-dom";
 import { Button } from "@mui/material";
 import { Socket, io } from "socket.io-client";
-
+import './chat.css'
 
 export enum ChanMode {
 	PUBLIC = "public",
@@ -48,10 +48,11 @@ function ListConv({focusConv, setFocusConv}: focusConvProps) {
 	const dms: ChannelData[]  = response.data!.filter((conv) => conv.mode === ChanMode.DM)
 	const chans: ChannelData[]  = response.data!.filter((conv) => conv.mode !== ChanMode.DM)
 	return (
-		<div /*className="list-button-conv"*/>
+		<div className="list-conv-flex">
 			{
 				dms.map((chan) => (
 					<Button
+						className="MuiButton-conv"
 						key={chan.name}
 						onClick={() => setFocusConv(chan.name)}
 					>
@@ -62,6 +63,7 @@ function ListConv({focusConv, setFocusConv}: focusConvProps) {
 			{
 				chans.map((chan) => (
 					<Button
+						className="MuiButton-conv"
 						key={chan.name}
 						onClick={() => setFocusConv(chan.name)}
 					>
@@ -92,16 +94,15 @@ export default function Chat() {
 		return (<Loading />)
 
 	return (
-		<div /*className="chat-page"*/>
-			<header>
-				Chat
-			</header>
-			
-			<ListConv focusConv={focusConv} setFocusConv={setFocusConv} />
+		<div className="chat-page">
+			<div className="list-conv">
+
+				<ListConv focusConv={focusConv} setFocusConv={setFocusConv} />
+			</div>
 			{focusConv ? 
 				<Chatting chan={focusConv} socket={socket} />
-				: null // return a big button to create a channel
-			}		
+				: null //buton explore and create channels
+			}
 		</div>
 
 	  );

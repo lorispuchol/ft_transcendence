@@ -73,8 +73,7 @@ export class ChatService {
 			channel: chan,
 			content: content,
 		})
-		this.messagesRepository.save(newMsg)
-		return newMsg;
+		return this.messagesRepository.save(newMsg)
 	}
 
 	async getDm(user1: User, user2: User): Promise<Channel> {
