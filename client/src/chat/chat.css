@@ -8,6 +8,7 @@
 }
 
 .list-conv {
+	justify-content: flex-start;
 	display: block;
 	flex-grow: 1;
 	flex-shrink: 0;
@@ -46,7 +47,6 @@
 	font-size: 16px;
 	border-radius: 50%;
 	margin: 4px 2px;
-
 
 	/* margin-bottom: 15px;
 	width: 150px;

@@ -7,6 +7,7 @@ import { useLocation } from "react-router-dom";
 import { Button } from "@mui/material";
 import { Socket, io } from "socket.io-client";
 import './chat.css'
+import ChannelNav from "./ChannelNav";
 
 export enum ChanMode {
 	PUBLIC = "public",
@@ -35,6 +36,7 @@ interface focusConvProps {
 
 function ListConv({focusConv, setFocusConv}: focusConvProps) {
 	
+
 	//focusConv pour entourer sur la conv actuelle
 	const [response, setResponse]: [Response, Function] = useState({status: "loading"});
 	useEffect(() => {
@@ -51,26 +53,25 @@ function ListConv({focusConv, setFocusConv}: focusConvProps) {
 		<div className="list-conv-flex">
 			{
 				dms.map((chan) => (
-					<Button
+					<button
 						className="MuiButton-conv"
 						key={chan.name}
 						onClick={() => setFocusConv(chan.name)}
 					>
 						{chan.name}
-					</Button>
+					</button>
 				))
 			}
 			{
 				chans.map((chan) => (
-					<Button
+					<button
 						className="MuiButton-conv"
 						key={chan.name}
 						onClick={() => setFocusConv(chan.name)}
 					>
 						{chan.name}
-					</Button>
+					</button>
 				))
-				
 			}
 		</div>
 	)
@@ -98,12 +99,12 @@ export default function Chat() {
 			<div className="list-conv">
 
 				<ListConv focusConv={focusConv} setFocusConv={setFocusConv} />
+				<ChannelNav/>
 			</div>
 			{focusConv ? 
 				<Chatting chan={focusConv} socket={socket} />
 				: null //buton explore and create channels
 			}
 		</div>
-
-	  );
+	);
 }
