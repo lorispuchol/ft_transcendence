@@ -7,6 +7,14 @@ import { ChangeEvent, FormEvent, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 
+function logError(error: string[]) {
+	toast.error(error[0], {
+		position: "bottom-left",
+		autoClose: 2000,
+		hideProgressBar: true,
+	});
+}
+
 function LogInput() {
 	const [username, setUsername] = useState('')
 	const [password, setPassword] = useState('');
@@ -26,19 +34,7 @@ function LogInput() {
 				if (response.status === "OK" && response.data.status === "OK")
 					window.location.href= client_url + "/login?token=" + response.data.token;
 				else
-				{
-					const error = response.data ? response.data.error : response.error[0];
-					toast.error(error, {
-						position: "bottom-left",
-						autoClose: 2000,
-						hideProgressBar: true,
-						closeOnClick: true,
-						pauseOnHover: false,
-						draggable: false,
-						progress: undefined,
-						theme: "light",
-					});
-				}
+					logError(response.error);
 			});
 	}
 
@@ -48,18 +44,7 @@ function LogInput() {
 				if (response.status === "OK")
 					window.location.href= client_url + "/login?token=" + response.data;
 				else
-				{
-					toast.error(response.error[0], {
-						position: "bottom-left",
-						autoClose: 2000,
-						hideProgressBar: true,
-						closeOnClick: true,
-						pauseOnHover: false,
-						draggable: false,
-						progress: undefined,
-						theme: "light",
-					});
-				}
+					logError(response.error);
 			});
 	}
 

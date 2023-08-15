@@ -16,7 +16,7 @@ function renderColor(status: string) {
 		case 'offline':
 			return "red";
 		default:
-			return "black"
+			return "red"
 	}
 }
 

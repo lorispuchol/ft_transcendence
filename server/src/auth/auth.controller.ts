@@ -45,7 +45,7 @@ export class AuthController {
 	async login(
 		@Body() user: UserWithPassword
 	) {
-		return (await this.authService.logInWithPassword(user.username, user.password));
+		return (await this.authService.logInWithPassword(user.username));
 	}
 
 	@Public()

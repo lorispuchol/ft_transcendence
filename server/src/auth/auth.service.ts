@@ -36,16 +36,9 @@ export class AuthService {
 		return await this.jwtService.signAsync(payload);
 	}
 
-	async logInWithPassword(login: string, password: string): Promise<Object> {
-		const user: User = await this.userService.findOneByLogin(login);
-		if (!user)
-			return {status: "KO", error: "user do not exist"};
+	async logInWithPassword(username: string): Promise<Object> {
+		const user: User = await this.userService.findOneByUsername(username);
 
-		const isMatch = await bcrypt.compare(password, user.password);
-		if (!isMatch)
-			return {status: "KO", error: "wrong password"};
-		
-		console.log(user, isMatch)
 		const payload = {id: user.id, login: user.login};
 		return {status: "OK", token: await this.jwtService.signAsync(payload)};
 	}
