@@ -36,7 +36,6 @@ export default function SettingsPopup({ close }: any) {
 				window.location.href = client_url + "/profile/" + username;
 			else
 				updateError(response.error);
-				console.log(response.error)
 		})
 	}
 

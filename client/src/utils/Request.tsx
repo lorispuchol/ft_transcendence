@@ -16,7 +16,7 @@ export async function GetRequest(path: string) {
 			const message = error.response.data.message;
 		 	res = {status: error.response.status, error: typeof(message) === "string" ? [message] : message};
 		}
-		if (error.code === "ERR_NETWORK")
+		else if (error.code === "ERR_NETWORK")
 			res = { status: "ERR_NETWORK", error: error.message };
 		else
 			res = { status: error.response.status, error: error.message };
@@ -56,10 +56,9 @@ export async function PatchRequest(path: string, data: Object) {
 		if (error.response)
 		{
 			const message = error.response.data.message;
-			console.log(message)
 		 	res = {status: error.response.status, error: typeof(message) === "string" ? [message] : message};
 		}
-		if (error.code === "ERR_NETWORK")
+		else if (error.code === "ERR_NETWORK")
 			res = { status: "ERR_NETWORK", error: error.message };
 		else
 			res = { status: error.response.status, error: error.message };
@@ -80,7 +79,7 @@ export async function DeleteRequest(path: string) {
 			const message = error.response.data.message;
 		 	res = {status: error.response.status, error: typeof(message) === "string" ? [message] : message};
 		}
-		if (error.code === "ERR_NETWORK")
+		else if (error.code === "ERR_NETWORK")
 			res = { status: "ERR_NETWORK", error: error.message };
 		else
 			res = { status: error.response.status, error: error.message };
