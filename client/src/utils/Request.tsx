@@ -56,6 +56,7 @@ export async function PatchRequest(path: string, data: Object) {
 		if (error.response)
 		{
 			const message = error.response.data.message;
+			console.log(message)
 		 	res = {status: error.response.status, error: typeof(message) === "string" ? [message] : message};
 		}
 		if (error.code === "ERR_NETWORK")

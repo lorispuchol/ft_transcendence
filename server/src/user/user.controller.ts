@@ -2,6 +2,7 @@ import { Body, Controller, Get, Param, Patch, Request } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { Public } from "src/auth/constants";
 import { User } from "./user.entity";
+import { newUsername } from "./user.dto";
 
 @Controller('user')
 export class UserController {
@@ -20,11 +21,10 @@ export class UserController {
 	@Patch('username')
 	async changeUsername(
 		@Request() req: any,
-		@Body('username') newUsername: string
-		) {
-		const status = await this.userService.changeUsername(req.user.id, newUsername);
-		const user =  await this.userService.findOneById(req.user.id);
-		return {status: status, user: user};
+		@Body() newUsername: newUsername
+	) {
+		this.userService.changeUsername(req.user.id, newUsername.username);
+		return {username: newUsername.username};
 	}
 
 	//dev

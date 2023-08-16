@@ -39,13 +39,8 @@ export class UserService {
 	}
 
 	async changeUsername(userId: number, newUsername: string) {
-		try {
-			this.userRepository.update({id: userId}, {username: newUsername});
-			return ("changed")
-		}
-		catch (error) {
-			return ("taken");
-		}
+		this.userRepository.update({id: userId}, {username: newUsername});
+		return ("OK")
 	}
 
 	////dev
