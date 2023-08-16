@@ -20,7 +20,7 @@ function LogInput() {
 	const [password, setPassword] = useState('');
 
 	function usernameChange(event: ChangeEvent<HTMLInputElement>) {
-		setUsername(event.target.value)
+		setUsername(event.target.value);
 	}
 
 	function passwordChange(event: ChangeEvent<HTMLInputElement>) {

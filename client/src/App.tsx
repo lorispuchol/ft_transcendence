@@ -9,7 +9,6 @@ import { GetRequest, server_url } from './utils/Request';
 import ErrorHandling from './utils/Error';
 import Loading from './utils/Loading';
 import Chat from './chat/Chat';
-import Everyone from './user/Everyone';
 import Game from './pages/game/Game';
 import Loader from './components/Loading/Loader'
 import { NavBar } from './components/NavBar/NavBar';
@@ -85,7 +84,6 @@ export default function App() {
 						<Route path='/' element={<Home />} />
 						<Route path='/profile' element={<RedirectToOwnProfile />} />
 						<Route path='/profile/:username' element={<Profile />} />
-						<Route path='/everyone' element={<Everyone />} />
 						<Route path='/login' element={<Navigate to='/' />} />
 						<Route path='/chat' element={<Chat />} />
 						<Route path='/game' element={<Game />} />
