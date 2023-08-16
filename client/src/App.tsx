@@ -10,14 +10,14 @@ import ErrorHandling from './utils/Error';
 import Loading from './utils/Loading';
 import Chat from './chat/Chat';
 import Everyone from './user/Everyone';
-import Game from './game/Game';
+import Game from './pages/game/Game';
 import Loader from './components/Loading/Loader'
 import { NavBar } from './components/NavBar/NavBar';
 import { EventContext, UserContext } from './utils/Context';
 import { Socket, io } from 'socket.io-client';
 
 interface UserData {
-	avatar: string,
+	avatar: string | null,
 	login: string,
 	username: string,
 	nb_victory: number,
@@ -88,7 +88,6 @@ export default function App() {
 						<Route path='/everyone' element={<Everyone />} />
 						<Route path='/login' element={<Navigate to='/' />} />
 						<Route path='/chat' element={<Chat />} />
-						<Route path='/chat/:username' element={<Chat />} />
 						<Route path='/game' element={<Game />} />
 						<Route path='/loader' element={<Loader />} />
 					</Routes>
@@ -97,5 +96,3 @@ export default function App() {
 		</WebSocket>
 	);
 }
-
-//ERR_NETWORK

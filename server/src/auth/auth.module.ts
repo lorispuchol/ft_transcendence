@@ -4,6 +4,7 @@ import { UserModule } from "src/user/user.module";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
 import { jwtConstants } from "./constants";
+import { IsUsernameAvailable, Match } from "./auth.decorator";
 
 @Module({
 	imports : [
@@ -15,8 +16,7 @@ import { jwtConstants } from "./constants";
 		})
 	],
 	controllers: [AuthController],
-	providers: [AuthService],
+	providers: [AuthService, IsUsernameAvailable, Match],
 	exports: [AuthService],
 })
-
 export class AuthModule {}

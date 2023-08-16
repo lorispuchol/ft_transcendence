@@ -9,6 +9,6 @@ export class AppController {
   @Public()
   @Get()
   getHello(): string {
-    return "oui";
+    return "c'est le backend idiot";
   }
 }

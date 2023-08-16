@@ -6,12 +6,13 @@ import { Participant } from "./entities/participant_chan_x_user.entity";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { UserModule } from "src/user/user.module";
 import { Channel } from "./entities/channel.entity";
+import { Message } from "./entities/message.entity";
 
 
 @Module({
 	imports: [
 		UserModule,
-		TypeOrmModule.forFeature([Participant, Channel], 'lorisforever'),],
+		TypeOrmModule.forFeature([Participant, Channel, Message], 'lorisforever'),],
 	controllers: [ChatController],
 	providers: [ChatGateway, ChatService],
 	exports: [ChatService]

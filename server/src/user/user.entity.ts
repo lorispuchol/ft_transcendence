@@ -3,12 +3,7 @@ import { Relationship } from "../relationship/relationship.entity";
 import { Message } from "src/chat/entities/message.entity";
 import { Channel } from "src/chat/entities/channel.entity";
 import { Match } from "src/game/match.entity";
-
-export enum UserStatus {
-    OFFLINE = "offline",
-    ONLINE = "online",
-    GAME = "game",
-}
+import { Participant } from "src/chat/entities/participant_chan_x_user.entity";
 
 @Entity()
 export class User extends BaseEntity {
@@ -25,10 +20,17 @@ export class User extends BaseEntity {
 	@Column({
 		type: 'varchar',
 		length: 16,
-		nullable: true,
+		nullable: false,
 		unique: true,
 	})
 	username: string;
+
+	@Column({
+		type: 'varchar',
+		nullable: true,
+		default: null,
+	})
+	password: string;
 
 	@Column({
 		type: 'bytea',
@@ -36,13 +38,6 @@ export class User extends BaseEntity {
 		default: null,
 	})
 	avatar: Buffer;
-
-	@Column({
-		type: "enum",
-		enum: UserStatus,
-		default: UserStatus.ONLINE,
-	})
-	status: string;
 
 	@Column({
 		type: 'integer',
@@ -56,19 +51,21 @@ export class User extends BaseEntity {
 	})
 	nb_defeat: number;
 
-	@OneToMany(() => Relationship, (relationship) => relationship)
-	relationships: Relationship[];
+	@OneToMany(() => Relationship, (relationship) => relationship.requester)
+	sendRelationships: Relationship[];
+
+	@OneToMany(() => Relationship, (relationship) => relationship.recipient)
+	recvRelationships: Relationship[];
 	
 	@OneToMany(() => Message, (message) => message.sender)
 	sendMessages: Message[];
 
+	@OneToMany(() => Participant, (part) => part.user)
+	participants: Participant[]
+
+	@OneToMany(() => Match, (match) => match.challenger)
+	challengeMatches: Match[]
 	
-	@OneToMany(() => Message, (message) => message.receiver)
-	recvMessages: Message[];
-
-	@OneToMany(() => Channel, (channel) => channel)
-	channels: Channel[]
-
-	@OneToMany(() => Match, (match) => match)
-	matches: Match[]
+	@OneToMany(() => Match, (match) => match.opponent)
+	opponMatches: Match[]
 }

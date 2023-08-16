@@ -1,8 +1,7 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "./user.entity";
 import { Repository } from "typeorm";
-import { EventService } from "src/event/event.service";
 
 @Injectable()
 export class UserService {
@@ -11,9 +10,10 @@ export class UserService {
 			private userRepository: Repository<User>
 	){}
 
-	async createOne(login: string): Promise<User | undefined> {
+	async createOne(login: string, password?: string): Promise<User | undefined> {
 		const username: string = login;
 		const newUser: User = this.userRepository.create({login, username});
+		newUser.password = password;
 		return await this.userRepository.save(newUser);
 	}
 
