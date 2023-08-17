@@ -16,6 +16,12 @@ export class ChatController {
 		)
 	}
 
+	@Get('getMembers/:chan')
+	async GetMembers( 
+		@Param('chan') chan: string) {
+			return await this.chatService.getAllMembers(chan);
+	}
+
 	@Get('getDm/:receiver')
 	async getDm(
 		@Request() req: any,
@@ -30,6 +36,6 @@ export class ChatController {
 		@Request() req: any,
 		@Param('chan') chan: string
 	) {
-		return this.chatService.getMessages(chan)
+		return this.chatService.getMessages(req.user.login, chan)
 	}
 }

@@ -1,37 +1,15 @@
 import { List, ListItem, ListItemText } from "@mui/material";
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useContext, useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
 import "./chat.css";
 import { GetRequest } from "../utils/Request";
 import Loading from "../utils/Loading";
 import ErrorHandling from "../utils/Error";
+import { MessageData } from "./interfaceData";
+import { SocketChatContext } from "../utils/Context";
 
 interface ChattingProps {
 	chan: string;
-	socket: Socket
-}
-
-interface UserData {
-	avatar: string | null,
-	login: string,
-	username: string,
-	nb_victory: number,
-	nb_defeat: number,
-}
-
-interface ChannelData {
-	id: number, 
-	name: string,
-	mode: string,
-	password: string | null;
-}
-
-interface MessageData {
-	id: number;
-	sender: UserData;
-	channel: ChannelData;
-	content: string;
-	date: Date;
 }
 
 interface Response {
@@ -42,24 +20,32 @@ interface Response {
 
 interface MessagesProps {
 	chan: string,
-	socket: Socket,
 }
 
-function Messages({chan, socket}: MessagesProps) {
+interface MessagesListenerProps {
+	chan: string,
+	msg: MessageData,
+}
+
+function Messages({chan}: MessagesProps) {
 	
 	const [response, setResponse]: [Response, Function] = useState({status: "loading"});
 	const [messages, setMessages]: [MessageData[], Function] = useState([]);
+	const socket: Socket | null = useContext(SocketChatContext);
+
 
 	useEffect(() => {
 		GetRequest("/chat/getMessages/" + chan).then((res) => {setResponse(res); setMessages(res.data)})
-		function messageListener(message: MessageData) {
-			setMessages((prevMessages: MessageData[]) => {
-				const newMessages: MessageData[] = [...prevMessages, message];
-				return newMessages;
-			});
+		function messageListener(message: MessagesListenerProps) {
+			if (chan === message.chan) {
+				setMessages((prevMessages: MessageData[]) => {
+					const newMessages: MessageData[] = [...prevMessages, message.msg];
+					return newMessages;
+				});
+			}
 		};
-		socket.on('message', messageListener);
-		return () => {socket.off('message', messageListener);};
+		socket!.on('message', messageListener);
+		return () => {socket!.off('message', messageListener);};
 	}, [chan, socket])
 
 	const messageRef = useRef<null | HTMLDivElement>(null);
@@ -103,12 +89,13 @@ function Messages({chan, socket}: MessagesProps) {
 	)
 }
 
-function MessageInput({ chan, socket }: MessagesProps) {
+function MessageInput({ chan }: MessagesProps) {
 	const [value, setValue] = useState('');
+	const socket = useContext(SocketChatContext);
 
 	function submitForm(e: FormEvent) {
 		e.preventDefault();
-		socket.emit('message',chan, value);
+		socket!.emit('message',chan, value);
 		setValue('');
 	};
 
@@ -119,13 +106,15 @@ function MessageInput({ chan, socket }: MessagesProps) {
 	);
 }
 
-export default function Chatting({chan, socket}: ChattingProps ) {
+export default function Chatting({chan}: ChattingProps ) {
 
+	if (!chan)
+		return null
 	return (
 		<div className="chatting">
 			<strong>chating in: {chan}</strong>
-			<Messages chan={chan} socket={socket} />
-			<MessageInput chan={chan} socket={socket} />
+			<Messages chan={chan} />
+			<MessageInput chan={chan} />
 		</div>
 	);
 }

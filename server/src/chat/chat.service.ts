@@ -5,6 +5,8 @@ import { FindOptionsWhere, Repository } from "typeorm";
 import { MemberDistinc, Participant } from "./entities/participant_chan_x_user.entity";
 import { ChanMode, Channel } from "./entities/channel.entity";
 import { Message } from "./entities/message.entity";
+import { RelationshipService } from "src/relationship/relationship.service";
+import { UserService } from "src/user/user.service";
 
 @Injectable()
 export class ChatService {
@@ -16,7 +18,10 @@ export class ChatService {
 		private channelRepository: Repository<Channel>,
 
 		@InjectRepository(Message, 'lorisforever')
-		private messagesRepository: Repository<Message>
+		private messagesRepository: Repository<Message>,
+
+		private relationshipService: RelationshipService,
+		private userService: UserService
 	) {}
 	
 	async getConvs(user: User): Promise<Channel[]> {
@@ -57,7 +62,11 @@ export class ChatService {
 	}
 
 	async getAllMembers(chanName: string) {
+	
 		const channel: Channel = await this.findChanByName(chanName);
+
+		if(!channel)
+			return null;
 
 		const participants: Participant[] = await this.participantRepository.find({
 			where: {
@@ -100,7 +109,7 @@ export class ChatService {
 		return dm
 	}
 
-	async getMessages(chan: string): Promise<Message[]> {
+	async getMessages(user: string, chan: string): Promise<Message[]> {
 		const channel = await this.channelRepository.findOne({
 			where: {
 				name: chan
@@ -114,6 +123,14 @@ export class ChatService {
 				channel: channel
 			} as FindOptionsWhere<Channel>
 		})
-		return messages;
+		// return messages;
+
+		const u: User = await this.userService.findOneByLogin(user);
+		const displayMessages: Message[] = [];
+		const request = messages.map( async (msg) => {	
+			if (!await this.relationshipService.ReqIsBlocked(msg.sender, u))
+				displayMessages.push(msg)
+		})
+		return Promise.all(request).then(() => displayMessages);
 	}
 }

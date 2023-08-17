@@ -4,11 +4,7 @@ import { IconButton } from "@mui/material";
 import { Message } from "@mui/icons-material";
 import { useNavigate} from "react-router-dom";
 import ErrorHandling from "../utils/Error";
-
-
-interface RelationData{
-	status: string,
-}
+import { RelationData } from "./interfaceData";
 
 interface Res {
 	status: string | number,

@@ -1,26 +1,14 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Chatting from "./Chatting";
 import { GetRequest, server_url } from "../utils/Request";
 import Loading from "../utils/Loading";
 import ErrorHandling from "../utils/Error";
 import { useLocation } from "react-router-dom";
-import { Button } from "@mui/material";
 import { Socket, io } from "socket.io-client";
 import './chat.css'
-import ChannelNav from "./ChannelNav";
+import { ChanMode, ChannelData, ParticipantData } from "./interfaceData";
+import { SocketChatContext } from "../utils/Context";
 
-export enum ChanMode {
-	PUBLIC = "public",
-	PROTECTED = "protected",
-	PRIVATE = "private",
-	DM = "dm"
-}
-interface ChannelData {
-	id: number, 
-	name: string,
-	mode: string,
-	password: string | null;
-}
 interface Response {
 	status: string | number,
 	data?: ChannelData[],
@@ -34,10 +22,18 @@ interface focusConvProps {
 	setFocusConv: Function,
 }
 
-function ListConv({focusConv, setFocusConv}: focusConvProps) {
-	
+interface ResponseMembers {
+	status: string | number,
+	data?: ParticipantData[],
+	error?: string,
+}
 
-	//focusConv pour entourer sur la conv actuelle
+interface ListMembersProps {
+	chan: string
+}
+
+function ListConv({focusConv, setFocusConv}: focusConvProps) {
+
 	const [response, setResponse]: [Response, Function] = useState({status: "loading"});
 	useEffect(() => {
 			GetRequest("/chat/getConvs").then((response) => setResponse(response));
@@ -54,7 +50,7 @@ function ListConv({focusConv, setFocusConv}: focusConvProps) {
 			{
 				dms.map((chan) => (
 					<button
-						className="MuiButton-conv"
+						className={`button-conv ${chan.name === focusConv ? 'focused' : ''}`}
 						key={chan.name}
 						onClick={() => setFocusConv(chan.name)}
 					>
@@ -65,7 +61,7 @@ function ListConv({focusConv, setFocusConv}: focusConvProps) {
 			{
 				chans.map((chan) => (
 					<button
-						className="MuiButton-conv"
+						className={`button-conv ${chan.name === focusConv ? 'focused' : ''}`}
 						key={chan.name}
 						onClick={() => setFocusConv(chan.name)}
 					>
@@ -76,6 +72,32 @@ function ListConv({focusConv, setFocusConv}: focusConvProps) {
 		</div>
 	)
 }
+
+function ListMembers({chan}: ListMembersProps) {
+
+	const isDm: boolean = chan.includes("+");
+
+	const [response, setResponse]: [ResponseMembers, Function] = useState({status: "loading"});
+	useEffect(() => {
+			GetRequest("/chat/getMembers/" + chan).then((response) => setResponse(response));
+	}, [chan]);
+	if (response.status === "loading")
+		return (<Loading />);
+	if (response.status !== "OK")
+		return (<ErrorHandling status={response.status} message={response.error} />);
+
+	if (!response.data)
+		return <div>there is only you in this channel</div>
+	return (
+		<div>
+			{
+				response.data.map(( member ) => <div key={member.user.login}>{member.user.login}</div>)
+			}
+		</div>
+	)
+	
+}
+
 
 export default function Chat() {
 	const location = useLocation();
@@ -95,16 +117,12 @@ export default function Chat() {
 		return (<Loading />)
 
 	return (
-		<div className="chat-page">
-			<div className="list-conv">
-
-				<ListConv focusConv={focusConv} setFocusConv={setFocusConv} />
-				<ChannelNav/>
+		<SocketChatContext.Provider value={socket}>
+			<div className="chat-page">
+					<ListConv focusConv={focusConv} setFocusConv={setFocusConv}/>
+					<Chatting chan={focusConv} />
+					{focusConv ? <ListMembers chan={focusConv} /> : null}
 			</div>
-			{focusConv ? 
-				<Chatting chan={focusConv} socket={socket} />
-				: null //buton explore and create channels
-			}
-		</div>
+		</SocketChatContext.Provider>
 	);
 }

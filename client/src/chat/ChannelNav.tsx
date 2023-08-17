@@ -23,7 +23,7 @@ function CreateChanPop({setIsOpen}: CreateChanPopProps) {
 	
 	function modeChange(event: any) {
 		setMode(event.target.value)
-		console.log(event.target.value)
+
 	}
 	
 	function createChan() {
@@ -51,6 +51,8 @@ function CreateChanPop({setIsOpen}: CreateChanPopProps) {
 		</div>
 	)
 }
+
+
 
 
 
