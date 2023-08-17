@@ -1,0 +1,15 @@
+@use '../../style/color' as c;
+
+.game {
+	// width: 100%;
+	// height: 100%;
+	background-color: c.$secondary;
+	border-color: c.$teritary;
+	margin: 0px;
+}
+
+.classique {
+	background-color: black;
+	border-color: white;
+	margin: 0px;
+}

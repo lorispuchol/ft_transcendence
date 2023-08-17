@@ -6,7 +6,7 @@ import NoRouteFound from "../Error/NoRouteFound";
 import Loading from "../../utils/Loading";
 import UserStatus from "../../user/UserStatus";
 import { IoSettingsSharp } from 'react-icons/io5'
-
+import defaultPp from './default.png';
 import './Profile.scss'
 import { Paper } from "@mui/material";
 
@@ -36,7 +36,7 @@ export function RedirectToOwnProfile() {
 	return (<Navigate to={"/profile/" + response.data?.username} />);
 }
 
-export const defaultAvatar = "https://cdn.intra.42.fr/users/292c41c82eeb97e81e28e35d25405eb8/kmammeri.jpg";
+export const defaultAvatar = defaultPp;
 
 export default function Profile() {
 	const param = useParams();

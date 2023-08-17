@@ -58,7 +58,7 @@ $primary_color: #fad390;
 	}
 }
 
-@media screen and (max-width: 900px) and (min-width: 590px){
+@media screen and (((max-width: 915px) and (min-width: 590px)) or (max-width: 490px)){
 
 	.gaming_button {
 		grid-column: 1/6;

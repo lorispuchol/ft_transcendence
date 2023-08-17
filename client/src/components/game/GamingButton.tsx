@@ -1,6 +1,6 @@
 import { VideogameAsset } from "@mui/icons-material"
 import { Button } from "@mui/material"
-import { primaryColor } from "../../fonts/color"
+import { primaryColor } from "../../style/color"
 import { useEffect, useState } from "react";
 import { GetRequest } from "../../utils/Request";
 import ErrorHandling from "../../utils/Error";
