@@ -56,18 +56,21 @@ function CreateChanPop({setIsOpen}: CreateChanPopProps) {
 
 
 
-export default function ChannelNav() {
+export default function ChannelNav({big}: any) {
 
 	const [isOpen, setIsOpen]: [boolean, Function] = useState(false);
-
+	console.log(big)
 	return (
-		<div>
-			<IconButton
-				className="MuiButton-conv"
+		<div className={big? "big-chan-nav" : "list-conv"}>
+			<button
+				className={big === true ? "big-button-chan-nav" : "button-conv"}
 				onClick={() => setIsOpen(true)}
 			>
 				<Add />
-			</IconButton>
+			</button>
+			<button className={big === true ? "big-button-chan-nav" : "button-conv"}>
+				<Search />
+			</button>
 			{isOpen && <CreateChanPop setIsOpen={setIsOpen}/>}
 		</div>
 	)

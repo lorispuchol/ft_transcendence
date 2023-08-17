@@ -7,6 +7,7 @@ import Loading from "../utils/Loading";
 import ErrorHandling from "../utils/Error";
 import { MessageData } from "./interfaceData";
 import { SocketChatContext } from "../utils/Context";
+import ChannelNav from "./ChannelNav";
 
 interface ChattingProps {
 	chan: string;
@@ -108,8 +109,6 @@ function MessageInput({ chan }: MessagesProps) {
 
 export default function Chatting({chan}: ChattingProps ) {
 
-	if (!chan)
-		return null
 	return (
 		<div className="chatting">
 			<strong>chating in: {chan}</strong>

@@ -8,6 +8,7 @@ import { Socket, io } from "socket.io-client";
 import './chat.css'
 import { ChanMode, ChannelData, ParticipantData } from "./interfaceData";
 import { SocketChatContext } from "../utils/Context";
+import ChannelNav from "./ChannelNav";
 
 interface Response {
 	status: string | number,
@@ -46,7 +47,7 @@ function ListConv({focusConv, setFocusConv}: focusConvProps) {
 	const dms: ChannelData[]  = response.data!.filter((conv) => conv.mode === ChanMode.DM)
 	const chans: ChannelData[]  = response.data!.filter((conv) => conv.mode !== ChanMode.DM)
 	return (
-		<div className="list-conv-flex">
+		<div className="list-conv">
 			{
 				dms.map((chan) => (
 					<button
@@ -69,6 +70,7 @@ function ListConv({focusConv, setFocusConv}: focusConvProps) {
 					</button>
 				))
 			}
+			<ChannelNav big={false} />
 		</div>
 	)
 }
@@ -119,9 +121,15 @@ export default function Chat() {
 	return (
 		<SocketChatContext.Provider value={socket}>
 			<div className="chat-page">
+				<div className="list-conv">
 					<ListConv focusConv={focusConv} setFocusConv={setFocusConv}/>
-					<Chatting chan={focusConv} />
+				</div>
+				<div className="chatting">
+					{focusConv ? <Chatting chan={focusConv} /> : <ChannelNav big={true}/>}
+				</div>
+				<div className="list-member">
 					{focusConv ? <ListMembers chan={focusConv} /> : null}
+				</div>
 			</div>
 		</SocketChatContext.Provider>
 	);
