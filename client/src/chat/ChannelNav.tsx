@@ -61,14 +61,13 @@ export default function ChannelNav({big}: any) {
 	const [isOpen, setIsOpen]: [boolean, Function] = useState(false);
 	console.log(big)
 	return (
-		<div className={big? "big-chan-nav" : "list-conv"}>
+		<div className={big ? "big-chan-nav" : "list-conv"}>
 			<button
-				className={big === true ? "big-button-chan-nav" : "button-conv"}
 				onClick={() => setIsOpen(true)}
 			>
 				<Add />
 			</button>
-			<button className={big === true ? "big-button-chan-nav" : "button-conv"}>
+			<button>
 				<Search />
 			</button>
 			{isOpen && <CreateChanPop setIsOpen={setIsOpen}/>}

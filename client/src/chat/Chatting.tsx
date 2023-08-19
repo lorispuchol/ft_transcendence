@@ -110,10 +110,10 @@ function MessageInput({ chan }: MessagesProps) {
 export default function Chatting({chan}: ChattingProps ) {
 
 	return (
-		<div className="chatting">
+		<>
 			<strong>chating in: {chan}</strong>
 			<Messages chan={chan} />
 			<MessageInput chan={chan} />
-		</div>
+		</>
 	);
 }

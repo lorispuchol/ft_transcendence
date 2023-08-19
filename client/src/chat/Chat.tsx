@@ -7,7 +7,7 @@ import { useLocation } from "react-router-dom";
 import { Socket, io } from "socket.io-client";
 import './chat.css'
 import { ChanMode, ChannelData, ParticipantData } from "./interfaceData";
-import { SocketChatContext } from "../utils/Context";
+import { SocketChatContext, UserContext } from "../utils/Context";
 import ChannelNav from "./ChannelNav";
 
 interface Response {
@@ -35,6 +35,8 @@ interface ListMembersProps {
 
 function ListConv({focusConv, setFocusConv}: focusConvProps) {
 
+	const user: string | undefined = useContext(UserContext);
+
 	const [response, setResponse]: [Response, Function] = useState({status: "loading"});
 	useEffect(() => {
 			GetRequest("/chat/getConvs").then((response) => setResponse(response));
@@ -47,22 +49,26 @@ function ListConv({focusConv, setFocusConv}: focusConvProps) {
 	const dms: ChannelData[]  = response.data!.filter((conv) => conv.mode === ChanMode.DM)
 	const chans: ChannelData[]  = response.data!.filter((conv) => conv.mode !== ChanMode.DM)
 	return (
-		<div className="list-conv">
+		<>
 			{
 				dms.map((chan) => (
-					<button
-						className={`button-conv ${chan.name === focusConv ? 'focused' : ''}`}
-						key={chan.name}
-						onClick={() => setFocusConv(chan.name)}
-					>
-						{chan.name}
-					</button>
+					<div className="conv">
+						<button
+							className={`${chan.name === focusConv && 'focused'}`}
+							key={chan.name}
+							onClick={() => setFocusConv(chan.name)}
+							>
+							{chan.name.replace(user!, "").replace("+", "").toUpperCase().charAt(0)}
+							{/* feature the picture */}
+						</button>
+						<p>{chan.name.replace(user!, "").replace("+", "")}</p>
+					</div>
 				))
 			}
 			{
 				chans.map((chan) => (
 					<button
-						className={`button-conv ${chan.name === focusConv ? 'focused' : ''}`}
+						className={`${chan.name === focusConv && 'focused'}`}
 						key={chan.name}
 						onClick={() => setFocusConv(chan.name)}
 					>
@@ -71,7 +77,7 @@ function ListConv({focusConv, setFocusConv}: focusConvProps) {
 				))
 			}
 			<ChannelNav big={false} />
-		</div>
+		</>
 	)
 }
 
