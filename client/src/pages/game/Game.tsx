@@ -1,17 +1,9 @@
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import "./Game.scss";
-
-// function draw(ctx: CanvasRenderingContext2D, frameCount: number) {
-// 	const width: number = ctx.canvas.width;
-// 	const height: number = ctx.canvas.height;
-// 	ctx.clearRect(0, 0, width, height);
-// 	ctx.fillStyle = '#000000';
-// 	ctx.beginPath();
-// 	ctx.arc(width * 0.5, height * 0.5, 200*Math.sin(frameCount*0.05)**2, 0, 2*Math.PI);
-// 	ctx.rect(100, 5, 10, 10)
-// 	ctx.fill();
-// }
+import handlePaddle, { handleKey } from "./paddle";
+import handleBall from "./ball";
+import collision from "./collision";
 
 function handleSize(ctx: CanvasRenderingContext2D) {
 	function resize() {
@@ -23,74 +15,56 @@ function handleSize(ctx: CanvasRenderingContext2D) {
 	return resize;
 }
 
-enum pad {
-	rigth = 0.9,
-	left = 0.1
+const defaultBall = {
+	x : 50,
+	y : 50,
+	dx : -0.5,
+	dy : 0,
+	r: 2,
+	speed : 0.01
 }
 
-function paddle (type: pad ,ctx: CanvasRenderingContext2D, y: number) {
-	const width: number = ctx.canvas.width;
-	const height: number = ctx.canvas.height;
-
-	ctx.fillStyle = '#FFFFFF';
-	ctx.beginPath();
-	ctx.rect(width*type, (y - 0.1) * height, width*0.02, height*0.2);
-	ctx.fill();
+const defaultPaddle = {
+	w: 1,
+	h: 15,
+	//rightPaddle pos
+	rx: 90,
+	ry: 50,
+	//leftPaddle pos
+	lx: 8,
+	ly: 50,
 }
-
-function handleMove(setKey: any): any[] {
-	let framecount = 0;
-	let animationFrameId;
-
-	function onKeyDown({ key }: any) {
-		//console.log(key);
-		setKey(key);
-	}
-	function onKeyUp({ key }: any) {
-		//console.log("up " + key)
-		setKey(null);
-	}
-
-	document.addEventListener('keydown', onKeyDown);
-	document.addEventListener('keyup', onKeyUp);
-	return ([onKeyDown, onkeyup]);
-}
-
-
 
 export default function Game() {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
-	const [leftPad, setLeftPad]: [number, Function] = useState(0.5);
-	const [rightPad, setRigthPad]: [number, Function] = useState(0.5);
-	const [key, setKey]: [any, Function] = useState(null);
-	let animationFrameId: number;
-
+	
 	useEffect(() => {
 		const ctx = canvasRef!.current!.getContext('2d')!;
+		let animationFrameId: number;
 
 		const resize = handleSize(ctx);
-		const [idKey] = handleMove((key: string) => {setKey(key)});
+		const [idKey] = handleKey();
+		let ball = defaultBall;
+		let paddle = defaultPaddle;
 
 		function render() {
-			//console.log(key)
-			paddle(pad.rigth, ctx, rightPad);
-			paddle(pad.left, ctx, leftPad);
+			ctx.clearRect(0,0, ctx.canvas.width, ctx.canvas.height);
+			handlePaddle(ctx, paddle);
+			handleBall(ctx, ball);
+			collision(paddle, ball);
 			animationFrameId = window.requestAnimationFrame(render);
 		}
-		animationFrameId = window.requestAnimationFrame(render);
+		render();
 	
 		return (() => {
 			window.cancelAnimationFrame(animationFrameId);
 			window.removeEventListener("resize", resize);
-			window.removeEventListener("keydown", idKey[0]);
-			window.removeEventListener("keyup", idKey[1]);
+			document.removeEventListener("keydown", idKey[0]);
+			document.removeEventListener("keyup", idKey[1]);
 		});
-	}, [paddle]);
+	}, []);
 
 	return (
-		<>
 			<canvas id="pong" ref={canvasRef} className="classique"/>
-			<strong>{key}</strong>
-		</>
 	);
 }
