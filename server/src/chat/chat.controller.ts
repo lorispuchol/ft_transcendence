@@ -22,6 +22,13 @@ export class ChatController {
 			return await this.chatService.getAllMembers(chan);
 	}
 
+	@Get('getAvatarDm/:chan')
+	async GetAvatarDm( 
+		@Request() req: any,
+		@Param('chan') chan: string) {
+			return await this.chatService.getAvatarDm(chan, req.user.login);
+	}
+
 	@Get('getDm/:receiver')
 	async getDm(
 		@Request() req: any,

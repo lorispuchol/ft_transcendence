@@ -61,7 +61,7 @@ export default function ChannelNav({big}: any) {
 	const [isOpen, setIsOpen]: [boolean, Function] = useState(false);
 	console.log(big)
 	return (
-		<div className={big ? "big-chan-nav" : "list-conv"}>
+		<div className={big ? "big-chan-nav" : "lil-chan-nav"}>
 			<button
 				onClick={() => setIsOpen(true)}
 			>

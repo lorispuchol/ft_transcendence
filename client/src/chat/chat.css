@@ -32,7 +32,7 @@
 	order: 2;
 }
 
-.big-chan-nav {
+.big-chan-nav, .lil-chan-nav {
 	display: flex;
 	flex-basis: 100%;
 	flex-wrap: wrap;
@@ -48,7 +48,13 @@
 	color: blueviolet;
 }
 
-.list-conv > button, .list-conv > .conv > button{
+.lil-chan-nav > button {
+	flex-basis: 45%;
+	flex-grow: 0;
+	flex-shrink: 0;
+}
+
+.lil-chan-nav > button, .list-conv > button{
 	background-color: #04AA6D;
 	color: white;
 	padding: 20px;
@@ -56,30 +62,30 @@
 	text-decoration: none;
 	display: block;
 	font-size: 16px;
-	border-radius: 50%;
+	border-radius: 20px;
 	margin: 4px 2px;
 	height: 5em;
-	width:5em;
+	width: 95%;
 	white-space:nowrap;
 	overflow:hidden;
 	text-overflow: ellipsis;
 	margin-left: 10px;
 }
 
-.conv > p {
+.button-conv > p {
 	padding-left: 5px;
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
 
-.conv {
+.inside-button-conv {
 	display: flex;
 	flex-direction: row;
 	justify-content: flex-start;
 	align-items: center;
 }
 
-.list-conv > button:hover, .list-conv > .conv > button:hover {
+.lil-chan-nav > button:hover, .list-conv > button:hover {
 	background-color: #3e8e41;
 }
 

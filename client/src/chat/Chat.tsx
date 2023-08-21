@@ -9,6 +9,7 @@ import './chat.css'
 import { ChanMode, ChannelData, ParticipantData } from "./interfaceData";
 import { SocketChatContext, UserContext } from "../utils/Context";
 import ChannelNav from "./ChannelNav";
+import { Avatar } from "@mui/material";
 
 interface Response {
 	status: string | number,
@@ -16,6 +17,11 @@ interface Response {
 	error?: string,
 }
 
+interface ResImg {
+	status: string | number,
+	data?: FormData | null, // || Buffer || string 
+	error?: string,
+}
 interface focusConvProps {
 	chanName?: string;
 	chans?: ChannelData[]
@@ -31,6 +37,37 @@ interface ResponseMembers {
 
 interface ListMembersProps {
 	chan: string
+}
+
+interface ButtonConvProps {
+	
+	chan: ChannelData,
+	focusConv: string;
+	setFocusConv: Function
+}
+
+function ButtonConv({chan, focusConv, setFocusConv}: ButtonConvProps) {
+	
+	const user = useContext(UserContext);
+	const [res, setRes]: [ResImg, Function] = useState({status: "loading"});
+
+	
+	useEffect(() => {
+		GetRequest("/chat/getAvatarDm/" + chan.name).then((response) => setRes(response));
+	}, []);
+
+	return (
+		<button
+			className={`${chan.name === focusConv && 'focused'}`}
+			key={chan.name}
+			onClick={() => setFocusConv(chan.name)}
+			>
+				<div className="inside-button-conv">
+					<Avatar src="" alt="avatar"></Avatar>
+					<p>{chan.name.replace(user!, "").replace("+", "")}</p>
+				</div>
+		</button>
+	)
 }
 
 function ListConv({focusConv, setFocusConv}: focusConvProps) {
@@ -52,28 +89,12 @@ function ListConv({focusConv, setFocusConv}: focusConvProps) {
 		<>
 			{
 				dms.map((chan) => (
-					<div className="conv">
-						<button
-							className={`${chan.name === focusConv && 'focused'}`}
-							key={chan.name}
-							onClick={() => setFocusConv(chan.name)}
-							>
-							{chan.name.replace(user!, "").replace("+", "").toUpperCase().charAt(0)}
-							{/* feature the picture */}
-						</button>
-						<p>{chan.name.replace(user!, "").replace("+", "")}</p>
-					</div>
+					<ButtonConv chan={chan} focusConv={focusConv} setFocusConv={setFocusConv} />
 				))
 			}
 			{
 				chans.map((chan) => (
-					<button
-						className={`${chan.name === focusConv && 'focused'}`}
-						key={chan.name}
-						onClick={() => setFocusConv(chan.name)}
-					>
-						{chan.name}
-					</button>
+					<ButtonConv chan={chan} focusConv={focusConv} setFocusConv={setFocusConv} />
 				))
 			}
 			<ChannelNav big={false} />

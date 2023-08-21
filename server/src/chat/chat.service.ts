@@ -133,4 +133,10 @@ export class ChatService {
 		})
 		return Promise.all(request).then(() => displayMessages);
 	}
+
+	async getAvatarDm(chan: string, userReq: string) {
+		const members: Participant[] = await this.getAllMembers(chan);
+		const searchMember = members.filter((member) => member.user.login !== userReq)
+		return searchMember[0].user.avatar;
+	}
 }
