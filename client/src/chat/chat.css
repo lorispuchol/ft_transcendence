@@ -1,98 +1,107 @@
 .chat-page {
 	display: flex;
 	height: 86vh;
-	background-color: grey;
-	border-radius: 20px;
+	border-radius: 0.25rem;
 }
 
+/* ////////////////////////////  List Conv  /////////////////////////////////// */
+
 .list-conv {
+	border-radius: 0.25rem;
 	flex-basis: 20%;
 	flex-grow: 0;
 	flex-shrink: 0;
 	order: 0;
 	overflow: scroll;
-	border: black 1px solid;
+	background-color: #282f4a;
+	box-shadow: inset 0 0 5px #000000;
+	display: flex;
+	flex-direction: column;
+	padding: 10px;
 }
 
+.button-conv {
+	margin: 5px;
+	padding: 10px;
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+	color: white;
+	font-size: 16px;
+	border-radius: 4px;
+	height: 4em;
+	flex-grow: 0;
+	flex-shrink: 0;
+	white-space:nowrap;
+}
+
+.button-conv > p {
+	margin-left: 10px;
+	overflow:hidden;
+	text-overflow: ellipsis;
+}
+
+.button-conv:hover {
+	background-color: #808080a6;
+	box-shadow: 0 0 5px #00000070 !important;
+
+}
+
+.focused {
+	background-color: #8080806b;
+	box-shadow: 0 0 5px #00000070 !important;
+}
+
+.notice {
+	background-color: #ff0000 !important;
+}
+
+/* ////////////////////////////////  Chatting  //////////////////////////// */
+
 .chatting {
+	border-radius: 0.25rem;
 	display: flex;
 	flex-basis: 60%;
 	flex-grow: 0;
 	flex-shrink: 0;
-	border: black 1px solid;
+	background-color: #323C58;
+	box-shadow: inset 0 0 5px #000000;
 	order: 1;
 }
 
 .list-member {
+	border-radius: 0.25rem;
+	background-color: #46506c;
 	flex-basis: 20%;
 	flex-grow: 0;
 	flex-shrink: 0;
-	border: black 1px solid;
-
+	box-shadow: inset 0 0 5px #000000;
 	order: 2;
 }
 
-.big-chan-nav, .lil-chan-nav {
+.chan-nav {
 	display: flex;
-	flex-basis: 100%;
 	flex-wrap: wrap;
 	flex-direction: row;
 	justify-content: space-between;
-
 }
 
-.big-chan-nav > button {
-	flex-basis: 45%;
-	flex-grow: 0;
-	flex-shrink: 0;
-	color: blueviolet;
-}
 
-.lil-chan-nav > button {
-	flex-basis: 45%;
-	flex-grow: 0;
-	flex-shrink: 0;
-}
 
-.lil-chan-nav > button, .list-conv > button{
+.create-chan-form {
+	display: flex;
+	flex-direction: column;
+	flex-wrap: nowrap;
 	background-color: #04AA6D;
 	color: white;
 	padding: 20px;
-	text-align: center;
 	text-decoration: none;
 	display: block;
 	font-size: 16px;
-	border-radius: 20px;
+	border-radius: 4px;
 	margin: 4px 2px;
-	height: 5em;
 	width: 95%;
-	white-space:nowrap;
-	overflow:hidden;
-	text-overflow: ellipsis;
 	margin-left: 10px;
 }
 
-.button-conv > p {
-	padding-left: 5px;
-	overflow: hidden;
-	text-overflow: ellipsis;
-}
-
-.inside-button-conv {
-	display: flex;
-	flex-direction: row;
-	justify-content: flex-start;
-	align-items: center;
-}
-
-.lil-chan-nav > button:hover, .list-conv > button:hover {
-	background-color: #3e8e41;
-}
-
-.focused {
-	background-color: red !important;
-}
-
-.create-channel-popup {
-	border: blueviolet 1px solid;
-}
+/* ////////////////////////////////  ListMember  //////////////////////////// */

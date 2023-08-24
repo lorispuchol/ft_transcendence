@@ -1,76 +1,101 @@
 import { Add, Close, Search } from "@mui/icons-material";
-import { IconButton } from "@mui/material";
+import { FormControl, FormControlLabel, FormGroup, FormHelperText, FormLabel, IconButton, Switch, TextField } from "@mui/material";
 import { ChangeEvent, useState } from "react";
 import './chat.css'
 
-interface CreateChanPopProps {
-	setIsOpen: Function;
+function CreateChanForm() {
+  const [strings, setStrings] = useState({
+    name: "",
+    password: "",
+  });
+
+  const [check, setCheck] = useState({
+	private: false
+  });
+
+
+  const changeCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setCheck({
+      ...check,
+      [event.target.name]: event.target.checked,
+    });
+  };
+
+  const changeStrings = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setStrings({
+      ...strings,
+      [event.target.name]: event.target.value,
+    });
+  };
+
+  function createChannel() {
+
+  }
+
+  return (
+    <FormControl component="fieldset" variant="standard">
+      <FormLabel component="legend">Create your own channel</FormLabel>
+      <FormGroup>
+        <FormControlLabel
+          control={
+            <TextField value={strings.name} onChange={changeStrings} name="name" />
+          }
+          label=""
+        />
+        <FormControlLabel
+          control={
+            <Switch checked={check.private} onChange={changeCheck} name="private" />
+          }
+          label="turn on to make your chennal private"
+		//   labelPlacement="start"
+        />
+		{
+			check.private === true ?
+				<FormControlLabel
+				control={
+					<TextField  value={strings.password} onChange={changeStrings} name="password" />
+				}
+				label=""
+				/> 
+			: null
+		}
+        
+		<IconButton><Add/></IconButton>
+      </FormGroup>
+    </FormControl>
+  );
 }
 
-function CreateChanPop({setIsOpen}: CreateChanPopProps) {
-	const [chanName, setChanName]: [string, Function] = useState('');
-	const [mode, setMode]: [string, Function] = useState('')
-	const [password, setPassword]: [string, Function] = useState('');
 
-	function chanNameChange(event: ChangeEvent<HTMLInputElement>) {
-		setChanName(event.target.value)
-	}
-	
-	function passwordChange(event: ChangeEvent<HTMLInputElement>) {
-		setPassword(event.target.value)
-	}
-
-	
-	function modeChange(event: any) {
-		setMode(event.target.value)
-
-	}
-	
-	function createChan() {
-		return mode
-	}
+export default function ChannelNav() {
 
 	return (
-		<div className="create-channel-popup">
-			<IconButton onClick={() => setIsOpen(false)}><Close /></IconButton>
-			<form onSubmit={createChan}>
-				<input type="text" value={chanName} autoFocus placeholder="USERNAME" onChange={chanNameChange} />
-			</form>
-			<select name="mode" value={mode} id="mode-select" onChange={modeChange}>
-				<option value="">--Please choose an option--</option>
-				<option value="public">Public</option>
-				<option value="protected">Protected</option>
-				<option value="private">Private</option>
-			</select>
-			<form onSubmit={createChan}>
-				<input type="password" value={password} placeholder="PASSWORD" onChange={passwordChange} />
-			</form>
-			<div>
-				<button  onClick={() => createChan()}>CREATE CHAN</button>
-			</div>
-		</div>
-	)
-}
-
-
-
-
-
-export default function ChannelNav({big}: any) {
-
-	const [isOpen, setIsOpen]: [boolean, Function] = useState(false);
-	console.log(big)
-	return (
-		<div className={big ? "big-chan-nav" : "lil-chan-nav"}>
-			<button
-				onClick={() => setIsOpen(true)}
-			>
-				<Add />
-			</button>
+		<div className="chan-nav">
+			
 			<button>
 				<Search />
 			</button>
-			{isOpen && <CreateChanPop setIsOpen={setIsOpen}/>}
+			
+			<div className="create-chan-form">
+
+				{/* <form onSubmit={createChan}>
+					<TextField type="text" value={chanName} autoFocus placeholder="Channel Name" onChange={chanNameChange} />
+					<Switch aria-label=""/>
+				</form>
+				<select name="mode" value={mode} id="mode-select" onChange={modeChange}>
+					<option value="">--Please choose an option--</option>
+					<option value="public">Public</option>
+					<option value="protected">Protected</option>
+					<option value="private">Private</option>
+				</select>
+				<form onSubmit={createChan}>
+					<input className="bg-transparent" type="password" value={password} placeholder="PASSWORD" onChange={passwordChange} />
+				</form> */}
+				<CreateChanForm />
+				{/* <div>
+					<button  onClick={() => createChan()}>CREATE CHAN</button>
+				</div> */}
+			</div>
 		</div>
 	)
 }
