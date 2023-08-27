@@ -1,5 +1,5 @@
 
-interface Pad {
+export interface Pad {
 	w: number,
 	h: number,
 	rx: number,

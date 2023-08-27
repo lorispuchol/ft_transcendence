@@ -1,33 +1,32 @@
 
 import { useEffect, useRef } from "react";
 import "./Game.scss";
-import handlePaddle, { handleKey, init_paddle } from "./paddle";
-import handleBall, { init_ball } from "./ball";
+import handlePaddle, { Pad, handleKey, init_paddle } from "./paddle";
+import handleBall, { Ball, drawBall, init_ball } from "./ball";
 import collision from "./collision";
 
-interface Ball {
-	x : number,
-	y : number,
-	rad: number,
-	dx : number,
-	dy : number,
-	speed : number
-}
+let freezeFrame = 0;
 
-interface Pad {
-	w: number,
-	h: number,
-	rx: number,
-	ry: number,
-	lx: number,
-	ly: number,
-}
-
-function checkPoint(width: number, height: number, paddle: Pad, ball: Ball) {
-	if (ball.x >= (width - ball.rad) || ball.x <= ball.rad) {
+function checkPoint(ctx: CanvasRenderingContext2D, width: number, height: number, paddle: Pad, ball: Ball) {
+	if (ball.x >= (width - 2*ball.rad) || ball.x <= 2*ball.rad) {
+		ball.color = "red"
+		drawBall(ctx, ball);
+		freezeFrame = 20;
 		Object.assign(paddle, init_paddle(width,height));
 		Object.assign(ball, init_ball(width, height));
 	}
+}
+
+const times: number[] = [];
+function displayFps(ctx: CanvasRenderingContext2D, timestamp: number) {
+	const now = timestamp;
+	while (times.length > 0 && times[0] <= now - 1000) {
+		times.shift();
+	}
+	times.push(now);
+	const fps = times.length;
+	ctx.font = "50px Arial"
+	ctx.fillText(fps + " fps", 40, 70);
 }
 
 export default function Game() {
@@ -43,15 +42,21 @@ export default function Game() {
 		const ball : Ball = init_ball(width, height);
 		const paddle: Pad = init_paddle(width, height);
 
-		function render() {
-			ctx.clearRect(0,0, width, height);
-			//checkPoint(width, height, paddle, ball);
-			handlePaddle(ctx, paddle);
-			collision(ctx, width, height, paddle, ball);
-			handleBall(ctx, ball);
+
+		function render(timestamp: number) {
+			if (freezeFrame)
+				freezeFrame--;
+			else {
+				ctx.clearRect(0,0, width, height);
+				displayFps(ctx, timestamp);
+				handlePaddle(ctx, paddle);
+				collision(width, height, paddle, ball);
+				handleBall(ctx, ball);
+				checkPoint(ctx, width, height, paddle, ball);
+			}
 			animationFrameId = window.requestAnimationFrame(render);
 		}
-		render();
+		animationFrameId = window.requestAnimationFrame(render);
 	
 		return (() => {
 			window.cancelAnimationFrame(animationFrameId);
@@ -61,7 +66,7 @@ export default function Game() {
 	}, []);
 
 	return (
-		<div className="wrap">
+		<div className="canvas_wrap">
 			<canvas id="pong" ref={canvasRef} className="classique"/>
 		</div>
 	);

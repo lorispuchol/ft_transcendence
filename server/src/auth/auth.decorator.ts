@@ -42,7 +42,7 @@ export class IsUsernameAvailable {
 
 @ValidatorConstraint({ async: true })
 @Injectable()
-export class Match {
+export class PasswordMatch {
 	constructor(
 		private userService: UserService,
 	) {}
