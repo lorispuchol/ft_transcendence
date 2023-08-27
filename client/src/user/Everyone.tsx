@@ -103,12 +103,16 @@ export default function Everyone() {
 
 	return (
 			<List className="everyone_list">
-				{users!.map((user: UserData) => (
-					username !== user.username &&
-						<div key={user.id} className="">
-								<ProfileElement user={user} />
-						</div>
-				))}
+				{users.length > 1 ? 
+					users.map((user: UserData) => (
+						username !== user.username &&
+							<div key={user.id} className="">
+									<ProfileElement user={user} />
+							</div>
+					))
+					:
+					<Paper className="nobody">nobody there</Paper>
+				}
 			</List>
 	);
 }

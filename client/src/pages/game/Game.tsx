@@ -1,38 +1,33 @@
 
 import { useEffect, useRef } from "react";
 import "./Game.scss";
-import handlePaddle, { handleKey } from "./paddle";
-import handleBall from "./ball";
+import handlePaddle, { handleKey, init_paddle } from "./paddle";
+import handleBall, { init_ball } from "./ball";
 import collision from "./collision";
 
-function handleSize(ctx: CanvasRenderingContext2D) {
-	function resize() {
-		ctx.canvas.width = (window.innerWidth - 40);
-		ctx.canvas.height = window.innerHeight * 0.8;
+interface Ball {
+	x : number,
+	y : number,
+	rad: number,
+	dx : number,
+	dy : number,
+	speed : number
+}
+
+interface Pad {
+	w: number,
+	h: number,
+	rx: number,
+	ry: number,
+	lx: number,
+	ly: number,
+}
+
+function checkPoint(width: number, height: number, paddle: Pad, ball: Ball) {
+	if (ball.x >= (width - ball.rad) || ball.x <= ball.rad) {
+		Object.assign(paddle, init_paddle(width,height));
+		Object.assign(ball, init_ball(width, height));
 	}
-	resize();
-	window.addEventListener("resize", resize);
-	return resize;
-}
-
-const defaultBall = {
-	x : 50,
-	y : 50,
-	dx : -0.5,
-	dy : 0,
-	r: 2,
-	speed : 0.01
-}
-
-const defaultPaddle = {
-	w: 1,
-	h: 15,
-	//rightPaddle pos
-	rx: 90,
-	ry: 50,
-	//leftPaddle pos
-	lx: 8,
-	ly: 50,
 }
 
 export default function Game() {
@@ -42,29 +37,32 @@ export default function Game() {
 		const ctx = canvasRef!.current!.getContext('2d')!;
 		let animationFrameId: number;
 
-		const resize = handleSize(ctx);
+		const width = ctx.canvas.width = 3200
+		const height = ctx.canvas.height = 1800;
 		const [idKey] = handleKey();
-		let ball = defaultBall;
-		let paddle = defaultPaddle;
+		const ball : Ball = init_ball(width, height);
+		const paddle: Pad = init_paddle(width, height);
 
 		function render() {
-			ctx.clearRect(0,0, ctx.canvas.width, ctx.canvas.height);
+			ctx.clearRect(0,0, width, height);
+			//checkPoint(width, height, paddle, ball);
 			handlePaddle(ctx, paddle);
+			collision(ctx, width, height, paddle, ball);
 			handleBall(ctx, ball);
-			collision(paddle, ball);
 			animationFrameId = window.requestAnimationFrame(render);
 		}
 		render();
 	
 		return (() => {
 			window.cancelAnimationFrame(animationFrameId);
-			window.removeEventListener("resize", resize);
 			document.removeEventListener("keydown", idKey[0]);
 			document.removeEventListener("keyup", idKey[1]);
 		});
 	}, []);
 
 	return (
+		<div className="wrap">
 			<canvas id="pong" ref={canvasRef} className="classique"/>
+		</div>
 	);
 }

@@ -2,26 +2,33 @@
 interface Ball {
 	x : number,
 	y : number,
+	rad: number,
 	dx : number,
 	dy : number,
-	r: number,
 	speed : number
 }
 
-function drawBall(ctx: CanvasRenderingContext2D, ball: Ball) {
-	const width: number = ctx.canvas.width;
-	const height: number = ctx.canvas.height;
+export function init_ball(width: number, height: number) {
+	const x = width * 0.5;
+	const y = height * 0.5;
+	const rad = 0.5 * Math.sqrt(width * width + height * height) * 0.015;
 
-	console.log(width, height);
+	const dx = -20;
+	const dy = 0;
+	const speed = 2;
+
+	return {x, y, rad, dx, dy, speed};
+}
+
+function drawBall(ctx: CanvasRenderingContext2D, ball: Ball) {
 	ctx.fillStyle = '#FFFFFF';
 	ctx.beginPath();
-	ctx.arc(width * (ball.x * 0.01), height * (ball.y * 0.01),
-		((width + height) * 0.62) * (ball.r * 0.01), 0, 2 * Math.PI);
+	ctx.arc(ball.x, ball.y, ball.rad, 0, 2 * Math.PI);
 	ctx.fill();
 }
 
 export default function handleBall (ctx: CanvasRenderingContext2D, ball: Ball) {
 	drawBall(ctx, ball);
-	ball.x += ball.dx;
-	ball.y += ball.dy;
+	ball.x += ball.dx * ball.speed;
+	ball.y += ball.dy * ball.speed;
 }

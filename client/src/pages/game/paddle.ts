@@ -8,19 +8,25 @@ interface Pad {
 	ly: number,
 }
 
-enum spad {
-	rigth = 0.9,
-	left = 0.08
+export function init_paddle(width: number, height: number) {
+	const w = width * 0.01;
+	const h = height * 0.15;
+
+	const rx = width * 0.9 - w * 0.5;
+	const ry = height * 0.5 - h * 0.5;
+
+	const lx = width * 0.1 - w * 0.5;
+	const ly = height * 0.5 - h * 0.5;
+
+	return {w, h, rx, ry, lx, ly};
 }
 
-function paddle (type: spad ,ctx: CanvasRenderingContext2D, pad: Pad, y: number) {
-	const width: number = ctx.canvas.width;
-	const height: number = ctx.canvas.height;
 
+function paddle (ctx: CanvasRenderingContext2D, pad: Pad) {
 	ctx.fillStyle = '#FFFFFF';
 	ctx.beginPath();
-	//-10% because of the margin
-	ctx.rect(width * type, ((y - 10) * 0.01) * height, width * (pad.w * 0.01), height * (pad.h * 0.01));
+	ctx.rect(pad.lx, pad.ly, pad.w , pad.h);
+	ctx.rect(pad.rx, pad.ry, pad.w , pad.h);
 	ctx.fill();
 }
 
@@ -39,7 +45,6 @@ export function handleKey(): any[] {
 			rightKey.push(e.key);
 		else if (allowedLeftKey.includes(e.key) && !leftKey.includes(e.key))
 			leftKey.push(e.key);
-		
 	}
 	function onKeyUp(e: any) {
 		if (e.repeat)
@@ -55,20 +60,22 @@ export function handleKey(): any[] {
 	return ([onKeyDown, onkeyup]);
 }
 
-function movement(pad: Pad) {
-	if (rightKey[0] === "ArrowUp" && pad.ry >= 10)
-		pad.ry -= 2;
-	else if (rightKey[0] === "ArrowDown" && pad.ry <= 95)
-		pad.ry += 2;
+function movement(height: number, pad: Pad) {
+	const borderGap: number = height * 0.006;
+	const speed: number = height * 0.02;
+
+	if (rightKey[0] === "ArrowUp" && pad.ry >= borderGap)
+		pad.ry -= speed;
+	else if (rightKey[0] === "ArrowDown" && pad.ry <= height - pad.h - borderGap)
+		pad.ry += speed;
 	
-	if (leftKey[0] === "w" && pad.ly >= 10)
-		pad.ly -= 2;
-	else if (leftKey[0] === "s" && pad.ly <= 95)
-		pad.ly += 2;
+	if (leftKey[0] === "w" && pad.ly >= borderGap)
+		pad.ly -= speed;
+	else if (leftKey[0] === "s" && pad.ly <= height - pad.h - borderGap)
+		pad.ly += speed;
 }
 
 export default function handlePaddle(ctx: CanvasRenderingContext2D, pad: Pad) {
-	movement(pad);
-	paddle(spad.rigth, ctx, pad, pad.ry);
-	paddle(spad.left, ctx, pad, pad.ly);
+	movement(ctx.canvas.height, pad);
+	paddle(ctx, pad);
 }

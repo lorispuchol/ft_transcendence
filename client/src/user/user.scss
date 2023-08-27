@@ -36,6 +36,14 @@ $primary_color: #fad390;
 	padding-right: 15px;
 }
 
+.nobody {
+	height: 36px;
+	margin: 0.5rem;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
 @media screen and (max-width: 1775px){
 	.everyone_list {
 		grid-template-columns: none;
