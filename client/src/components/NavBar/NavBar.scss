@@ -1,4 +1,5 @@
-$primary_color: #fad390;
+$primary_color: #786fa6;
+$secondary_color: #7cc6d6;
 
 .nav_bar {
 	// background-color: white;
@@ -97,6 +98,7 @@ $primary_color: #fad390;
 	.menu_btn {
 		display: block;
 		filter: blur(0);
+		z-index: 2;
 	}
 	.mobile_notif {
 		display: block;
@@ -156,6 +158,7 @@ $primary_color: #fad390;
 	transition-property: visible;
 	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 	transition-duration: 500ms;
+	z-index: 1;
 }
 
 .mobile_notif_off {

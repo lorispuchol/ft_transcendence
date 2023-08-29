@@ -2,7 +2,7 @@ import { useSearchParams } from "react-router-dom";
 import { PostRequest, client_url, server_url } from "../../utils/Request";
 import Loading from "../../utils/Loading";
 import './LogIn.scss'
-import '../../style/Poppins/Poppins-Regular.ttf';
+import '../../style/fonts/Poppins/Poppins-Regular.ttf';
 import { ChangeEvent, FormEvent, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
@@ -31,11 +31,11 @@ function LogInput() {
 		e.preventDefault();
 		PostRequest("/auth/login", {username, password})
 			.then((response: any) =>{
-				if (response.status === "OK" && response.data.status === "OK")
+				if (response.status === "OK")
 					window.location.href= client_url + "/login?token=" + response.data.token;
 				else
 					logError(response.error);
-			});
+			}); 
 	}
 
 	function signup() {
