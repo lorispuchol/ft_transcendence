@@ -1,4 +1,4 @@
-import { Navigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { GetRequest } from "../../utils/Request";
 import { useEffect, useState } from "react";
 import ErrorHandling from "../../utils/Error";
@@ -24,20 +24,6 @@ interface Response {
 	status: string,
 	data?: UserData,
 	error?: string,
-}
-
-export function RedirectToOwnProfile() {
-	const [response, setResponse]: [Response, Function] = useState({status: "loading"});
-	useEffect(() => {
-		GetRequest("/user/me").then((response) => setResponse(response));
-	}, []);
-	// console.log(response.status);
-	if (response.status === "loading")
-		return (<Loading />);
-	if (response.status !== "OK")
-		return (<ErrorHandling status={response.status} message={response.error} />);
-	console.log(response.status);
-	return (<Navigate to={"/profile/" + response.data?.username} />);
 }
 
 export const defaultAvatar = defaultPp;
