@@ -31,11 +31,11 @@ function LogInput() {
 		e.preventDefault();
 		PostRequest("/auth/login", {username, password})
 			.then((response: any) =>{
-				if (response.status === "OK" && response.data.status === "OK")
+				if (response.status === "OK")
 					window.location.href= client_url + "/login?token=" + response.data.token;
 				else
 					logError(response.error);
-			});
+			}); 
 	}
 
 	function signup() {
