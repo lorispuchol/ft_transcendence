@@ -42,21 +42,21 @@ export class IsUsernameAvailable {
 
 @ValidatorConstraint({ async: true })
 @Injectable()
-export class Match {
+export class PasswordMatch {
 	constructor(
 		private userService: UserService,
 	) {}
 
 	async validate(value: string, args: ValidationArguments) {
-		const user: User = await this.userService.findOneByUsername(value);
+		const log: any = args.object;
+		const user: User = await this.userService.findOneByUsername(log.username);
 		if (!user)
 			return false;
 
-		const [relatedPropertyName] = args.constraints;
-		const password = (args.object as any)[relatedPropertyName];
-		const isMatch = await bcrypt.compare(password, user.password);
+		const isMatch = await bcrypt.compare(log.password, user.password);
 		if (!isMatch)
 			return false;
+		return true;
 	}
 
 	defaultMessage(args: ValidationArguments) {

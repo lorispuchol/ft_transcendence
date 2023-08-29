@@ -1,6 +1,8 @@
 import { Logout } from "@mui/icons-material";
 import { IconButton, Paper } from "@mui/material";
 import { client_url } from "../utils/Request";
+import Everyone from "../user/Everyone";
+import './Home.scss';
 
 export default function Home() {
 	const token = "token: " + localStorage.getItem("token");
@@ -11,16 +13,18 @@ export default function Home() {
 	}
 
 	return (
-		<>
-			<div><strong><u>home</u></strong></div>
-			<Paper className="break-words">
-				{token}
-			</Paper>
-			<div className="p-2">
-				<Paper className="w-min p-1">
-					<IconButton onClick={disconnect}><Logout color="error"/></IconButton>
-				</Paper>
+		<div className="home">
+			<div className="left_elem">
+				<Paper className="break-words">{token}</Paper>
+				<div className="p-2">
+					<Paper className="w-min p-1">
+						<IconButton onClick={disconnect}><Logout color="error"/></IconButton>
+					</Paper>
+				</div>
 			</div>
-		</>
+			<div className="list_container">
+				<Everyone />
+			</div>
+		</div>
 	);
 }
