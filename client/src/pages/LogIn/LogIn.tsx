@@ -2,7 +2,7 @@ import { useSearchParams } from "react-router-dom";
 import { PostRequest, client_url, server_url } from "../../utils/Request";
 import Loading from "../../utils/Loading";
 import './LogIn.scss'
-import '../../fonts/Poppins/Poppins-Regular.ttf';
+import '../../style/fonts/Poppins/Poppins-Regular.ttf';
 import { ChangeEvent, FormEvent, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';

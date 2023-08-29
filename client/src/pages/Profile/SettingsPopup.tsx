@@ -18,15 +18,17 @@ function updateError(error: string[]) {
 
 export default function SettingsPopup({ close }: any) {
 	const [username, setUsername] = useState('')
-	const [pp, setPp] = useState('')
+	const [pp, setPp] = useState<File>()
 
 	function usernameChange(event: ChangeEvent<HTMLInputElement>) {
 		setUsername(event.target.value);
 	}
 
 	function ppChange(event: ChangeEvent<HTMLInputElement>) {
-		console.log(event.target.files)
-		setPp(event.target.value);
+		// console.log(event.target.files)
+		const files = (event.target as HTMLInputElement).files;
+		if (files && files.length > 0)
+			setPp(files[0]);
 	}
 
 	function updateUsername(e: FormEvent) {
@@ -62,7 +64,7 @@ export default function SettingsPopup({ close }: any) {
 							<button className='update_button'>UPDATE</button> 
 						</form>
 						<form className='settings_option' onSubmit={updatePp}>
-							Modifier photo de profile: <input type='file' accept='/image/*' value={pp} onChange={ppChange} />
+							Modifier photo de profile: <input type='file' accept='/image/*' onChange={ppChange} />
 							<button className='update_button'>UPDATE</button>
 						</form>
 					</Paper>
