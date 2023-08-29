@@ -1,13 +1,18 @@
 import { ReactElement, useContext, useEffect, useState } from "react";
 import { Socket } from "socket.io-client";
-import { Badge, ClickAwayListener, Divider, IconButton, List, ListItem, ListItemAvatar, Paper, Popper } from "@mui/material";
-import { EmojiPeople, Message, Notifications, VideogameAsset } from "@mui/icons-material";
+import { Badge, Button, ClickAwayListener, Divider, IconButton, List, ListItem, ListItemAvatar, Paper, Popper } from "@mui/material";
+import { EmojiPeople, MarkChatUnread, MarkUnreadChatAlt, Message, Notifications, VideogameAsset } from "@mui/icons-material";
 import EventButton from "./EventButton";
-import { EventContext } from "../../utils/Context";
+import { EventContext, UserContext } from "../../utils/Context";
+import { useNavigate } from "react-router-dom";
 
 interface Event {
 	type: string,
 	sender: string,
+}
+
+interface RenderIconProps {
+	e: Event
 }
 
 interface SocketProps {
@@ -19,25 +24,37 @@ interface EventWrapperProps {
 	numberOfEvent: number,
 }
 
-function renderIcon(type: string) {
-	switch(type) {
+function RenderIcon({e}: RenderIconProps) {
+	
+	const user = useContext(UserContext)
+	const navigate = useNavigate();
+
+	function goToMsg() {
+		console.log("trynavigate")
+		navigate("/chat", {replace: false, state: {to: e.sender.replace("#", "")}})
+	}
+
+	switch(e.type) {
 		case 'friendRequest':
 			return (<EmojiPeople />);
 		case 'gameRequest':
 			return (<VideogameAsset />);
-		case 'privateMessage':
-			return (<Message />)
+		case 'message':
+			return (<Button onClick={goToMsg}><MarkChatUnread /></Button>)
 		default:
 			return (<strong>error: type not found</strong>)
 	}
 }
 
 function Events({ socket }: SocketProps) {
+	const user = useContext(UserContext);
 	const [events, setEvents]: [Event[], Function] = useState([]);
 
 	useEffect(() => {
 		function eventListener(event: Event) {
 			setEvents((prevEvents: Event[]) => {
+				if (prevEvents.find((value) => value.sender + value.type === event.sender + event.type))
+					return [...prevEvents];
 				const newEvents: Event[] = [...prevEvents, event];
 				return newEvents;
 			});
@@ -66,8 +83,8 @@ function Events({ socket }: SocketProps) {
 				{events.map((event: Event, index: number) => (
 					<div key={event.type + event.sender}>
 						<ListItem>
-							<ListItemAvatar>{renderIcon(event.type)}</ListItemAvatar>
-							{event.sender}
+							<ListItemAvatar><RenderIcon e={event} /></ListItemAvatar>
+							{event.sender.replace("+", "").replace(user!, "")}
 						</ListItem>
 						<EventButton event={event}/>
 						{index + 1 !== events.length? <Divider /> : null}

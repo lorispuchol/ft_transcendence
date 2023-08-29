@@ -6,10 +6,12 @@ import ErrorHandling from "../utils/Error";
 import { useLocation } from "react-router-dom";
 import { Socket, io } from "socket.io-client";
 import './chat.css'
-import { ChanMode, ChannelData, MessageData, ParticipantData } from "./interfaceData";
+import { ChanMode, ChannelData, MessageData, ParticipantData, UserData } from "./interfaceData";
 import { SocketChatContext, UserContext } from "../utils/Context";
 import ChannelNav from "./ChannelNav";
 import { Avatar } from "@mui/material";
+import { MarkEmailUnread, Tag } from "@mui/icons-material";
+import ListMembers from "./ListMember";
 
 interface Response {
 	status: string | number,
@@ -17,9 +19,9 @@ interface Response {
 	error?: string,
 }
 
-interface ResImg {
+interface ResMembers {
 	status: string | number,
-	data?: FormData | null, // || Buffer || string 
+	data?: ParticipantData[] | null,
 	error?: string,
 }
 interface focusConvProps {
@@ -29,20 +31,10 @@ interface focusConvProps {
 	setFocusConv: Function,
 }
 
-interface ResponseMembers {
-	status: string | number,
-	data?: ParticipantData[],
-	error?: string,
-}
-
-interface ListMembersProps {
-	chan: string
-}
-
 interface ButtonConvProps {
 	chan: ChannelData,
-	focusConv: string;
-	setFocusConv: Function
+	focusConv: string,
+	setFocusConv: Function,
 }
 
 interface MessagesListenerProps {
@@ -50,35 +42,57 @@ interface MessagesListenerProps {
 	msg: MessageData,
 }
 
-function ButtonConv({chan, focusConv, setFocusConv}: ButtonConvProps) {
 
-	const [newMsg, setNewMsg]: [boolean, Function] = useState(false);
-	const user = useContext(UserContext);
-	const socket = useContext(SocketChatContext);
-	const [senderConv, setSenderConv]: [string, Function] = useState(""); 
-
-	const [res, setRes]: [ResImg, Function] = useState({status: "loading"});
-	
-	useEffect(() => {
-		GetRequest("/chat/getAvatarDm/" + chan.name).then((response) => setRes(response));
-		function messageListener(message: MessagesListenerProps) {
-			setSenderConv(message.chan)
-			if (chan.name === message.chan && focusConv !== message.chan) {
-				setNewMsg(true);
-			}
-		};
-		socket!.on('message', messageListener);
-		return () => {socket!.off('message', messageListener);};
-	}, [socket, newMsg]);
+function ChanButtonConv({chan, focusConv, setFocusConv}: ButtonConvProps) {
 
 	return (
 		<button
-			className={`button-conv ${chan.name === focusConv && 'focused'} ${newMsg === true && senderConv !== focusConv && 'notice'}`}
+			className={`button-conv ${chan.name === focusConv && 'focused'}`}
 			key={chan.name}
-			onClick={() => {setFocusConv(chan.name); setNewMsg(false)}}
-			>
-				<Avatar src="" alt="avatar"></Avatar>
-				<p>{chan.name.replace(user!, "").replace("+", "")}</p>
+			onClick={()=> setFocusConv(chan.name)}
+		>
+			<Avatar>
+				<Tag />
+			</Avatar>
+			<p>{chan.name}</p>
+		</button>
+	)
+}
+
+
+function DmButtonConv({chan, focusConv, setFocusConv}: ButtonConvProps) {
+
+	const user = useContext(UserContext);
+	const [resMembers, setResMembers]: [ResMembers, Function] = useState({status: "loading"});
+
+	useEffect(() => {
+		GetRequest("/chat/getMembers/" + chan.name).then((res) => setResMembers(res))
+	}, [chan]);
+
+	if (resMembers.status === "loading")
+		return (<Loading />);
+	if (resMembers.status !== "OK")
+		return (<ErrorHandling status={resMembers.status} message={resMembers.error} />);
+
+	let displayUsername: string = "";
+	let displayAvatar: string = "";
+	if (resMembers.data![0].user.username === user) {
+		displayUsername = resMembers.data![1].user.username
+		// displayAvatar = resMembers.data![1].user.avatar
+	}
+	else {
+		displayUsername = resMembers.data![0].user.username
+		// displayAvatar = resMembers.data![0].user.avatar
+	}
+
+	return (
+		<button
+			className={`button-conv ${chan.name === focusConv && 'focused'}`}
+			key={chan.name}
+			onClick={()=> setFocusConv(chan.name)}
+		>
+			<Avatar src={displayAvatar} alt="avatar"></Avatar>
+			<p>{displayUsername}</p>
 		</button>
 	)
 }
@@ -108,43 +122,24 @@ function ListConv({focusConv, setFocusConv}: focusConvProps) {
 		<>
 			{
 				dms.map((chan) => (
-					<ButtonConv key={chan.name} chan={chan} focusConv={focusConv} setFocusConv={setFocusConv} />
+					<DmButtonConv key={chan.name} chan={chan} focusConv={focusConv} setFocusConv={setFocusConv} />
 				))
 			}
 			{
+				dms.length ? 
+					chans.length ?
+						<hr />
+						: null
+					:null
+			}
+			{
 				chans.map((chan) => (
-					<ButtonConv chan={chan} focusConv={focusConv} setFocusConv={setFocusConv} />
+					<ChanButtonConv key={chan.name} chan={chan} focusConv={focusConv} setFocusConv={setFocusConv} />
 				))
 			}
 		</>
 	)
 }
-
-function ListMembers({chan}: ListMembersProps) {
-
-	const isDm: boolean = chan.includes("+");
-
-	const [response, setResponse]: [ResponseMembers, Function] = useState({status: "loading"});
-	useEffect(() => {
-			GetRequest("/chat/getMembers/" + chan).then((response) => setResponse(response));
-	}, [chan]);
-	if (response.status === "loading")
-		return (<Loading />);
-	if (response.status !== "OK")
-		return (<ErrorHandling status={response.status} message={response.error} />);
-
-	if (!response.data)
-		return <div>there is only you in this channel</div>
-	return (
-		<div>
-			{
-				response.data.map(( member ) => <div key={member.user.login}>{member.user.login}</div>)
-			}
-		</div>
-	)
-	
-}
-
 
 export default function Chat() {
 	const location = useLocation();
@@ -152,6 +147,7 @@ export default function Chat() {
 
 	const [socket, setSocket]: [Socket | null, Function] = useState(null);
 
+	console.log(focusConv)
 	useEffect(() => {
 		const token = localStorage.getItem("token");
 		const option = { transportOptions: { polling: { extraHeaders: { token: token }}}};
@@ -159,6 +155,10 @@ export default function Chat() {
 		setSocket(newSocket);
 		return () => {newSocket.close()};
 	}, [setSocket]);
+
+	useEffect(() => {
+		setFocusConv(location.state?.to);
+	}, [location]);
 
 	if (!socket)
 		return (<Loading />)

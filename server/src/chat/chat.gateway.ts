@@ -10,7 +10,12 @@ import { User } from "src/user/user.entity";
 import { Participant } from "./entities/participant_chan_x_user.entity";
 import { Message } from "./entities/message.entity";
 import { RelationshipService } from "src/relationship/relationship.service";
+import { EventGateway } from "src/event/event.gateway";
 
+interface Event {
+	type: string,
+	sender: string,
+}
 @WebSocketGateway({
 	namespace: "chat",
 	cors: { origin: [client_url] },
@@ -21,6 +26,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		private chatService: ChatService,
 		private userService: UserService,
 		private relationshipService: RelationshipService,
+		private eventGateaway: EventGateway,
 	) {}
 
 	private users: Map<string, Socket> = new Map();
@@ -52,12 +58,25 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		const msg: Message = await this.chatService.saveNewMsg(sender, channel, value[1])
 
 		const toEmits: Socket[] = []
+		const loginsToEvent: string[] = [];
+
 		const promises = members.map( async (member) => {
 			const socket: Socket = this.users.get(member.user.login)
 			if (socket && await this.relationshipService.ReqIsBlocked(sender, member.user) === false) {
 				toEmits.push(socket)
 			}
+			loginsToEvent.push(member.user.login);
 		})
-		Promise.all(promises).then(() => toEmits.map((socket) => socket.emit('message', {chan: value[0], msg: msg})))
+		console.log(members)
+		Promise.all(promises).then(() => {
+			toEmits.map((socket) => socket.emit('message', {chan: value[0], msg: msg}));
+			loginsToEvent.map((login) => {
+				if(login !== sender.login)
+					if (channel.name.includes("+"))
+						this.eventGateaway.newEvent(login, {type: "message", sender: channel.name})
+					else
+						this.eventGateaway.newEvent(login, {type: "message", sender: "#" + channel.name})
+			})
+		})
 	}
 }

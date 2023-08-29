@@ -19,7 +19,7 @@ export enum RelationshipStatus {
 }
 
 export interface UserData {
-	avatar: string | null,
+	avatar: string | null, // Buffer ? FormData?
 	login: string,
 	username: string,
 	nb_victory: number,
