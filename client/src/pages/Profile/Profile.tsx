@@ -31,10 +31,12 @@ export function RedirectToOwnProfile() {
 	useEffect(() => {
 		GetRequest("/user/me").then((response) => setResponse(response));
 	}, []);
+	// console.log(response.status);
 	if (response.status === "loading")
-	return (<Loading />);
+		return (<Loading />);
 	if (response.status !== "OK")
-	return (<ErrorHandling status={response.status} message={response.error} />);
+		return (<ErrorHandling status={response.status} message={response.error} />);
+	console.log(response.status);
 	return (<Navigate to={"/profile/" + response.data?.username} />);
 }
 
@@ -57,6 +59,7 @@ export default function Profile() {
 		return (<ErrorHandling status={response.status} message={response.error} />);
 	if (!response.data?.username)
 		return (<NoRouteFound />)
+	console.log(response.data.username);
 	const profile = {
 		avatar: response.data.avatar? response.data.avatar : defaultAvatar,
 		login: response.data.login,

@@ -3,6 +3,8 @@ import { UserService } from "./user.service";
 import { Public } from "src/auth/constants";
 import { User } from "./user.entity";
 import { newUsername } from "./user.dto";
+import { newAvatar } from "./user.dto";
+import { profile } from "console";
 
 @Controller('user')
 export class UserController {
@@ -15,7 +17,7 @@ export class UserController {
 	async getMeData(
 		@Request() req: any
 		) {
-		return await this.userService.findOneByUsername(req.user.login);
+		return await this.userService.findOneByLogin(req.user.login);
 	}
 
 	@Patch('username')
@@ -25,6 +27,15 @@ export class UserController {
 	) {
 		this.userService.changeUsername(req.user.id, newUsername.username);
 		return {username: newUsername.username};
+	}
+
+	@Patch('avatar')
+	async changeAvatar(
+		@Request() req: any,
+		@Body() newAvatar: newAvatar
+	) {
+		this.userService.changeAvatar(req.user.id, newAvatar.avatar);
+		return {avatar: newAvatar.avatar};
 	}
 
 	//dev

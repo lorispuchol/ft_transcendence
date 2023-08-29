@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsStrongPassword, MaxLength, MinLength, Validate } from "class-validator";
+import { IsNotEmpty, IsString, IsStrongPassword, MaxLength, MinLength, Validate, isNotEmpty } from "class-validator";
 import { IsUsernameAvailable } from "src/auth/auth.decorator";
 
 export class newUsername {
@@ -8,4 +8,9 @@ export class newUsername {
 	@MinLength(2)
 	@Validate(IsUsernameAvailable)
 	username: string;
+}
+
+export class newAvatar	{
+	@IsNotEmpty()
+	avatar: Buffer;
 }

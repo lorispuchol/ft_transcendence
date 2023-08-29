@@ -25,6 +25,7 @@ export default function SettingsPopup({ close }: any) {
 	}
 
 	function ppChange(event: ChangeEvent<HTMLInputElement>) {
+		console.log(event.target.files)
 		setPp(event.target.value);
 	}
 
@@ -41,7 +42,13 @@ export default function SettingsPopup({ close }: any) {
 
 	function updatePp(e: FormEvent) {
 		e.preventDefault();
-	//PatchRequest("/user/username", {username})
+		PatchRequest("/user/avatar", {pp})
+		.then ((response:any) => {
+			if (response.status === "OK")
+				window.location.href = client_url + "/profile/" + username;
+			else
+				updateError(response.error);
+		})
 	}
 
 	return (
@@ -55,7 +62,7 @@ export default function SettingsPopup({ close }: any) {
 							<button className='update_button'>UPDATE</button> 
 						</form>
 						<form className='settings_option' onSubmit={updatePp}>
-							Modifier photo de profile: <input type='file' value={pp} onChange={ppChange} />
+							Modifier photo de profile: <input type='file' accept='/image/*' value={pp} onChange={ppChange} />
 							<button className='update_button'>UPDATE</button>
 						</form>
 					</Paper>

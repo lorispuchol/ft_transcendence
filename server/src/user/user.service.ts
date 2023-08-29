@@ -43,6 +43,11 @@ export class UserService {
 		return ("OK")
 	}
 
+	async changeAvatar(userId: number, newAvatar: Buffer) {
+		this.userRepository.update({id: userId}, {avatar: newAvatar});
+		return ("OK") // ?
+	}
+
 	////dev
 	async getAllUsers() {
 		return this.userRepository.find();
