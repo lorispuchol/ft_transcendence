@@ -5,7 +5,7 @@
 @font-face {
 	font-family: "Poppins";
 	src: local("Poppins"),
-	 url("./fonts/Poppins/Poppins-Regular.ttf") format("truetype");
+	 url("./style/fonts/Poppins/Poppins-Regular.ttf") format("truetype");
 }
 
 /* @import url("https://fonts.googleapis.com/css2?family=Agdasima:wght@400;700&family=Poppins:wght@300;400;500;700&display=swap"); */

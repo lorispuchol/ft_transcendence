@@ -9,7 +9,7 @@ import EventList from '../event/EventList';
 import { Paper } from '@mui/material';
 
 export const NavBar = () => {
-	const pages = [['GAMING', '/game'], ['EVERYONE', '/everyone'], ['CHAT', '/chat'], ['404', '/ratio']];
+	const pages = [['GAMING', '/game'], ['CHAT', '/chat'], ['404', '/ratio']];
 	const [select, setSelect]: [string, Function] = useState(useLocation().pathname);
 
 	function hanldeClick(path: string) {

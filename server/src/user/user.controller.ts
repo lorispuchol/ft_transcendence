@@ -2,22 +2,9 @@ import { Body, Controller, Get, Param, Patch, Post, Request, UploadedFile, UseIn
 import { UserService } from "./user.service";
 import { Public } from "src/auth/constants";
 import { User } from "./user.entity";
-// import { FileInterceptor } from "@nestjs/platform-express";
-
-// import { diskStorage } from "multer";
-// import { randomUUID } from 'crypto';
-// import Path = require('path');
-
-// const storage = {
-// 	storage : diskStorage({
-// 		destination: 'src/uploads/files',
-// 		filename: (req, file, cb) =>{
-// 			const filename: string = 'myfile-' + randomUUID();
-// 			const extension: string = Path.parse(file.originalname).ext;
-// 			cb(null, `${filename}${extension}`)
-// 		}
-// 	})
-// }
+import { newUsername } from "./user.dto";
+import { newAvatar } from "./user.dto";
+import { profile } from "console";
 
 @Controller('user')
 export class UserController {
@@ -30,17 +17,25 @@ export class UserController {
 	async getMeData(
 		@Request() req: any
 		) {
-		return await this.userService.findOneByUsername(req.user.login);
+		return await this.userService.findOneByLogin(req.user.login);
 	}
 
 	@Patch('username')
 	async changeUsername(
 		@Request() req: any,
-		@Body('username') newUsername: string
-		) {
-		const status = await this.userService.changeUsername(req.user.id, newUsername);
-		const user =  await this.userService.findOneById(req.user.id);
-		return {status: status, user: user};
+		@Body() newUsername: newUsername
+	) {
+		this.userService.changeUsername(req.user.id, newUsername.username);
+		return {username: newUsername.username};
+	}
+
+	@Patch('avatar')
+	async changeAvatar(
+		@Request() req: any,
+		@Body() newAvatar: newAvatar
+	) {
+		this.userService.changeAvatar(req.user.id, newAvatar.avatar);
+		return {avatar: newAvatar.avatar};
 	}
 
 	//dev

@@ -57,18 +57,16 @@ function ProfileElement({ user }: ProfileElementProps) {
 					<Paper className="everyone_username">{user.username}</Paper>
 				</NavLink>
 			</div>
-			<div className="p-2"><GamingButton login={user.login}/></div>
-      		<div className="px-2"><MessageButton receiver={user.login}/></div>
-			<div className="grid grid-cols-2">
-				<div><Friendbutton login={user.login} render={rerender} /></div>
-				<div><BlockButton login={user.login} render={rerender} /></div>
+			<div className="p-2 grid grid-cols-5">
+				<div className="gaming_button"><GamingButton login={user.login}/></div>
+      			<div className="message_button"><MessageButton receiver={user.login}/></div>
+				<div className="friend_button"><Friendbutton login={user.login} render={rerender} /></div>
+				<div className="block_button"><BlockButton login={user.login} render={rerender} /></div>
 			</div>
 		</Paper>
-			<Snackbar open={open?true:false} autoHideDuration={1000} onClose={handleClose}>
-				<Alert className="w-fit" onClose={handleClose} severity="info">
-					{open}
-				</Alert> 
-			</Snackbar>
+		<Snackbar open={open?true:false} autoHideDuration={1000} onClose={handleClose}>
+			<Alert className="w-fit" onClose={handleClose} severity="info">{open}</Alert> 
+		</Snackbar>
 		</>
 	)
 }
@@ -105,12 +103,16 @@ export default function Everyone() {
 
 	return (
 			<List className="everyone_list">
-				{users!.map((user: UserData) => (
-					username !== user.username &&
-						<div key={user.id} className="px-4">
-								<ProfileElement user={user} />
-						</div>
-				))}
+				{users.length > 1 ? 
+					users.map((user: UserData) => (
+						username !== user.username &&
+							<div key={user.id} className="">
+									<ProfileElement user={user} />
+							</div>
+					))
+					:
+					<Paper className="nobody">nobody there</Paper>
+				}
 			</List>
 	);
 }
