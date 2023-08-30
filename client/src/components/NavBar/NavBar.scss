@@ -1,4 +1,4 @@
-@use '../../style/color' as c;
+@use '/app/src/style/color' as c;
 
 .nav_bar {
 	// background-color: white;
@@ -6,7 +6,7 @@
 	justify-content: space-between;
 	align-items: center;
 	margin-bottom: 20px;
-	// box-shadow: 0 0 0 0.100rem $primary_color;
+	// box-shadow: 0 0 0 0.100rem c.$primary;
 	// border-radius: 0.25rem; /* 4px */
 	flex-wrap: wrap;
 	font-family: 'Poppins';
@@ -53,7 +53,7 @@
 
 .nav_bar_avatar_a {
 	scale: (1.1);
-	border-color: c.$primary_color;
+	border-color: c.$primary;
 	border-width: 2px;
 	border-radius: 9999px;
 	margin-right: 12px;

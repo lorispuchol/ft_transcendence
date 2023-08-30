@@ -1,4 +1,4 @@
-@use '../../style/color' as c;
+@use '/app/src/style/color' as c;
 
 .everyone_username {
 	background-color: c.$primary !important;
