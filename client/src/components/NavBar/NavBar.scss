@@ -1,5 +1,4 @@
-$primary_color: #786fa6;
-$secondary_color: #7cc6d6;
+@use '../../style/color' as c;
 
 .nav_bar {
 	// background-color: white;
@@ -30,7 +29,7 @@ $secondary_color: #7cc6d6;
 }
 
 .nav_bar_link_a {
-	color: $primary_color;
+	color: c.$primary;
 	margin-right: 12px;
 	transition-property: opacity, scale;
 	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
@@ -54,7 +53,7 @@ $secondary_color: #7cc6d6;
 
 .nav_bar_avatar_a {
 	scale: (1.1);
-	border-color: $primary_color;
+	border-color: c.$primary_color;
 	border-width: 2px;
 	border-radius: 9999px;
 	margin-right: 12px;

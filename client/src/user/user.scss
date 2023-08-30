@@ -1,7 +1,7 @@
-$primary_color: #faf390;
+@use '../../style/color' as c;
 
 .everyone_username {
-	background-color: $primary_color !important;
+	background-color: c.$primary !important;
 	width: 200px;
 	height: 36px;
 	padding-top: 5px;

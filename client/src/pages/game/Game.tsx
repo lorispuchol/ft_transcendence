@@ -36,7 +36,7 @@ export default function Game() {
 		let roundStart: boolean = true;
 		let now = performance.now();
 
-		function render(timestamp: number) {
+		function render() {
 			if (freezeFrame)
 			{
 				freezeFrame--;
