@@ -4,8 +4,6 @@ import { Pad } from "./paddle";
 const clamp = (num: number, min: number, max: number) => Math.min(Math.max(num, min), max);
 
 function wallHit(width: number, height: number, ball: Ball) {
-	// if (ball.x >= (width - ball.rad) || ball.x <= ball.rad)
-	// 	ball.dx *= -1;
 	if (ball.y >= (height - ball.rad) || ball.y <= ball.rad)
 		ball.dy *= -1;
 }
@@ -16,10 +14,8 @@ enum padSide {
 }
 
 function bounce(side: padSide, ball: Ball, ph: number, px: number, py:number) {
-	
-	console.log("collide");
 	let angle = -Math.PI * 0.5;
-	let collidePoint = (ball.y - py) / ph + 0.01;
+	let collidePoint = (ball.y - py) / ph;
 	collidePoint = clamp(collidePoint, 0, 1);
 	angle += (collidePoint * (Math.PI * -0.2) + Math.PI * 0.1);
 	
@@ -30,8 +26,8 @@ function bounce(side: padSide, ball: Ball, ph: number, px: number, py:number) {
 	ball.dx -= d * normal.x * ball.acc;
 	ball.dy -= d * normal.y * ball.acc;
 	
-	ball.dx = Math.abs(ball.dx) * side
-
+	//force ball to go to the other side and lock max dx to 74
+	ball.dx = Math.min(Math.abs(ball.dx), 74) * side;
 	return 0;
 }
 

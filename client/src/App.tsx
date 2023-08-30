@@ -1,7 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import './App.css'
 import Home from './home/Home';
-import Profile, { RedirectToOwnProfile } from './pages/Profile/Profile';
+import Profile from './pages/Profile/Profile';
 import LogIn from './pages/LogIn/LogIn';
 import NoRouteFound from './pages/Error/NoRouteFound';
 import { ReactElement, useEffect, useState } from 'react';
@@ -82,7 +82,6 @@ export default function App() {
 					<Routes>
 						<Route path='*' element={<NoRouteFound />} />
 						<Route path='/' element={<Home />} />
-						<Route path='/profile' element={<RedirectToOwnProfile />} />
 						<Route path='/profile/:username' element={<Profile />} />
 						<Route path='/login' element={<Navigate to='/' />} />
 						<Route path='/chat' element={<Chat />} />

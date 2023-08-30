@@ -1,16 +1,18 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import './NavBar.scss'
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import menu_btn from './img/menu_btn.png';
 import kirby from './img/kirby.jpeg';
 import Avatar from '@mui/material/Avatar';
 import { defaultAvatar } from '../../pages/Profile/Profile';
 import EventList from '../event/EventList';
 import { Paper } from '@mui/material';
+import { UserContext } from '../../utils/Context';
 
 export const NavBar = () => {
 	const pages = [['GAMING', '/game'], ['CHAT', '/chat'], ['404', '/ratio']];
 	const [select, setSelect]: [string, Function] = useState(useLocation().pathname);
+	const username = useContext(UserContext);
 
 	function hanldeClick(path: string) {
 		setSelect(path);
@@ -65,7 +67,7 @@ export const NavBar = () => {
 						<NavLink key={page[0]} className={select === page[1] ? 'nav_bar_link_a' : 'nav_bar_link_p'} onClick={() => hanldeClick(page[1])} to={page[1]}>{page[0]}</NavLink>
 					))}
 					<EventList className='nav_bar_link_p' />
-					<NavLink to={'/profile'} onClick={() => hanldeClick("profile")}>
+					<NavLink to={'/profile/' + username} onClick={() => hanldeClick("profile")}>
 						<Avatar className={select === "profile" ? 'nav_bar_avatar_a' : 'nav_bar_avatar_p'}  src={defaultAvatar} alt="TEST"></Avatar>
 					</NavLink>
 				</nav>
