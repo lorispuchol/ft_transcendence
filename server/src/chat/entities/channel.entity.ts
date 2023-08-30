@@ -4,7 +4,6 @@ import { Participant } from "./participant_chan_x_user.entity";
 
 export enum ChanMode {
 	PUBLIC = "public",
-	PROTECTED = "protected",
 	PRIVATE = "private",
 	DM = "dm"
 }
@@ -34,7 +33,8 @@ export class Channel extends BaseEntity {
 	
 	@Column({
 		type: 'varchar',
-		nullable: true
+		nullable: true,
+		default: null
 	})
 	password: string
 
