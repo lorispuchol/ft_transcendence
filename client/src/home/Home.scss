@@ -1,4 +1,4 @@
-$primary_color: #fad390;
+@use '/app/src/style/color' as c;
 
 .home {
 	display: flex;
@@ -11,12 +11,12 @@ $primary_color: #fad390;
 
 .left_elem {
 	margin-right: 10px;
-	color: #fad390;
+	color: c.$primary;
 
 }
 
 .list_container {
-	border: 4px solid white;
+	border: 4px solid c.$secondary;
 	min-height: 86vh;
 }
 

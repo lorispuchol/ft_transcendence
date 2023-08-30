@@ -22,7 +22,7 @@ export function init_paddle(width: number, height: number) {
 }
 
 
-function paddle (ctx: CanvasRenderingContext2D, pad: Pad) {
+function drawPaddle (ctx: CanvasRenderingContext2D, pad: Pad) {
 	ctx.fillStyle = '#FFFFFF';
 	ctx.beginPath();
 	ctx.rect(pad.lx, pad.ly, pad.w , pad.h);
@@ -77,5 +77,5 @@ function movement(height: number, pad: Pad) {
 
 export default function handlePaddle(ctx: CanvasRenderingContext2D, pad: Pad) {
 	movement(ctx.canvas.height, pad);
-	paddle(ctx, pad);
+	drawPaddle(ctx, pad);
 }

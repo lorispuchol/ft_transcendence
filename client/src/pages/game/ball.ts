@@ -21,7 +21,8 @@ export function init_ball(width: number, height: number) {
 	const rad = 0.5 * Math.sqrt(width * width + height * height) * 0.015;
 
 	const dx = rng(0, 1) ? 20 : -20;
-	const dy = rng(-10, 10);
+	const dyRng = rng(-10, 10);
+	const dy = dyRng ? dyRng : 1;
 	const speed = 1.5;
 	const acc = 1.03;
 
