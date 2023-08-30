@@ -1,74 +1,37 @@
+import LocalGame from "./LocalGame";
+import './Game.scss';
+import { Paper } from "@mui/material";
+import { useState } from "react";
+import GameMenu from "./GameMenu";
 
-import { useEffect, useRef } from "react";
-import "./Game.scss";
-import handlePaddle, { Pad, handleKey, init_paddle } from "./paddle";
-import handleBall, { Ball, drawBall, init_ball } from "./ball";
-import collision from "./collision";
-import { countDown } from "./countDown";
+interface player {
+	score: number,
+	avatar: any,
+	username: string,
+}
 
-let freezeFrame = 0;
-
-function checkPoint(ctx: CanvasRenderingContext2D, width: number, height: number, paddle: Pad, ball: Ball) {
-	if (ball.x >= (width - 2*ball.rad) || ball.x <= 2*ball.rad) {
-		ball.color = "red"
-		drawBall(ctx, ball);
-		freezeFrame = 20;
-		Object.assign(paddle, init_paddle(width,height));
-		Object.assign(ball, init_ball(width, height));
-		return true;
+function modeSelect(mode: string) {
+	switch(mode) {
+		case "menu":
+			return (<GameMenu />);
+		case "local":
+			return (<LocalGame />);
 	}
-	return false;
 }
 
 export default function Game() {
-	const canvasRef = useRef<HTMLCanvasElement>(null);
+	const [player1, setplayer1]: [player | null, Function] = useState(null);
+	const [player2, setplayer2]: [player | null, Function] = useState(null);
+	const [mode, setMode]: [string, Function] = useState("menu");
 	
-	useEffect(() => {
-		const ctx = canvasRef!.current!.getContext('2d')!;
-		
-		const width = ctx.canvas.width = 3200;
-		const height = ctx.canvas.height = 1800;
-		const [idKey] = handleKey();
-		const ball : Ball = init_ball(width, height);
-		const paddle: Pad = init_paddle(width, height);
-		
-		let animationFrameId: number;
-		let roundStart: boolean = true;
-		let now = performance.now();
-
-		function render() {
-			if (freezeFrame)
-			{
-				freezeFrame--;
-				now = performance.now();
-			}
-			else if (roundStart)
-			{
-				roundStart = countDown(ctx, now, 500);
-				handlePaddle(ctx, paddle);
-				drawBall(ctx, ball);
-			}
-			else {
-				ctx.clearRect(0,0, width, height);
-				handlePaddle(ctx, paddle);
-				collision(width, height, paddle, ball);
-				handleBall(ctx, ball);
-				roundStart = checkPoint(ctx, width, height, paddle, ball);
-			}
-			animationFrameId = window.requestAnimationFrame(render);
-		}
-		animationFrameId = window.requestAnimationFrame(render);
-	
-		return (() => {
-			window.cancelAnimationFrame(animationFrameId);
-			document.removeEventListener("keydown", idKey[0]);
-			document.removeEventListener("keyup", idKey[1]);
-		});
-	}, []);
-
 	return (
-		<div className="canvas_wrap">
-			<canvas id="pong" ref={canvasRef} className="classique"/>
-		</div>
-	);
+		<>
+			<div className="canvas_wrap">
+				<Paper className="player_card"><div className="el_pongo">PONGO</div></Paper>
+				{modeSelect(mode)}
+				<Paper className="player_card"><div className="el_pongo">PONGO</div></Paper>
+			</div>
+			{mode !== "menu" && <div className="flex justify-center"><Paper className="forfeit_button">FORFEIT</Paper></div>}
+		</>
+	)
 }

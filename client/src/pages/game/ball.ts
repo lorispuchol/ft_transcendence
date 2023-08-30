@@ -1,3 +1,4 @@
+import { teritaryColor } from "../../style/color";
 
 export interface Ball {
 	color: string,
@@ -15,7 +16,7 @@ function rng(min: number, max: number) {
 }
 
 export function init_ball(width: number, height: number) {
-	const color = "white";
+	const color = teritaryColor;
 	const x = width * 0.5;
 	const y = height * 0.5;
 	const rad = 0.5 * Math.sqrt(width * width + height * height) * 0.015;

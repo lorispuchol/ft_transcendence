@@ -1,6 +1,6 @@
 import { VideogameAsset } from "@mui/icons-material"
 import { Button } from "@mui/material"
-import { primaryColor } from "../../style/color"
+import { primaryColor, secondaryColor } from "../../style/color"
 import { useEffect, useState } from "react";
 import { GetRequest } from "../../utils/Request";
 import ErrorHandling from "../../utils/Error";
@@ -27,16 +27,14 @@ export default function GamingButton({ login }: GamingButtonProps) {
 		GetRequest("/relationship/" + login).then((response) => setResponse(response));
 	}, [login]);
 	if (response.status === "loading")
-		return (<Button sx={{backgroundColor: primaryColor}} color="error" variant="outlined" startIcon={<VideogameAsset />}>challenge</Button>);
+		return (<Button sx={{backgroundColor: primaryColor}} color="inherit" variant="outlined" startIcon={<VideogameAsset />}>challenge</Button>);
 	if (response.status !== "OK")
 		return (<ErrorHandling status={response.status} message={response.error} />);
 
 	const status: string = response.data!.status;
 	if (status === "blocked" || status === "blockedYou")
-		return (<Button disabled sx={{backgroundColor: primaryColor}} variant="outlined" startIcon={<VideogameAsset />}>challenge</Button>);
+		return (<Button disabled sx={{backgroundColor: primaryColor, "&:hover": {backgroundColor: secondaryColor}}} variant="outlined" startIcon={<VideogameAsset />}>challenge</Button>);
 	return (
-		<>
-			<Button sx={{backgroundColor: primaryColor}} color="error" variant="outlined" startIcon={<VideogameAsset />}>challenge</Button>
-		</>
+			<Button sx={{backgroundColor: primaryColor, "&:hover": {backgroundColor: secondaryColor}}} color="inherit" variant="outlined" startIcon={<VideogameAsset />}>challenge</Button>
 	)
 }

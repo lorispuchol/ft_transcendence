@@ -1,3 +1,4 @@
+import { teritaryColor } from "../../style/color";
 
 export interface Pad {
 	w: number,
@@ -23,7 +24,7 @@ export function init_paddle(width: number, height: number) {
 
 
 function drawPaddle (ctx: CanvasRenderingContext2D, pad: Pad) {
-	ctx.fillStyle = '#FFFFFF';
+	ctx.fillStyle = teritaryColor;
 	ctx.beginPath();
 	ctx.rect(pad.lx, pad.ly, pad.w , pad.h);
 	ctx.rect(pad.rx, pad.ry, pad.w , pad.h);

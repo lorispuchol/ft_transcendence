@@ -2,20 +2,36 @@
 
 .canvas_wrap {
 	display: flex;
-	justify-content: center;
+	justify-content: space-between;
+	margin-bottom: 10px;
+}
+
+.player_card {
+	color: white;
+	background-color: white;
+	width: 12vw;
+	max-height: 39vw;
+}
+
+.el_pongo {
+	padding: 0.8vw;
+	padding-left: 3vw;
+	overflow-wrap: break-word;
+	//font-size: 6rem;
+	font-size: 7.4vw;
+	line-height: 1;
+	color: c.$secondary;
 }
 
 .classique {
-	background-color: black;
-	outline: 2px solid white;
-	margin: 0px;
+	background-color: #625d6a9f;
+	outline: 4px solid c.$teritary;
+	margin: 5px;
 	width:70vw;
 	height: 39.375vw;
 }
 
-.game {
-	background-color: c.$secondary;
-	outline: 2px solid c.$teritary;
-	margin: 0px;
+.forfeit_button {
+	padding: 8px;
+	background-color: rgba(190, 40, 40, 0.953) !important;
 }
-

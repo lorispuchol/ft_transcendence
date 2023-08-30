@@ -19,8 +19,8 @@ function bounce(side: padSide, ball: Ball, ph: number, px: number, py:number) {
 	collidePoint = clamp(collidePoint, 0, 1);
 	angle += (collidePoint * (Math.PI * -0.2) + Math.PI * 0.1);
 	
-	let normal = { x: Math.sin(angle), y: -Math.cos(angle)}
-	let d = 2 * (ball.dx * normal.x + ball.dy * normal.y);
+	const normal = { x: Math.sin(angle), y: -Math.cos(angle)}
+	const d = 2 * (ball.dx * normal.x + ball.dy * normal.y);
 
 
 	ball.dx -= d * normal.x * ball.acc;

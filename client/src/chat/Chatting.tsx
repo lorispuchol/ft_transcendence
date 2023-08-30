@@ -7,7 +7,6 @@ import Loading from "../utils/Loading";
 import ErrorHandling from "../utils/Error";
 import { MessageData } from "./interfaceData";
 import { SocketChatContext } from "../utils/Context";
-import ChannelNav from "./ChannelNav";
 
 interface ChattingProps {
 	chan: string;
