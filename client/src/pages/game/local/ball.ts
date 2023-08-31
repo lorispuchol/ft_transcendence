@@ -1,4 +1,4 @@
-import { teritaryColor } from "../../style/color";
+import { teritaryColor } from "../../../style/color";
 
 export interface Ball {
 	color: string,

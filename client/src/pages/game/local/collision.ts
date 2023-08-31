@@ -1,7 +1,7 @@
 import { Ball } from "./ball";
 import { Pad } from "./paddle";
 
-const clamp = (num: number, min: number, max: number) => Math.min(Math.max(num, min), max);
+export const clamp = (num: number, min: number, max: number) => Math.min(Math.max(num, min), max);
 
 function wallHit(width: number, height: number, ball: Ball) {
 	if (ball.y >= (height - ball.rad) || ball.y <= ball.rad)

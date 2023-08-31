@@ -31,6 +31,42 @@
 	height: 39.375vw;
 }
 
+.demo {
+	//position: absolute;
+	z-index: 1;
+}
+
+.menu_container {
+	position: relative;
+}
+
+.menu_wrapper {
+	position: absolute;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 100%;
+	z-index: 2;
+}
+
+.menu {
+	background-color: rgba(255, 255, 255, 0.518) !important;
+	outline: 4px solid c.$primary;
+	border-color: c.$primary;
+	width:35vw;
+	height: 20vw;
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.menu_buttons {
+	grid-column: 2/3;
+	grid-row: 1 / span 2;
+	border-left: 4px solid;
+	border-color: inherit;
+}
+
 .forfeit_button {
 	padding: 8px;
 	background-color: rgba(190, 40, 40, 0.953) !important;
