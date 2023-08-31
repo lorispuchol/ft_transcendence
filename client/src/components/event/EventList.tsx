@@ -30,7 +30,6 @@ function RenderIcon({e}: RenderIconProps) {
 	const navigate = useNavigate();
 
 	function goToMsg() {
-		console.log("trynavigate")
 		navigate("/chat", {replace: false, state: {to: e.sender.replace("#", "")}})
 	}
 

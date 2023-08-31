@@ -147,7 +147,6 @@ export default function Chat() {
 
 	const [socket, setSocket]: [Socket | null, Function] = useState(null);
 
-	console.log(focusConv)
 	useEffect(() => {
 		const token = localStorage.getItem("token");
 		const option = { transportOptions: { polling: { extraHeaders: { token: token }}}};

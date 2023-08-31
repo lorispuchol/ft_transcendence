@@ -1,10 +1,9 @@
-import { Body, Controller, Get, Param, Patch, Post, Request, UploadedFile, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Get, Param, Patch, Request,} from "@nestjs/common";
 import { UserService } from "./user.service";
 import { Public } from "src/auth/constants";
 import { User } from "./user.entity";
 import { newUsername } from "./user.dto";
 import { newAvatar } from "./user.dto";
-import { profile } from "console";
 
 @Controller('user')
 export class UserController {
@@ -58,16 +57,6 @@ export class UserController {
 	deleteFakeUser(@Param('login') login: string) {
 		return this.userService.deleteOne(login);
 	}
-
-	// @Post('setAvatar')
-    // @UseInterceptors(FileInterceptor('file', storage))
-	// async uploadAvatar(
-	// 	@Request() req: any,
-    //     @UploadedFile() file: any
-    // ){
-	// 	console.log(storage.storage.filename.filename)
-    //     // return this.userService.uploadAvatar(file, await this.userService.findOneByUsername(req.user.login))
-    // }
 
 	@Get(':username')
 	async getUserData(

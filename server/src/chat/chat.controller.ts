@@ -1,6 +1,7 @@
-import { Controller, Get, Param, Request } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Request } from "@nestjs/common";
 import { ChatService } from "./chat.service";
 import { UserService } from "src/user/user.service";
+import { NewChannelWithPassword, NewChannelWithoutPassword } from "./channel.dto";
 
 @Controller('chat')
 export class ChatController {
@@ -16,17 +17,24 @@ export class ChatController {
 		)
 	}
 
+	@Post('createChan')
+	async createChan( 
+		@Body() datasChan: NewChannelWithoutPassword
+	) {
+		// return (await this.authService.createUserWithPassword(user.username, user.password));
+	}
+
+	@Post('createChanWithPw')
+	async createChanWithPw( 
+		@Body() datasChan: NewChannelWithPassword
+	) {
+		// return (await this.authService.createUserWithPassword(user.username, user.password));
+	}
+
 	@Get('getMembers/:chan')
 	async GetMembers( 
 		@Param('chan') chan: string) {
 			return await this.chatService.getAllMembers(chan);
-	}
-
-	@Get('getAvatarDm/:chan')
-	async GetAvatarDm( 
-		@Request() req: any,
-		@Param('chan') chan: string) {
-			return await this.chatService.getAvatarDm(chan, req.user.login);
 	}
 
 	@Get('getDm/:receiver')

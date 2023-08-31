@@ -1,6 +1,7 @@
 export enum ChanMode {
 	PUBLIC = "public",
 	PRIVATE = "private",
+	PROTECTED = "protected",
 	DM = "dm"
 }
 
