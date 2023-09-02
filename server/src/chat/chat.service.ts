@@ -7,6 +7,7 @@ import { ChanMode, Channel } from "./entities/channel.entity";
 import { Message } from "./entities/message.entity";
 import { RelationshipService } from "src/relationship/relationship.service";
 import { UserService } from "src/user/user.service";
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class ChatService {
@@ -35,11 +36,22 @@ export class ChatService {
 		return chans;
 	}
 
-	async createChannel(firstUser: User, name: string, mode: ChanMode) {
+	async createChannel(firstUser: User, name: string, mode: ChanMode, password?: string) {
+
+		if((!password && mode === ChanMode.PROTECTED) ||
+			(password && (mode === ChanMode.PRIVATE || mode === ChanMode.PUBLIC))) {
+			throw new HttpException("forbidden", HttpStatus.FORBIDDEN);
+		}
+
 		const newChan: Channel = await this.channelRepository.create({
 			name: name,
 			mode: mode
 		})
+		if(password) {
+			const salt = await bcrypt.genSalt();
+			const hash = await bcrypt.hash(password, salt);
+			newChan.password = hash;
+		}
 		
 		const firstMember: Participant = new Participant()
 		firstMember.channel = newChan;
@@ -140,8 +152,6 @@ export class ChatService {
 				channel: channel
 			} as FindOptionsWhere<Channel>
 		})
-		// return messages;
-
 		const u: User = await this.userService.findOneByLogin(user);
 		const displayMessages: Message[] = [];
 		const request = messages.map( async (msg) => {	
@@ -151,38 +161,3 @@ export class ChatService {
 		return Promise.all(request).then(() => displayMessages);
 	}
 }
-
-// async createChannel(firstUser: User, name: string, mode: ChanMode, password? : string) {
-
-// 	if((password == null && mode === ChanMode.PROTECTED) ||
-// 		(password != null && (mode !== ChanMode.PRIVATE && mode !== ChanMode.PUBLIC)))
-// 		return ({status: "KO", desc: "Request impossible"});
-	
-// 	var newChan: Channel;
-// 	if(password) {
-// 		const salt = await bcrypt.genSalt();
-// 		const hash = await bcrypt.hash(password, salt);
-	
-// 		newChan = this.channelRepository.create({
-// 			name: name,
-// 			mode: mode,
-// 			password: hash
-// 		})
-// 	}
-// 	else {
-// 		newChan = this.channelRepository.create({
-// 			name: name,
-// 			mode: mode
-// 		})
-// 	}
-	
-// 	const firstMember: Participant = new Participant()
-// 	firstMember.channel = newChan;
-// 	firstMember.distinction = MemberDistinc.OWNER;
-// 	firstMember.user = firstUser;
-
-// 	await this.channelRepository.save(newChan);
-// 	await this.participantRepository.save(firstMember);
-
-// 	return newChan
-// }

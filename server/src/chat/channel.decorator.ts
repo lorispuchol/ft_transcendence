@@ -52,7 +52,7 @@ export class PasswordChannelMatch {
 export class IsMode {
 	constructor() {}
 
-	async validate(value: string) {
+	async validate(value: ChanMode) {
 		if (value !== ChanMode.PUBLIC &&
 			value !== ChanMode.PRIVATE && 
 			value !== ChanMode.PROTECTED)

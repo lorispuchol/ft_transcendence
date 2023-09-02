@@ -2,6 +2,20 @@ import { IsNotEmpty, IsString, IsStrongPassword, MaxLength, MinLength, NotContai
 import { IsChannelNameAvailable, IsMode, PasswordChannelMatch } from "./channel.decorator";
 import { ChanMode } from "./entities/channel.entity";
 
+export class NewChannelWithoutPassword {
+	
+	@IsNotEmpty()
+	@IsString()
+	@MaxLength(33)
+	@MinLength(2)
+	@NotContains("+")
+	@Validate(IsChannelNameAvailable)
+	channelName: string;
+	
+	@Validate(IsMode)
+	mode: ChanMode;
+}
+
 export class NewChannelWithPassword {
 	
 	@IsNotEmpty()
@@ -20,23 +34,13 @@ export class NewChannelWithPassword {
 	@Validate(IsMode)
 	mode: ChanMode;
 }
+export class SetPasswordChannel {
 
-export class NewChannelWithoutPassword {
-	
 	@IsNotEmpty()
 	@IsString()
 	@MaxLength(33)
 	@MinLength(2)
 	@NotContains("+")
-	@Validate(IsChannelNameAvailable)
-	channelName: string;
-	
-	@Validate(IsMode)
-	mode: ChanMode;
-}
-
-export class SetPasswordChannel {
-
 	channelName: string;
 
 	@IsNotEmpty()
@@ -47,6 +51,11 @@ export class SetPasswordChannel {
 
 export class JoinChannelWithPassword {
 
+	@IsNotEmpty()
+	@IsString()
+	@MaxLength(33)
+	@MinLength(2)
+	@NotContains("+")
 	channelName: string;
 
 	@IsNotEmpty()

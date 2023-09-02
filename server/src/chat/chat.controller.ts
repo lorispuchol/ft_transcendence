@@ -39,7 +39,7 @@ export class ChatController {
 			await this.userService.findOneByLogin(req.user.login),
 			datasChan.channelName,
 			datasChan.mode,
-			// datasChan.password
+			datasChan.password
 		)
 	}
 
