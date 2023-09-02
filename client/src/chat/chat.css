@@ -1,9 +1,13 @@
 .chat-page {
 	display: flex;
-	height: 86vh;
+	height: 82vh;
 	border-radius: 0.25rem;
 }
 
+hr {
+	border: 1px solid #616161;
+	border-radius: 4px;
+}
 /* ////////////////////////////  List Conv  /////////////////////////////////// */
 
 .list-conv {
@@ -51,7 +55,7 @@
 	box-shadow: 0 0 5px #00000070 !important;
 }
 
-/* ////////////////////////////////  Chatting  //////////////////////////// */
+/* ////////////////////////////////  Chatting and ChanNav //////////////////////////// */
 
 .chatting {
 	border-radius: 0.25rem;

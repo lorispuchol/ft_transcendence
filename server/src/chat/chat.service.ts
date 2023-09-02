@@ -35,6 +35,23 @@ export class ChatService {
 		return chans;
 	}
 
+	async createChannel(firstUser: User, name: string, mode: ChanMode) {
+		const newChan: Channel = await this.channelRepository.create({
+			name: name,
+			mode: mode
+		})
+		
+		const firstMember: Participant = new Participant()
+		firstMember.channel = newChan;
+		firstMember.distinction = MemberDistinc.OWNER;
+		firstMember.user = firstUser;
+
+		await this.channelRepository.save(newChan);
+		await this.participantRepository.save(firstMember);
+
+		return newChan
+	}
+
 	async createDm(user1: User, user2: User) {
 		const newMp: Channel = await this.channelRepository.create({
 			name: user1.login + "+" + user2.login,
@@ -134,3 +151,38 @@ export class ChatService {
 		return Promise.all(request).then(() => displayMessages);
 	}
 }
+
+// async createChannel(firstUser: User, name: string, mode: ChanMode, password? : string) {
+
+// 	if((password == null && mode === ChanMode.PROTECTED) ||
+// 		(password != null && (mode !== ChanMode.PRIVATE && mode !== ChanMode.PUBLIC)))
+// 		return ({status: "KO", desc: "Request impossible"});
+	
+// 	var newChan: Channel;
+// 	if(password) {
+// 		const salt = await bcrypt.genSalt();
+// 		const hash = await bcrypt.hash(password, salt);
+	
+// 		newChan = this.channelRepository.create({
+// 			name: name,
+// 			mode: mode,
+// 			password: hash
+// 		})
+// 	}
+// 	else {
+// 		newChan = this.channelRepository.create({
+// 			name: name,
+// 			mode: mode
+// 		})
+// 	}
+	
+// 	const firstMember: Participant = new Participant()
+// 	firstMember.channel = newChan;
+// 	firstMember.distinction = MemberDistinc.OWNER;
+// 	firstMember.user = firstUser;
+
+// 	await this.channelRepository.save(newChan);
+// 	await this.participantRepository.save(firstMember);
+
+// 	return newChan
+// }

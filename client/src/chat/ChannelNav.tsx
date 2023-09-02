@@ -1,15 +1,17 @@
 import { Add, AddCircleOutline, Clear, TravelExplore } from "@mui/icons-material";
-import { FormControl, FormControlLabel, FormGroup, FormLabel, IconButton, TextField } from "@mui/material";
-import { useState } from "react";
+import { FormControl, FormGroup, FormLabel, IconButton, TextField } from "@mui/material";
+import { useContext, useState } from "react";
 import './chat.css'
 import { PostRequest } from "../utils/Request";
 import { ToastContainer, toast } from "react-toastify";
+import { SocketChatContext } from "../utils/Context";
+import { ChanMode } from "./interfaceData";
 
-interface Res {
-	status: string | number,
-	data?: string,
-	error?: string,
-}
+// interface Res {
+// 	status: string | number,
+// 	data?: string,
+// 	error?: string,
+// }
 
 function logError(error: string[]) {
 	toast.error(error[0], {
@@ -29,7 +31,10 @@ function logSuccess(msg: string) {
 }
 
 
-function Create() {
+function Create({close}: any) {
+
+	const socket = useContext(SocketChatContext);
+
 	const [datasChan, setStrings] = useState({
 		channelName: "",
 		password: "",
@@ -42,20 +47,23 @@ function Create() {
 		});
 	};
 
-	const changePw = (event: React.ChangeEvent<HTMLInputElement>) => {
-		setStrings({
-			...datasChan,
-			password: event.target.value,
-		});
-	};
+	// const changePw = (event: React.ChangeEvent<HTMLInputElement>) => {
+	// 	setStrings({
+	// 		...datasChan,
+	// 		password: event.target.value,
+	// 	});
+	// };
 
 	function submitChannel() {
 		const channelName = datasChan.channelName;
+		const mode: ChanMode = ChanMode.PROTECTED;
 
-		console.log(datasChan.channelName, datasChan.password);
-		PostRequest("/chat/createChan", {channelName}).then((response: any) => {
-			if (response.status === "OK")
+		PostRequest("/chat/createChanWithoutPw", {channelName, mode}).then((response: any) => {
+			if (response.status === "OK"){
+				socket!.emit('message',channelName, "Welcome To Everybody!");
+				close();
 				logSuccess(`Channel ${channelName} created successfully`)
+			}
 			else
 				logError(response.error);
 		});
@@ -70,7 +78,6 @@ function Create() {
 					<IconButton onClick={submitChannel}><Add/></IconButton>
 				</FormGroup>
 			</FormControl>
-			<ToastContainer />
 		</div>
 	  );
 }
@@ -101,21 +108,25 @@ export default function ChannelNav() {
 	const [activePopUp, setActivePopUp]: [string, Function] = useState("")
 
 	return (
-		<div className="chan-nav">
-			<button onClick={() => setActivePopUp("explore")}>
-				<TravelExplore />
-			</button>
-			<button  onClick={() => setActivePopUp("create")}>
-				<AddCircleOutline />
-			</button>
+		<>
+			<div className="chan-nav">
+				<button onClick={() => setActivePopUp("explore")}>
+					<TravelExplore />
+				</button>
+				<button  onClick={() => setActivePopUp("create")}>
+					<AddCircleOutline />
+				</button>
 
-			{
-				activePopUp !== "" &&
-					<PopUp close={() => setActivePopUp("")}>
-						{activePopUp === "create" ? <Create /> : <Explore />}
-					</PopUp>
-			}
-		</div>
+				{
+					activePopUp !== "" &&
+						<PopUp close={() => setActivePopUp("")}>
+							{activePopUp === "create" ? <Create close={() => setActivePopUp("")}/> : <Explore />}
+						</PopUp>
+				}
+			</div>
+			<ToastContainer />
+		</>
+		
 	)
 }
 

@@ -1,11 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { ValidationArguments, ValidatorConstraint } from "class-validator";
-import { User } from "src/user/user.entity";
-import { UserService } from "src/user/user.service";
-import { ftConstants } from "src/auth/constants";
-import axios from "axios";
 import * as bcrypt from 'bcrypt';
 import { ChatService } from "./chat.service";
+import { ChanMode, Channel } from "./entities/channel.entity";
 
 @ValidatorConstraint({ async: true })
 @Injectable()
@@ -15,30 +12,14 @@ export class IsChannelNameAvailable {
 	) {}
 
 	async validate(value: string) {
-
-		// const userByLogin: User = await this.userService.findOneByLogin(value);
-		// if (userByLogin)
-		//  	return (false);
-		// const userByUsername: User = await this.userService.findOneByUsername(value);
-		// if (userByUsername)
-		//  	return (false);
-
-		// const data = {
-		// 	grant_type: "client_credentials",
-		// 	client_id: ftConstants.uid,
-		// 	client_secret: ftConstants.secret,
-		// 	redirect_uri: ftConstants.redirect_uri,
-		// };
-		// const getToken = await axios.post("https://api.intra.42.fr/oauth/token", data);
-		// const userData = await axios.get("https://api.intra.42.fr/v2/users?filter[login]=" + value, {
-		// 	headers: { Authorization:'Bearer ' + getToken.data.access_token }})
-		// const ftUser: any[] = userData.data;
-		// return (ftUser.length === 0);
+		const channel: Channel = await this.chatService.findChanByName(value);
+		if (channel)
+		 	return (false);
 		return true
 	}
 
 	defaultMessage(args: ValidationArguments) {
-		return `Channel name not available.`;
+		return `Channel name ${(args.object as any).channelName} is not available`;
 	}
 }
 
@@ -50,18 +31,39 @@ export class PasswordChannelMatch {
 	) {}
 
 	async validate(value: string, args: ValidationArguments) {
-		// const log: any = args.object;
-		// const user: User = await this.userService.findOneByUsername(log.username);
-		// if (!user)
-		// 	return false;
+		const log: any = args.object;
+		const channel: Channel = await this.chatService.findChanByName(log.channelName);
+		if (!channel)
+			return false;
 
-		// const isMatch = await bcrypt.compare(log.password, user.password);
-		// if (!isMatch)
-		// 	return false;
-		// return true;
+		const isMatch = await bcrypt.compare(log.password, channel.password);
+		if (!isMatch)
+			return false;
+		return true;
 	}
 
 	defaultMessage(args: ValidationArguments) {
-		// return "unknow username or wrong password";
+		return "unknow channel name or wrong password";
 	}
 }
+
+@ValidatorConstraint({ async: true })
+@Injectable()
+export class IsMode {
+	constructor() {}
+
+	async validate(value: string) {
+		if (value !== ChanMode.PUBLIC &&
+			value !== ChanMode.PRIVATE && 
+			value !== ChanMode.PROTECTED)
+			return false
+		return true
+	}
+	defaultMessage(args: ValidationArguments) {
+		return `Channel mode ${(args.object as any).mode} is not an existing mode`;
+	}
+}
+
+// as ChanMode
+// as ChanMode
+// as ChanMode
