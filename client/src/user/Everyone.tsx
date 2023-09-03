@@ -108,9 +108,7 @@ export default function Everyone() {
 				{users.length > 1 ? 
 					users.map((user: UserData) => (
 						username !== user.username &&
-							<div key={user.id} className="">
-									<ProfileElement user={user} />
-							</div>
+									<ProfileElement key={user.id} user={user} />
 					))
 					:
 					<Paper className="nobody">nobody there</Paper>

@@ -50,8 +50,8 @@
 	z-index: 2;
 }
 
-.menu {
-	background-color: rgba(255, 255, 255, 0.518) !important;
+.menu{
+	background-color: rgb(196, 187, 212) !important;
 	outline: 4px solid c.$primary;
 	border-color: c.$primary;
 	width:35vw;
@@ -70,4 +70,29 @@
 .forfeit_button {
 	padding: 8px;
 	background-color: rgba(190, 40, 40, 0.953) !important;
+}
+
+.menu_select {
+	display: flex;
+	width: 100%;
+	//overflow: hidden;
+	outline: 2px solid c.$primary;
+}
+
+.menu_select > Button {
+	color: c.$secondary;
+	background-color: inherit;
+	height: 4.965vw;
+	border: 0px !important;
+	justify-content: space-between;
+}
+
+.menu_select > Button:hover{
+	background-color: c.$primary;
+	filter: brightness(1.1);
+}
+
+.button_focus {
+	background-color: c.$primary !important;
+	filter: brightness(1.2);
 }

@@ -10,34 +10,42 @@ interface player {
 	username: string,
 }
 
+interface Setting {
+	type: string,
+	mode: string,
+}
+
 function PlayerCard( {player}: any ) {
 	return (
 		<Paper className="player_card"><div className="el_pongo">PONGO</div></Paper>
 	)
 }
 
-function modeSelect(mode: string, setMode: Function) {
-	switch(mode) {
+function modeSelect(type: string, setSetting: Function) {
+	switch(type) {
 		case "menu":
-			return (<GameMenu setMode={setMode}/>);
+			return (<GameMenu setSetting={setSetting}/>);
 		case "local":
-			return (<LocalGame />);
+				return (<LocalGame />);
 	}
 }
 
 export default function Game() {
 	const [player1, setplayer1]: [player | null, Function] = useState(null);
 	const [player2, setplayer2]: [player | null, Function] = useState(null);
-	const [mode, setMode]: [string, Function] = useState("menu");
+	const [setting, setSetting]: [Setting, Function] = useState({type: "menu", mode: "classic"});
 	
 	return (
 		<>
 			<div className="canvas_wrap">
 				<PlayerCard player={player1} />
-				{modeSelect(mode, setMode)}
+				{modeSelect(setting.type, setSetting)}
 				<PlayerCard player={player2} />
 			</div>
-			{mode !== "menu" && <div className="flex justify-center"><Paper className="forfeit_button">FORFEIT</Paper></div>}
+			{setting.type !== "menu" && 
+				<div className="flex justify-center"><button onClick={()=> setSetting({type: "menu", mode: "classic"})}>
+					<Paper className="forfeit_button">FORFEIT</Paper>
+				</button></div>}
 		</>
 	)
 }

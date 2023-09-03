@@ -18,17 +18,11 @@ function bounce(side: padSide, ball: Ball, ph: number, px: number, py:number) {
 	let collidePoint = (ball.y - py) / ph;
 	collidePoint = clamp(collidePoint, 0, 1);
 	angle += (collidePoint * (Math.PI * -0.2) + Math.PI * 0.1);
-	
-	const normal = { x: Math.sin(angle), y: -Math.cos(angle)}
-	const d = 2 * (ball.dx * normal.x + ball.dy * normal.y);
 
-
-	ball.dx -= d * normal.x * ball.acc;
-	ball.dy -= d * normal.y * ball.acc;
-	
-	//force ball to go to the other side and lock max dx to 74
-	ball.dx = Math.min(Math.abs(ball.dx), 74) * side;
-	return 0;
+	if (ball.speed < 100)
+		ball.speed += ball.acc;
+	ball.dx =  Math.abs(Math.sin(angle)) * side;
+	ball.dy = -Math.cos(angle);
 }
 
 function paddleHit(pad: Pad, ball: Ball) {
