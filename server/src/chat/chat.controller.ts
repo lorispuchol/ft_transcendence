@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, Request } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Request } from "@nestjs/common";
 import { ChatService } from "./chat.service";
 import { UserService } from "src/user/user.service";
 import { NewChannelWithPassword, NewChannelWithoutPassword } from "./channel.dto";
@@ -33,7 +33,6 @@ export class ChatController {
 	async createChanWithPw(
 		@Request() req: any,
 		@Body() datasChan: NewChannelWithPassword
-
 	) {
 		return await this.chatService.createChannel(
 			await this.userService.findOneByLogin(req.user.login),

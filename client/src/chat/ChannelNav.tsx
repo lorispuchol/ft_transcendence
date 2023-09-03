@@ -1,17 +1,11 @@
 import { Add, AddCircleOutline, Clear, TravelExplore } from "@mui/icons-material";
-import { FormControl, FormGroup, FormLabel, IconButton, TextField } from "@mui/material";
+import { Button, FormControl, FormControlLabel, FormGroup, FormLabel, IconButton, Paper, Radio, RadioGroup, TextField } from "@mui/material";
 import { useContext, useState } from "react";
 import './chat.css'
 import { PostRequest } from "../utils/Request";
 import { ToastContainer, toast } from "react-toastify";
 import { SocketChatContext } from "../utils/Context";
 import { ChanMode } from "./interfaceData";
-
-// interface Res {
-// 	status: string | number,
-// 	data?: string,
-// 	error?: string,
-// }
 
 function logError(error: string[]) {
 	toast.error(error[0], {
@@ -35,48 +29,90 @@ function Create({close}: any) {
 
 	const socket = useContext(SocketChatContext);
 
-	const [datasChan, setStrings] = useState({
+	const [datasChan, setDatasChan] = useState({
 		channelName: "",
 		password: "",
+		mode: ChanMode.PUBLIC,
 	});
 	
 	const changeName = (event: React.ChangeEvent<HTMLInputElement>) => {
-		setStrings({
+		setDatasChan({
 			...datasChan,
 			channelName: event.target.value,
 		});
 	};
 
-	// const changePw = (event: React.ChangeEvent<HTMLInputElement>) => {
-	// 	setStrings({
-	// 		...datasChan,
-	// 		password: event.target.value,
-	// 	});
-	// };
-
-	function submitChannel() {
-		const channelName = datasChan.channelName;
-		const mode: ChanMode = ChanMode.PROTECTED;
-
-		PostRequest("/chat/createChanWithoutPw", {channelName, mode}).then((response: any) => {
-			if (response.status === "OK"){
-				socket!.emit('message',channelName, "Welcome To Everybody!");
-				close();
-				logSuccess(`Channel ${channelName} created successfully`)
-			}
-			else
-				logError(response.error);
+	const changeMode = (event: React.ChangeEvent<HTMLInputElement>) => {
+		setDatasChan({
+			...datasChan,
+			mode: event.target.value as ChanMode,
 		});
+	};
+
+	const changePw = (event: React.ChangeEvent<HTMLInputElement>) => {
+		setDatasChan({
+			...datasChan,
+			password: event.target.value,
+		});
+	};
+
+	function submitChannel(e: React.FormEvent<HTMLFormElement>) {
+		e.preventDefault();
+		const channelName = datasChan.channelName;
+		const mode: ChanMode = datasChan.mode;
+		const password = datasChan.password;
+
+		if (mode === ChanMode.PROTECTED) {
+			PostRequest("/chat/createChanWithPw", {channelName, password, mode}).then((response: any) => {
+				if (response.status === "OK"){
+					socket!.emit('message',channelName, "Welcome To Everybody!");
+					close();
+					logSuccess(`Channel ${channelName} created successfully`)
+				}
+				else
+					logError(response.error);
+			});
+		}
+		else {
+			PostRequest("/chat/createChanWithoutPw", {channelName, mode}).then((response: any) => {
+				if (response.status === "OK"){
+					socket!.emit('message',channelName, "Welcome To Everybody!");
+					close();
+					logSuccess(`Channel ${channelName} created successfully`)
+				}
+				else
+					logError(response.error);
+			});
+		}
 	}
 	
 	  return (
 		<div>
 			<FormControl>
-				<FormLabel>{datasChan.channelName}Create your own channel</FormLabel>
-				<FormGroup>
-					<TextField label="New channel name" value={datasChan.channelName} onChange={changeName} name="name" />
-					<IconButton onClick={submitChannel}><Add/></IconButton>
-				</FormGroup>
+				<p>Create your own channel</p>
+				<FormLabel className="text-red-700">Create your own channel</FormLabel>
+				<form onSubmit={submitChannel}>
+					<FormGroup> 
+
+					<TextField label="New channel name" value={datasChan.channelName} onChange={changeName} name="name" />	
+					{
+						datasChan.mode === ChanMode.PROTECTED &&
+						<TextField type="password" label="Password" value={datasChan.password} onChange={changePw} name="password" />	
+					}
+					</FormGroup>
+					<RadioGroup
+						onChange={changeMode}
+						value={datasChan.mode}
+						aria-labelledby="demo-radio-buttons-group-label"
+						defaultValue="public"
+						name="radio-buttons-group"
+					>
+						<FormControlLabel value={ChanMode.PUBLIC} control={<Radio />} label="Public" />
+						<FormControlLabel value={ChanMode.PRIVATE} control={<Radio />} label="Private" />
+						<FormControlLabel value={ChanMode.PROTECTED} control={<Radio />} label="Protected" />
+					</RadioGroup>
+					<Button type="submit" ><Add/></Button>
+				</form>
 			</FormControl>
 		</div>
 	  );
@@ -92,13 +128,13 @@ function Explore() {
 
 function PopUp({children, close}: any) {
 	return (
-		<div className="popup-box" onClick={close}>
-			<button onClick={close}>
-				<Clear />
-			</button>
-			<div className="popup-content" onClick={e => e.stopPropagation()}>
+		<div className="popup-bg" onClick={close}>
+			<Paper elevation={6} className="popup-box relative elevation" onClick={e => e.stopPropagation()}>
+				<button className="absolute top-0 right-0" onClick={close}>
+					<Clear />
+				</button>
 				{children}
-			</div>
+			</Paper>
 		</div>
 	)
 } 

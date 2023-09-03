@@ -9,7 +9,7 @@ import './chat.css'
 import { ChanMode, ChannelData, MessageData, ParticipantData, UserData } from "./interfaceData";
 import { SocketChatContext, UserContext } from "../utils/Context";
 import ChannelNav from "./ChannelNav";
-import { Avatar } from "@mui/material";
+import { Avatar, Button } from "@mui/material";
 import { MarkEmailUnread, Tag } from "@mui/icons-material";
 import ListMembers from "./ListMember";
 
@@ -126,11 +126,7 @@ function ListConv({focusConv, setFocusConv}: focusConvProps) {
 				))
 			}
 			{
-				dms.length ? 
-					chans.length ?
-						<hr />
-						: null
-					:null
+				dms.length && chans.length ? <hr /> : null
 			}
 			{
 				chans.map((chan) => (

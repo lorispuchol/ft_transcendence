@@ -78,7 +78,7 @@ hr {
 	flex-wrap: wrap;
 }
 
-.popup-box {
+.popup-bg {
 	position: absolute;
 	display: flex;
 	flex-direction: column;
@@ -91,10 +91,12 @@ hr {
 	height: 100%;
 }
 
-.popup-content {
+.popup-box  {
 	padding: 15px;
-	display: flex;
-	background-color: cadetblue;
+	/* display: flex; */
+	/* flex-wrap: nowrap; */
+	/* flex-direction: column; */
+	background-color: cadetblue !important;
 }
 
 .create-chan-form {
