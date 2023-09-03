@@ -65,6 +65,31 @@
 	grid-row: 1 / span 2;
 	border-left: 4px solid;
 	border-color: inherit;
+	display: flex;
+	flex-direction: column;
+	// justify-content: center;
+}
+
+.menu_buttons > button {
+	margin: auto;
+	font-size: 3vw;
+	height: min-content;
+	width: min-content;
+	color: c.$secondary;
+	background-color: c.$primary;
+	filter: brightness(1.2);
+}
+
+.menu_buttons > Button:hover{
+	background-color: c.$primary;
+	filter: brightness(1.1);
+}
+
+.defy {
+	margin: auto;
+	background-color: c.$primary;
+	height: 11vw;
+	width: 15vw;
 }
 
 .forfeit_button {

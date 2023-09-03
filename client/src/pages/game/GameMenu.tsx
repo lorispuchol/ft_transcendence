@@ -36,7 +36,9 @@ export default function GameMenu({ setSetting }: MenuProps) {
 					</div>
 					<div className="menu_buttons">
 						<Button key="play" onClick={() => setSetting({type: type, mode: mode})}>play</Button>
-						local-play/online-search_defy
+						<div className="defy">
+							
+						</div>
 					</div>
 				</Paper>
 			</div>
