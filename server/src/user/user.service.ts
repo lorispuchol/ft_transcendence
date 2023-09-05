@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "./user.entity";
 import { Repository } from "typeorm";
+import { server_url } from "src/auth/constants";
 
 @Injectable()
 export class UserService {
@@ -44,8 +45,8 @@ export class UserService {
 	}
 
 	async changeAvatar(userId: number, newAvatar: string) {
-		this.userRepository.update({id: userId}, {avatar: newAvatar});
-		return ("OK") // ?
+		this.userRepository.update({id: userId}, {avatar: server_url + '//' + newAvatar});
+		return ("OK")
 	}
 
 	////dev

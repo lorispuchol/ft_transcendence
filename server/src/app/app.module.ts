@@ -22,8 +22,9 @@ import { join } from 'path';
 		RelationshipModule,
 		EventModule,
 		ServeStaticModule.forRoot({
-			rootPath: join(__dirname, '..', '../../public'), // added ../ to get one folder back
-			serveRoot: '/public/'})
+			rootPath: join(__dirname, '..', '../../public'),
+			serveRoot: '/public/'
+		})
 	],
 	controllers: [AppController],
 	providers: [

@@ -53,7 +53,7 @@ export class UserController {
 		// @Body() newAvatar: newAvatar
 	) {
 		// console.log(file);
-		this.userService.changeAvatar(req.user.id, file.path);
+		this.userService.changeAvatar(req.user.id, file.filename);
 		console.log(file)
 		return {file};
 	}

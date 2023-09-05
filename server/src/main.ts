@@ -8,17 +8,14 @@ import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
-//   const app = await NestFactory.create(AppModule);
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  app.useStaticAssets(join(__dirname, '..', 'public'));
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
   app.enableCors({
 	origin: [client_url]
   })
   app.useGlobalGuards(new AuthGard());
   app.useGlobalPipes(new ValidationPipe());
-  app.useStaticAssets(join(__dirname, '..', 'public'), {
-	prefix: '/public',
-  });
   await app.listen(8080);
 }
 bootstrap();
