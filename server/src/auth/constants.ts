@@ -4,6 +4,7 @@ import { ConfigService } from "@nestjs/config";
 const configService = new ConfigService();
 
 export const client_url = "http://" + configService.get('SERVER_HOST') + ":" + configService.get('CLIENT_PORT');
+export const server_url = "http://" + configService.get('SERVER_HOST') + ":" + configService.get('SERVER_PORT');
 
 export const jwtConstants = {
 	secret: configService.get('JWT_SECRET'),

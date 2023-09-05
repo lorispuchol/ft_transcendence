@@ -1,9 +1,10 @@
+import { ScreenSize } from "./LocalGame";
 import { Ball } from "./ball";
 import { Pad } from "./paddle";
 
 export const clamp = (num: number, min: number, max: number) => Math.min(Math.max(num, min), max);
 
-function wallHit(width: number, height: number, ball: Ball) {
+function wallHit(height: number, ball: Ball) {
 	if (ball.y >= (height - ball.rad) || ball.y <= ball.rad)
 		ball.dy *= -1;
 }
@@ -47,7 +48,7 @@ function paddleHit(pad: Pad, ball: Ball) {
 		bounce(padSide.Left, ball, pad.h, pad.lx, pad.ly);
 }
 
-export default function collision(width: number, height: number, pad: Pad, ball: Ball) {
+export default function collision(screen: ScreenSize, pad: Pad, ball: Ball) {
 	paddleHit(pad, ball);
-	wallHit(width, height, ball);
+	wallHit(screen.h, ball);
 }

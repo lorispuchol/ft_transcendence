@@ -13,6 +13,13 @@
 	max-height: 39vw;
 }
 
+.in_game_card {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	align-items: center;
+}
+
 .el_pongo {
 	padding: 0.8vw;
 	padding-left: 3vw;
@@ -29,6 +36,7 @@
 	margin: 5px;
 	width:70vw;
 	height: 39.375vw;
+	z-index: 1;
 }
 
 .demo {

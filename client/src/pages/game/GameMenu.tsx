@@ -1,7 +1,7 @@
 import { Button, ButtonGroup, Paper } from "@mui/material";
 import DemoGame from "./DemoGame";
 import './Game.scss';
-import { Pause, Public, RocketLaunch, SportsTennis, Weekend } from "@mui/icons-material";
+import { Public, RocketLaunch, SportsTennis, Weekend } from "@mui/icons-material";
 import { useState } from "react";
 
 interface MenuProps {

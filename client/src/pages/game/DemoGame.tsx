@@ -1,13 +1,13 @@
 import { useEffect, useRef } from "react";
 import handleBall, { Ball, init_ball } from "./local/ball";
-import { teritaryColor } from "../../style/color";
 import './Game.scss';
+import { ScreenSize } from "./local/LocalGame";
 
-function wallHit(width: number, height: number, ball: Ball) {
-	if (ball.y >= (height - ball.rad) || ball.y <= ball.rad)
+function wallHit(screen: ScreenSize, ball: Ball) {
+	if (ball.y >= (screen.h - ball.rad) || ball.y <= ball.rad)
 		ball.dy *= -1;
 	
-	if (ball.x >= (width - ball.rad) || ball.x <= ball.rad)
+	if (ball.x >= (screen.w - ball.rad) || ball.x <= ball.rad)
 		ball.dx *= -1;
 }
 
@@ -18,13 +18,14 @@ export default function DemoGame() {
 		const ctx = canvasRef!.current!.getContext('2d')!;
 		let animationFrameId: number;
 		
-		const width = ctx.canvas.width = 3200;
-		const height = ctx.canvas.height = 1800;
-		const ball : Ball = init_ball(width, height);
+		const screen = {w: 3200, h: 1800}
+		ctx.canvas.width = screen.w;
+		ctx.canvas.height = screen.h;
+		const ball : Ball = init_ball(screen);
 
 		function render() {
-			ctx.clearRect(0,0, width, height);
-			wallHit(width, height, ball);
+			ctx.clearRect(0,0, screen.w, screen.h);
+			wallHit(screen, ball);
 			handleBall(ctx, ball);
 			animationFrameId = window.requestAnimationFrame(render);
 		}
