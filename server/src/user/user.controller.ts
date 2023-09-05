@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Request, UploadedFile, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Get, Param, Patch, Post, Request, UploadedFile, UseInterceptors, UploadedFile, UseInterceptors } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { Public } from "src/auth/constants";
 import { User } from "./user.entity";
@@ -77,13 +77,6 @@ export class UserController {
 	@Get('delete/:login')
 	deleteFakeUser(@Param('login') login: string) {
 		return this.userService.deleteOne(login);
-	}
-
-	//dev
-	@Public()
-	@Get('display/:username')
-	getData(@Param('username') username: string) {
-		return (this.userService.findOneByUsername(username));
 	}
 
 	@Get(':username')

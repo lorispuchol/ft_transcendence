@@ -1,8 +1,9 @@
-import { Close, Done } from "@mui/icons-material";
+import { Close, Done, MarkChatRead, MarkChatUnread } from "@mui/icons-material";
 import { Button } from "@mui/material";
 import { DeleteRequest, PatchRequest } from "../../utils/Request";
 import ErrorHandling from "../../utils/Error";
 import { useState } from "react";
+import { ChanMode, ChannelData } from "../../chat/interfaceData";
 
 interface Event {
 	type: string,
@@ -55,6 +56,14 @@ function AcceptFriend({ login }: ButtonProps) {
 	)
 }
 
+function GoToConv({event}: EventButtonProps) {
+	return (
+		<div className="w-max">
+		</div>
+	)
+}
+
+
 export default function EventButton ({ event }: EventButtonProps) {
 
 	if (event.type === "friendRequest")
@@ -64,7 +73,9 @@ export default function EventButton ({ event }: EventButtonProps) {
 				<RefuseFriend login={event.sender} />
 			</div>
 		)
-	if (event.type === "privateMessage")
-		return null;
+	if (event.type === "message") 
+		return (
+			<GoToConv event={event}/>
+		)
 	return (<strong>need fix</strong>)
 }

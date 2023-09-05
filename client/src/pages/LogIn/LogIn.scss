@@ -1,19 +1,19 @@
-$primary_color: #786fa6;
+@use '/app/src/style/color' as c;
 
 .background_primary {
-	background-color: $primary_color;
+	background-color: c.$primary;
 	background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%231f1b15' fill-opacity='0.4' fill-rule='evenodd'%3E%3Cpath d='M5 0h1L0 6V5zM6 5v1H5z'/%3E%3C/g%3E%3C/svg%3E");
 	min-height: 100vh;
 	font-family: 'Poppins' !important;
 }
 
 .background_secondary {
-	background-color: #fad390;
+	background-color: c.$primary;
 	background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23a55eea' fill-opacity='0.2' fill-rule='evenodd'%3E%3Cpath d='M5 0h1L0 6V5zM6 5v1H5z'/%3E%3C/g%3E%3C/svg%3E");
 }
 
 .background_box_login {
-	background-color: #ffffff;
+	background-color: c.$secondary;
 	background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23fad390' fill-opacity='0.14' fill-rule='evenodd'%3E%3Cpath d='M5 0h1L0 6V5zM6 5v1H5z'/%3E%3C/g%3E%3C/svg%3E");
 }
 
@@ -77,7 +77,7 @@ $primary_color: #786fa6;
 }
 
 .button_login {
-	background-color: $primary_color;
+	background-color: c.$primary;
 	display: flex;
 	justify-content: center;
 	font-size: 1.5rem; /* 24px */
