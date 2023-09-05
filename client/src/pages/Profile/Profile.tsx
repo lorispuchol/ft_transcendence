@@ -45,7 +45,6 @@ export default function Profile() {
 		return (<ErrorHandling status={response.status} message={response.error} />);
 	if (!response.data?.username)
 		return (<NoRouteFound />)
-	console.log(response.data.username);
 	const profile = {
 		avatar: response.data.avatar? response.data.avatar : defaultAvatar,
 		login: response.data.login,
@@ -53,6 +52,7 @@ export default function Profile() {
 		nb_victory: response.data.nb_victory,
 		nb_defeat: response.data.nb_defeat,
 	}
+	console.log(profile.avatar);
 
 
 	return (

@@ -16,7 +16,7 @@ interface ListMembersProps {
 
 export default function ListMembers({chan}: ListMembersProps) {
 
-	const isDm: boolean = chan.includes("+");
+	//const isDm: boolean = chan.includes("+");
 
 	const [response, setResponse]: [ResponseMembers, Function] = useState({status: "loading"});
 	useEffect(() => {

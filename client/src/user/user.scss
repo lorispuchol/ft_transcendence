@@ -18,6 +18,10 @@
 	grid-template-columns: repeat(auto-fit, minmax(808px, 1fr));
 }
 
+.everyone_list > div {
+	margin-bottom: 0px;
+}
+
 .profile_element {
 	margin: 0.5rem;
 	display: flex;
@@ -30,10 +34,18 @@
 	padding-right: 8px;
 }
 
+.button_group {
+	padding: 0.5rem;
+	display: grid;
+	grid-template-columns: repeat(5, minmax(0, 1fr));
+	color: c.$primary;
+}
+
 .gaming_button {
 	grid-column: 1/3;
 	padding-left: 15px;
 	padding-right: 15px;
+	color: white;
 }
 
 .nobody {

@@ -12,5 +12,5 @@ export class newUsername {
 
 export class newAvatar	{
 	@IsNotEmpty()
-	avatar: Buffer;
+	avatar: string;
 }

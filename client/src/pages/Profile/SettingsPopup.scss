@@ -20,10 +20,13 @@
 	display: flex;
 	flex-direction: column;
 	font-family: 'Poppins';
+	position: relative;
 }
 
 .close_button {
-	// display: flex;
+	position: absolute;
+	top: 1rem;
+	right: 1rem;
 	justify-content: end;
 	margin-bottom: 4px;
 }
