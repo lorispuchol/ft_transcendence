@@ -60,7 +60,7 @@ export default function SettingsPopup({ close }: any) {
 				<div>
 					<Paper className='settings_box'>
 						<button className='close_button' onClick={close}>X</button>
-						<form className='settings_option' onSubmit={updateUsername}>
+						<form className='settings_option mt-5' onSubmit={updateUsername}>
 							Username: <input type='text' value={username} onChange={usernameChange} />
 							<button className='update_button' onClick={updateUsername}>UPDATE</button> 
 						</form>
