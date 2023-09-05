@@ -5,7 +5,7 @@ import Loading from "../utils/Loading";
 import ErrorHandling from "../utils/Error";
 import { useLocation } from "react-router-dom";
 import { Socket, io } from "socket.io-client";
-import './chat.css'
+import './chat.scss'
 import { ChanMode, ChannelData, MessageData, ParticipantData, UserData } from "./interfaceData";
 import { SocketChatContext, UserContext } from "../utils/Context";
 import ChannelNav from "./ChannelNav";

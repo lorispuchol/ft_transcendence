@@ -1,7 +1,7 @@
 import { Add, AddCircleOutline, Clear, TravelExplore } from "@mui/icons-material";
-import { Button, FormControl, FormControlLabel, FormGroup, FormLabel, IconButton, Paper, Radio, RadioGroup, TextField } from "@mui/material";
+import { FormControl, FormControlLabel, FormGroup, FormLabel, IconButton, Paper, Radio, RadioGroup, TextField, colors } from "@mui/material";
 import { useContext, useState } from "react";
-import './chat.css'
+import './chat.scss'
 import { PostRequest } from "../utils/Request";
 import { ToastContainer, toast } from "react-toastify";
 import { SocketChatContext } from "../utils/Context";
@@ -88,30 +88,26 @@ function Create({close}: any) {
 	
 	  return (
 		<div>
-			<FormControl>
-				<p>Create your own channel</p>
-				<FormLabel className="text-red-700">Create your own channel</FormLabel>
+			<FormControl className="flex flex-col items-center">
+				<FormLabel className="text-inherit mb-3">Create your own channel</FormLabel>
 				<form onSubmit={submitChannel}>
-					<FormGroup> 
-
-					<TextField label="New channel name" value={datasChan.channelName} onChange={changeName} name="name" />	
-					{
-						datasChan.mode === ChanMode.PROTECTED &&
-						<TextField type="password" label="Password" value={datasChan.password} onChange={changePw} name="password" />	
-					}
+					<FormGroup color='inherit'>
+						<TextField className="mb-3 text-inherit" value={datasChan.channelName} onChange={changeName} name="name" placeholder="Channel Name" />	
+						<TextField className="mb-3 text-inherit" disabled={datasChan.mode !== ChanMode.PROTECTED} type="password" placeholder="Password" value={datasChan.password} onChange={changePw} name="password" />	
 					</FormGroup>
 					<RadioGroup
+						className="mb-3"
 						onChange={changeMode}
 						value={datasChan.mode}
 						aria-labelledby="demo-radio-buttons-group-label"
 						defaultValue="public"
 						name="radio-buttons-group"
 					>
-						<FormControlLabel value={ChanMode.PUBLIC} control={<Radio />} label="Public" />
-						<FormControlLabel value={ChanMode.PRIVATE} control={<Radio />} label="Private" />
-						<FormControlLabel value={ChanMode.PROTECTED} control={<Radio />} label="Protected" />
+						<FormControlLabel value={ChanMode.PUBLIC} control={<Radio color="default"/>} label="Public" />
+						<FormControlLabel value={ChanMode.PRIVATE} control={<Radio color="default"/>} label="Private" />
+						<FormControlLabel value={ChanMode.PROTECTED} control={<Radio color="default"/>} label="Protected" />
 					</RadioGroup>
-					<Button type="submit" ><Add/></Button>
+					<button className="w-full bg-white rounded transition hover:bg-blue-600 h-8" type="submit" ><Add/></button>
 				</form>
 			</FormControl>
 		</div>
@@ -129,10 +125,12 @@ function Explore() {
 function PopUp({children, close}: any) {
 	return (
 		<div className="popup-bg" onClick={close}>
-			<Paper elevation={6} className="popup-box relative elevation" onClick={e => e.stopPropagation()}>
-				<button className="absolute top-0 right-0" onClick={close}>
-					<Clear />
-				</button>
+			<Paper elevation={10} className="popup-box rounded-lg bg-inherit" onClick={e => e.stopPropagation()}>
+				<div className="flex flex-row justify-end w-full">	
+					<button className="text-inherit rounded-full" onClick={close}>
+						<Clear />
+					</button>
+				</div>
 				{children}
 			</Paper>
 		</div>
@@ -165,58 +163,3 @@ export default function ChannelNav() {
 		
 	)
 }
-
-/*
-<div className="create-chan-form">
-
-<form onSubmit={createChan}>
-	<TextField type="text" value={chanName} autoFocus placeholder="Channel Name" onChange={chanNameChange} />
-	<Switch aria-label=""/>
-</form>
-<select name="mode" value={mode} id="mode-select" onChange={modeChange}>
-	<option value="">--Please choose an option--</option>
-	<option value="public">Public</option>
-	<option value="protected">Protected</option>
-	<option value="private">Private</option>
-</select>
-<form onSubmit={createChan}>
-	<input className="bg-transparent" type="password" value={password} placeholder="PASSWORD" onChange={passwordChange} />
-</form>
-<CreateChanForm />
-<div>
-	<button  onClick={() => createChan()}>CREATE CHAN</button>
-</div>
-
-
-
-<FormControl>
-<FormLabel>Create your own channel</FormLabel>
-<FormGroup>
-  <FormControlLabel
-	control={
-	  <TextField value={strings.name} onChange={changeStrings} name="name" />
-	}
-	label=""
-  />
-  <FormControlLabel
-	control={
-	  <Switch checked={check.private} onChange={changeCheck} name="private" />
-	}
-	label="turn on to make your chennal private"
-  //   labelPlacement="start"
-  />
-  {
-	  check.private === true ?
-		  <FormControlLabel
-		  control={
-			  <TextField  value={strings.password} onChange={changeStrings} name="password" />
-		  }
-		  label=""
-		  /> 
-	  : null
-  }
-  <IconButton><Add/></IconButton>
-</FormGroup>
-</FormControl>
-
-*/
