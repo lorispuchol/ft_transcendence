@@ -6,6 +6,22 @@ import { newUsername } from "./user.dto";
 import { newAvatar } from "./user.dto";
 import { profile } from "console";
 
+import { randomUUID } from "crypto";
+import { diskStorage } from "multer";
+import Path = require('path');
+import { FileInterceptor } from "@nestjs/platform-express";
+
+const	storage = {
+	storage: diskStorage ({
+		destination: 'public/',
+		filename: (req, file, cb) => {
+			const filename: string = 'myfile-' + randomUUID();
+			const extension: string = Path.parse(file.originalname).ext;
+            cb(null, `${filename}${extension}`)
+		}
+	})
+}
+
 @Controller('user')
 export class UserController {
 	constructor(
@@ -30,12 +46,16 @@ export class UserController {
 	}
 
 	@Patch('avatar')
+	@UseInterceptors(FileInterceptor('file', storage))
 	async changeAvatar(
 		@Request() req: any,
-		@Body() newAvatar: newAvatar
+		@UploadedFile() file:any,
+		// @Body() newAvatar: newAvatar
 	) {
-		this.userService.changeAvatar(req.user.id, newAvatar.avatar);
-		return {avatar: newAvatar.avatar};
+		// console.log(file);
+		this.userService.changeAvatar(req.user.id, file.filename);
+		console.log(file)
+		return {file};
 	}
 
 	//dev
@@ -58,16 +78,6 @@ export class UserController {
 	deleteFakeUser(@Param('login') login: string) {
 		return this.userService.deleteOne(login);
 	}
-
-	// @Post('setAvatar')
-    // @UseInterceptors(FileInterceptor('file', storage))
-	// async uploadAvatar(
-	// 	@Request() req: any,
-    //     @UploadedFile() file: any
-    // ){
-	// 	console.log(storage.storage.filename.filename)
-    //     // return this.userService.uploadAvatar(file, await this.userService.findOneByUsername(req.user.login))
-    // }
 
 	@Get(':username')
 	async getUserData(

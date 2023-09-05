@@ -10,6 +10,8 @@ import { AuthGard } from '../auth/auth.guard';
 import { RelationshipModule } from '../relationship/relationship.module';
 import { ChatModule } from 'src/chat/chat.module';
 import { EventModule } from 'src/event/event.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
 	imports: [
@@ -18,7 +20,11 @@ import { EventModule } from 'src/event/event.module';
 		AuthModule,
 		ChatModule,
 		RelationshipModule,
-		EventModule
+		EventModule,
+		ServeStaticModule.forRoot({
+			rootPath: join(__dirname, '..', '../../public'),
+			serveRoot: '/public/'
+		})
 	],
 	controllers: [AppController],
 	providers: [
