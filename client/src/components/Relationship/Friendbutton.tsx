@@ -38,7 +38,7 @@ export function RelationButtonGet({path, update, icon}: RelationButtonProps) {
 		return (<ErrorHandling status={response.status} message={response.error} />);
 	
 	return (
-			<IconButton onClick={handleClick}>
+			<IconButton onClick={handleClick} color="inherit">
 						{icon}
 			</IconButton>
 	)
@@ -54,7 +54,7 @@ export function RelationButtonDelete({path, update, icon}: RelationButtonProps) 
 		return (<ErrorHandling status={response.status} message={response.error} />);
 
 	return (
-			<IconButton onClick={handleClick}>
+			<IconButton onClick={handleClick} color="inherit">
 						{icon}
 			</IconButton>
 	)

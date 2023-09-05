@@ -21,4 +21,8 @@ clean:				down
 
 re: 				clean all
 
+ub:
+					sh ip.sh
+					make
+
 .PHONY: 			all run stop start down clean re

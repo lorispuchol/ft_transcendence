@@ -1,3 +1,5 @@
+import { teritaryColor } from "../../../style/color";
+import { ScreenSize } from "./LocalGame";
 
 export interface Ball {
 	color: string,
@@ -14,17 +16,19 @@ function rng(min: number, max: number) {
 	return Math.floor(Math.random() * (max - min + 1) ) + min;
 }
 
-export function init_ball(width: number, height: number) {
-	const color = "white";
-	const x = width * 0.5;
-	const y = height * 0.5;
-	const rad = 0.5 * Math.sqrt(width * width + height * height) * 0.015;
+export function init_ball(screen: ScreenSize) {
+	const color = teritaryColor;
+	const x = screen.w * 0.5;
+	const y = screen.h * 0.5;
+	const rad = 0.5 * Math.sqrt(screen.w * screen.w + screen.h * screen.h) * 0.015;
 
-	const dx = rng(0, 1) ? 20 : -20;
-	const dyRng = rng(-10, 10);
-	const dy = dyRng ? dyRng : 1;
-	const speed = 1.5;
-	const acc = 1.03;
+	const collidePoint = rng(0, 100) / 100;
+	const angle = -Math.PI * 0.5 + (collidePoint * (Math.PI * -0.2) + Math.PI * 0.2);
+
+	const dx = Math.sin(angle) * (rng(0, 1)? 1 : -1);
+	const dy = -Math.cos(angle);
+	const speed = 15;
+	const acc = 4;
 
 	return {color, x, y, rad, dx, dy, speed, acc};
 }

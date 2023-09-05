@@ -9,7 +9,7 @@ export default function NoRouteFound() {
 				<div className='mb-8 text-2xl'>PAGE NOT FOUND</div>
 				<div>
 						<Link to="/">
-							<div className="rounded border border-black bg-white">GO BACK TO HOMEPAGE</div>
+							<div className="p-2 rounded border border-black bg-white">GO BACK TO HOMEPAGE</div>
 						</Link>
 				</div>
 			</div>
