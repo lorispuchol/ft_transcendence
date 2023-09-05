@@ -1,3 +1,5 @@
+import { teritaryColor } from "../../../style/color";
+import { ScreenSize } from "./LocalGame";
 
 export interface Pad {
 	w: number,
@@ -8,22 +10,22 @@ export interface Pad {
 	ly: number,
 }
 
-export function init_paddle(width: number, height: number) {
-	const w = width * 0.01;
-	const h = height * 0.15;
+export function init_paddle(screen: ScreenSize) {
+	const w = screen.w * 0.01;
+	const h = screen.h * 0.15;
 
-	const rx = width * 0.9 - w * 0.5;
-	const ry = height * 0.5 - h * 0.5;
+	const rx = screen.w * 0.9 - w * 0.5;
+	const ry = screen.h * 0.5 - h * 0.5;
 
-	const lx = width * 0.1 - w * 0.5;
-	const ly = height * 0.5 - h * 0.5;
+	const lx = screen.w * 0.1 - w * 0.5;
+	const ly = screen.h * 0.5 - h * 0.5;
 
 	return {w, h, rx, ry, lx, ly};
 }
 
 
-function drawPaddle (ctx: CanvasRenderingContext2D, pad: Pad) {
-	ctx.fillStyle = '#FFFFFF';
+export function drawPaddle (ctx: CanvasRenderingContext2D, pad: Pad) {
+	ctx.fillStyle = teritaryColor;
 	ctx.beginPath();
 	ctx.rect(pad.lx, pad.ly, pad.w , pad.h);
 	ctx.rect(pad.rx, pad.ry, pad.w , pad.h);

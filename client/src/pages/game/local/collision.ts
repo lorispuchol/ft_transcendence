@@ -1,9 +1,10 @@
+import { ScreenSize } from "./LocalGame";
 import { Ball } from "./ball";
 import { Pad } from "./paddle";
 
-const clamp = (num: number, min: number, max: number) => Math.min(Math.max(num, min), max);
+export const clamp = (num: number, min: number, max: number) => Math.min(Math.max(num, min), max);
 
-function wallHit(width: number, height: number, ball: Ball) {
+function wallHit(height: number, ball: Ball) {
 	if (ball.y >= (height - ball.rad) || ball.y <= ball.rad)
 		ball.dy *= -1;
 }
@@ -18,17 +19,11 @@ function bounce(side: padSide, ball: Ball, ph: number, px: number, py:number) {
 	let collidePoint = (ball.y - py) / ph;
 	collidePoint = clamp(collidePoint, 0, 1);
 	angle += (collidePoint * (Math.PI * -0.2) + Math.PI * 0.1);
-	
-	let normal = { x: Math.sin(angle), y: -Math.cos(angle)}
-	let d = 2 * (ball.dx * normal.x + ball.dy * normal.y);
 
-
-	ball.dx -= d * normal.x * ball.acc;
-	ball.dy -= d * normal.y * ball.acc;
-	
-	//force ball to go to the other side and lock max dx to 74
-	ball.dx = Math.min(Math.abs(ball.dx), 74) * side;
-	return 0;
+	if (ball.speed < 100)
+		ball.speed += ball.acc;
+	ball.dx =  Math.abs(Math.sin(angle)) * side;
+	ball.dy = -Math.cos(angle);
 }
 
 function paddleHit(pad: Pad, ball: Ball) {
@@ -53,7 +48,7 @@ function paddleHit(pad: Pad, ball: Ball) {
 		bounce(padSide.Left, ball, pad.h, pad.lx, pad.ly);
 }
 
-export default function collision(width: number, height: number, pad: Pad, ball: Ball) {
+export default function collision(screen: ScreenSize, pad: Pad, ball: Ball) {
 	paddleHit(pad, ball);
-	wallHit(width, height, ball);
+	wallHit(screen.h, ball);
 }

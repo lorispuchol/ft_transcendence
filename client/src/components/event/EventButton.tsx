@@ -1,9 +1,8 @@
-import { Close, Done, MarkChatRead, MarkChatUnread } from "@mui/icons-material";
+import { Close, Done } from "@mui/icons-material";
 import { Button } from "@mui/material";
 import { DeleteRequest, PatchRequest } from "../../utils/Request";
 import ErrorHandling from "../../utils/Error";
 import { useState } from "react";
-import { ChanMode, ChannelData } from "../../chat/interfaceData";
 
 interface Event {
 	type: string,

@@ -1,6 +1,6 @@
-import { Add, Close, Search } from "@mui/icons-material";
-import { FormControl, FormControlLabel, FormGroup, FormHelperText, FormLabel, IconButton, Switch, TextField } from "@mui/material";
-import { ChangeEvent, useState } from "react";
+import { Add, Search } from "@mui/icons-material";
+import { FormControl, FormControlLabel, FormGroup, FormLabel, IconButton, Switch, TextField } from "@mui/material";
+import { useState } from "react";
 import './chat.css'
 
 function CreateChanForm() {
@@ -27,10 +27,6 @@ function CreateChanForm() {
       [event.target.name]: event.target.value,
     });
   };
-
-  function createChannel() {
-
-  }
 
   return (
     <FormControl component="fieldset" variant="standard">

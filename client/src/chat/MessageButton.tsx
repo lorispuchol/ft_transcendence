@@ -42,7 +42,7 @@ export default function MessageButton({receiver}: MessageButtonProps) {
 	}
 	
 	return (
-			<IconButton onClick={handleClick} disabled={block} className="rounded-none">
+			<IconButton onClick={handleClick} disabled={block} color="inherit" className="rounded-none">
 				<Message />
 			</IconButton>
 	)

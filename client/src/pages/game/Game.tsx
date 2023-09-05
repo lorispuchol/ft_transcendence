@@ -1,74 +1,75 @@
+import LocalGame from "./local/LocalGame";
+import './Game.scss';
+import { Chip, Paper } from "@mui/material";
+import { useEffect, useState } from "react";
+import GameMenu from "./GameMenu";
+import bird from "./bird.png";
 
-import { useEffect, useRef } from "react";
-import "./Game.scss";
-import handlePaddle, { Pad, handleKey, init_paddle } from "./paddle";
-import handleBall, { Ball, drawBall, init_ball } from "./ball";
-import collision from "./collision";
-import { countDown } from "./countDown";
+interface player {
+	avatar: string,
+	username: string,
+}
 
-let freezeFrame = 0;
+interface Setting {
+	type: string,
+	mode: string,
+}
 
-function checkPoint(ctx: CanvasRenderingContext2D, width: number, height: number, paddle: Pad, ball: Ball) {
-	if (ball.x >= (width - 2*ball.rad) || ball.x <= 2*ball.rad) {
-		ball.color = "red"
-		drawBall(ctx, ball);
-		freezeFrame = 20;
-		Object.assign(paddle, init_paddle(width,height));
-		Object.assign(ball, init_ball(width, height));
-		return true;
+interface Scores {
+	p1: number,
+	p2: number,
+}
+
+function PlayerCard( {player, score}: any ) {
+
+	if (player)
+	{
+		const avatar = bird;
+		return (
+			<Paper className="player_card in_game_card">
+				<img src={avatar} alt="avatar" />
+				<div className="score">{score}</div>
+				<Chip label={player.username}/>
+				<div/>
+			</Paper>
+		);
 	}
-	return false;
+	return (
+		<Paper className="player_card"><div className="el_pongo">PONGO</div></Paper>
+	)
 }
 
 export default function Game() {
-	const canvasRef = useRef<HTMLCanvasElement>(null);
+	const [scores, setScores]: [Scores, Function] = useState({p1: 0, p2: 0});
+	const [player1, setplayer1]: [player | null, Function] = useState(null);
+	const [player2, setplayer2]: [player | null, Function] = useState(null);
+	const [setting, setSetting]: [Setting, Function] = useState({type: "menu", mode: "classic"});
 	
-	useEffect(() => {
-		const ctx = canvasRef!.current!.getContext('2d')!;
-		
-		const width = ctx.canvas.width = 3200;
-		const height = ctx.canvas.height = 1800;
-		const [idKey] = handleKey();
-		const ball : Ball = init_ball(width, height);
-		const paddle: Pad = init_paddle(width, height);
-		
-		let animationFrameId: number;
-		let roundStart: boolean = true;
-		let now = performance.now();
-
-		function render() {
-			if (freezeFrame)
-			{
-				freezeFrame--;
-				now = performance.now();
-			}
-			else if (roundStart)
-			{
-				roundStart = countDown(ctx, now, 500);
-				handlePaddle(ctx, paddle);
-				drawBall(ctx, ball);
-			}
-			else {
-				ctx.clearRect(0,0, width, height);
-				handlePaddle(ctx, paddle);
-				collision(width, height, paddle, ball);
-				handleBall(ctx, ball);
-				roundStart = checkPoint(ctx, width, height, paddle, ball);
-			}
-			animationFrameId = window.requestAnimationFrame(render);
+	function modeSelect() {
+		switch(setting.type) {
+			case "menu":
+				return (<GameMenu setSetting={setSetting}/>);
+			case "local":
+				return (<LocalGame setScores={setScores} setP1={setplayer1} setP2={setplayer2} />);
 		}
-		animationFrameId = window.requestAnimationFrame(render);
-	
-		return (() => {
-			window.cancelAnimationFrame(animationFrameId);
-			document.removeEventListener("keydown", idKey[0]);
-			document.removeEventListener("keyup", idKey[1]);
-		});
-	}, []);
+	}
+
+	useEffect(() => {
+		if (scores.p1 >= 5 || scores.p2 >= 5)
+			setSetting({type: "menu", mode: "classic"})
+	}, [scores])
 
 	return (
-		<div className="canvas_wrap">
-			<canvas id="pong" ref={canvasRef} className="classique"/>
-		</div>
-	);
+		<>
+			<div className="canvas_wrap">
+				<PlayerCard player={player1} score={scores.p1} />
+				{modeSelect()}
+				<PlayerCard player={player2} score={scores.p2} />
+			</div>
+			{setting.type !== "menu" && 
+				<div className="flex justify-center"><button onClick={()=> setSetting({type: "menu", mode: "classic"})}>
+					<Paper className="forfeit_button">FORFEIT</Paper>
+				</button></div>}
+		</>
+	)
 }
