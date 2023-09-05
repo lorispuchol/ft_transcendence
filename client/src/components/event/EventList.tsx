@@ -13,6 +13,7 @@ interface Event {
 
 interface RenderIconProps {
 	e: Event
+	setE: Function
 }
 
 interface SocketProps {
@@ -24,11 +25,16 @@ interface EventWrapperProps {
 	numberOfEvent: number,
 }
 
-function RenderIcon({e}: RenderIconProps) {
+function RenderIcon({e, setE}: RenderIconProps) {
 
 	const navigate = useNavigate();
 
 	function goToMsg() {
+		setE((prevEvents: Event[]) => {
+			const index = prevEvents.indexOf(e);
+			prevEvents.splice(index, 1);
+			return [...prevEvents];
+		});
 		navigate("/chat", {replace: false, state: {to: e.sender.replace("#", "")}})
 	}
 
@@ -81,7 +87,7 @@ function Events({ socket }: SocketProps) {
 				{events.map((event: Event, index: number) => (
 					<div key={event.type + event.sender}>
 						<ListItem>
-							<ListItemAvatar><RenderIcon e={event} /></ListItemAvatar>
+							<ListItemAvatar><RenderIcon e={event} setE={setEvents}/></ListItemAvatar>
 							{event.sender.replace("+", "").replace(user!, "")}
 						</ListItem>
 						<EventButton event={event}/>

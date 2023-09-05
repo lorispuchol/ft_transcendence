@@ -63,7 +63,3 @@ export class IsMode {
 		return `Channel mode ${(args.object as any).mode} is not an existing mode`;
 	}
 }
-
-// as ChanMode
-// as ChanMode
-// as ChanMode

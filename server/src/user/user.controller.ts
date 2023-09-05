@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Request,} from "@nestjs/common";
+import { Body, Controller, Get, Param, Patch, Request, UploadedFile, UseInterceptors,} from "@nestjs/common";
 import { UserService } from "./user.service";
 import { Public } from "src/auth/constants";
 import { User } from "./user.entity";

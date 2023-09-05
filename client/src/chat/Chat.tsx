@@ -6,12 +6,13 @@ import ErrorHandling from "../utils/Error";
 import { useLocation } from "react-router-dom";
 import { Socket, io } from "socket.io-client";
 import './chat.scss'
-import { ChanMode, ChannelData, MessageData, ParticipantData, UserData } from "./interfaceData";
+import { ChanMode, ChannelData, MessageData, ParticipantData } from "./interfaceData";
 import { SocketChatContext, UserContext } from "../utils/Context";
 import ChannelNav from "./ChannelNav";
-import { Avatar, Button } from "@mui/material";
-import { MarkEmailUnread, Tag } from "@mui/icons-material";
+import { Avatar } from "@mui/material";
+import { Tag } from "@mui/icons-material";
 import ListMembers from "./ListMember";
+import { defaultAvatar } from "../pages/Profile/Profile";
 
 interface Response {
 	status: string | number,
@@ -59,7 +60,6 @@ function ChanButtonConv({chan, focusConv, setFocusConv}: ButtonConvProps) {
 	)
 }
 
-
 function DmButtonConv({chan, focusConv, setFocusConv}: ButtonConvProps) {
 
 	const user = useContext(UserContext);
@@ -78,13 +78,14 @@ function DmButtonConv({chan, focusConv, setFocusConv}: ButtonConvProps) {
 	let displayAvatar: string = "";
 	if (resMembers.data![0].user.username === user) {
 		displayUsername = resMembers.data![1].user.username
-		// displayAvatar = resMembers.data![1].user.avatar
+		displayAvatar = resMembers.data![1].user.avatar
 	}
 	else {
 		displayUsername = resMembers.data![0].user.username
-		// displayAvatar = resMembers.data![0].user.avatar
+		displayAvatar = resMembers.data![0].user.avatar
 	}
-
+	if (!displayAvatar)
+		displayAvatar = defaultAvatar;
 	return (
 		<button
 			className={`button-conv ${chan.name === focusConv && 'focused'}`}
