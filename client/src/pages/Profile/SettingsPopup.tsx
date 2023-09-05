@@ -18,14 +18,13 @@ function updateError(error: string[]) {
 
 export default function SettingsPopup({ close }: any) {
 	const [username, setUsername] = useState('')
-	const [pp, setPp] = useState<File>()
+	const [pp, setPp] = useState<any>()
 
 	function usernameChange(event: ChangeEvent<HTMLInputElement>) {
 		setUsername(event.target.value);
 	}
 
 	function ppChange(event: ChangeEvent<HTMLInputElement>) {
-		// console.log(event.target.files)
 		const files = (event.target as HTMLInputElement).files;
 		if (files && files.length > 0)
 			setPp(files[0]);
@@ -44,7 +43,9 @@ export default function SettingsPopup({ close }: any) {
 
 	function updatePp(e: FormEvent) {
 		e.preventDefault();
-		PatchRequest("/user/avatar", {pp})
+		const formData = new FormData();
+		formData.append('file', pp);
+		PatchRequest("/user/avatar", formData)
 		.then ((response:any) => {
 			if (response.status === "OK")
 				window.location.href = client_url + "/profile/" + username;
@@ -61,11 +62,11 @@ export default function SettingsPopup({ close }: any) {
 						<button className='close_button' onClick={close}>X</button>
 						<form className='settings_option' onSubmit={updateUsername}>
 							Username: <input type='text' value={username} onChange={usernameChange} />
-							<button className='update_button'>UPDATE</button> 
+							<button className='update_button' onClick={updateUsername}>UPDATE</button> 
 						</form>
 						<form className='settings_option' onSubmit={updatePp}>
 							Modifier photo de profile: <input type='file' accept='/image/*' onChange={ppChange} />
-							<button className='update_button'>UPDATE</button>
+							<button className='update_button' onClick={updatePp}>UPDATE</button>
 						</form>
 					</Paper>
 					<ToastContainer />

@@ -1,10 +1,26 @@
-import { Body, Controller, Get, Param, Patch, Request } from "@nestjs/common";
+import { Body, Controller, Get, Param, Patch, Request, UploadedFile, UseInterceptors } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { Public } from "src/auth/constants";
 import { User } from "./user.entity";
 import { newUsername } from "./user.dto";
 import { newAvatar } from "./user.dto";
 import { profile } from "console";
+
+import { randomUUID } from "crypto";
+import { diskStorage } from "multer";
+import Path = require('path');
+import { FileInterceptor } from "@nestjs/platform-express";
+
+const	storage = {
+	storage: diskStorage ({
+		destination: 'src/upload/files',
+		filename: (req, file, cb) => {
+			const filename: string = 'myfile-' + randomUUID();
+			const extension: string = Path.parse(file.originalname).ext;
+            cb(null, `${filename}${extension}`)
+		}
+	})
+}
 
 @Controller('user')
 export class UserController {
@@ -30,12 +46,16 @@ export class UserController {
 	}
 
 	@Patch('avatar')
+	@UseInterceptors(FileInterceptor('file', storage))
 	async changeAvatar(
 		@Request() req: any,
-		@Body() newAvatar: newAvatar
+		@UploadedFile() file:any,
+		// @Body() newAvatar: newAvatar
 	) {
-		this.userService.changeAvatar(req.user.id, newAvatar.avatar);
-		return {avatar: newAvatar.avatar};
+		// console.log(file);
+		this.userService.changeAvatar(req.user.id, file.path);
+		console.log(file)
+		return {file};
 	}
 
 	//dev
@@ -57,6 +77,13 @@ export class UserController {
 	@Get('delete/:login')
 	deleteFakeUser(@Param('login') login: string) {
 		return this.userService.deleteOne(login);
+	}
+
+	//dev
+	@Public()
+	@Get('display/:username')
+	getData(@Param('username') username: string) {
+		return (this.userService.findOneByUsername(username));
 	}
 
 	@Get(':username')

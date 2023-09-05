@@ -43,7 +43,7 @@ export class UserService {
 		return ("OK")
 	}
 
-	async changeAvatar(userId: number, newAvatar: Buffer) {
+	async changeAvatar(userId: number, newAvatar: string) {
 		this.userRepository.update({id: userId}, {avatar: newAvatar});
 		return ("OK") // ?
 	}

@@ -33,11 +33,11 @@ export class User extends BaseEntity {
 	password: string;
 
 	@Column({
-		type: 'bytea',
+		type: 'varchar',
 		nullable: true,
 		default: null,
 	})
-	avatar: Buffer;
+	avatar: string;
 
 	@Column({
 		type: 'integer',
