@@ -48,7 +48,7 @@ export default function SettingsPopup({ close }: any) {
 		PatchRequest("/user/avatar", formData)
 		.then ((response:any) => {
 			if (response.status === "OK")
-				window.location.href = client_url + "/profile/" + username;
+				window.location.href = client_url + "/profile/" + username; // recup username
 			else
 				updateError(response.error);
 		})

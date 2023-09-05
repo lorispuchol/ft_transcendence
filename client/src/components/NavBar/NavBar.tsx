@@ -10,7 +10,7 @@ import { Paper } from '@mui/material';
 import { UserContext } from '../../utils/Context';
 
 export const NavBar = () => {
-	const pages = [['GAMING', '/game'], ['CHAT', '/chat'], ['404', '/ratio']];
+	const pages = [['GAMING', '/game'], ['CHAT', '/chat']];
 	const [select, setSelect]: [string, Function] = useState(useLocation().pathname);
 	const username = useContext(UserContext);
 

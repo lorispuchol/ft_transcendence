@@ -65,7 +65,7 @@
 .input_box:focus {
 	outline: black;
 	box-shadow: 0 0 0 0.150rem rgba(0, 0, 0, 1);
-	caret-color: transparent;
+	caret-color: c.$primary;
 }
 
 .button_box {

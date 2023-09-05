@@ -13,7 +13,7 @@ import { FileInterceptor } from "@nestjs/platform-express";
 
 const	storage = {
 	storage: diskStorage ({
-		destination: 'src/upload/files',
+		destination: 'public/',
 		filename: (req, file, cb) => {
 			const filename: string = 'myfile-' + randomUUID();
 			const extension: string = Path.parse(file.originalname).ext;
