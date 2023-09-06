@@ -26,7 +26,7 @@ interface Response {
 	error?: string,
 }
 
-export const defaultAvatar = defaultPp;
+export const defaultAvatar: string = defaultPp;
 
 export default function Profile() {
 	const [show, setShow] = useState(false);

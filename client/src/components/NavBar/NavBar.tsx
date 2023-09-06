@@ -1,40 +1,41 @@
-import { NavLink, useLocation, useParams } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import './NavBar.scss'
 import { useContext, useEffect, useState } from 'react';
 import menu_btn from './img/menu_btn.png';
 import kirby from './img/kirby.jpeg';
 import Avatar from '@mui/material/Avatar';
-import { defaultAvatar } from '../../pages/Profile/Profile';
 import EventList from '../event/EventList';
 import { Paper } from '@mui/material';
 import { UserContext } from '../../utils/Context';
 import { GetRequest } from '../../utils/Request';
-
-interface UserData {
-	avatar: string,
-	login: string,
-	username: string,
-	nb_victory: number,
-	nb_defeat: number,
-}
+import Loading from '../../utils/Loading';
+import ErrorHandling from '../../utils/Error';
+import { defaultAvatar } from '../../pages/Profile/Profile';
 
 interface Response {
 	status: string,
-	data?: UserData,
+	data?: string,
 	error?: string,
 }
+
+
 
 export const NavBar = () => {
 	const pages = [['GAMING', '/game'], ['CHAT', '/chat']];
 	const [select, setSelect]: [string, Function] = useState(useLocation().pathname);
 	const username = useContext(UserContext);
 
-	const param = useParams();
 
 	const [response, setResponse]: [Response, Function] = useState({status: "loading"});
 	useEffect(() => {
-		GetRequest("/user/" + param.username).then((response) => setResponse(response));
-	}, [param.username]);
+		GetRequest("/user/avatar/" + username).then((response) => setResponse(response));
+	}, [username]);
+	if (response.status === "loading")
+		return (<Loading />);
+	if (response.status !== "OK")
+		return (<ErrorHandling status={response.status} message={response.error} />);
+	
+	const avatar = response.data ? response.data : (defaultAvatar as string);
 
 	function hanldeClick(path: string) {
 		setSelect(path);
@@ -90,7 +91,7 @@ export const NavBar = () => {
 					))}
 					<EventList className='nav_bar_link_p' />
 					<NavLink to={'/profile/' + username} onClick={() => hanldeClick("profile")}>
-						<Avatar className={select === "profile" ? 'nav_bar_avatar_a' : 'nav_bar_avatar_p'}  src={defaultAvatar} alt="TEST"></Avatar>
+						<Avatar className={select === "profile" ? 'nav_bar_avatar_a' : 'nav_bar_avatar_p'}  src={avatar} alt="TEST"></Avatar>
 					</NavLink>
 				</nav>
 				<div className='mobile_notif'><EventList className=''/></div>

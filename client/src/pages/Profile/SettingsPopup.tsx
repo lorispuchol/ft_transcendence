@@ -1,7 +1,7 @@
 import { ChangeEvent, FormEvent, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
-import { Paper } from '@mui/material'
+import { ClickAwayListener, Paper } from '@mui/material'
 
 import { PatchRequest, client_url } from "../../utils/Request";
 
@@ -58,17 +58,19 @@ export default function SettingsPopup({ close }: any) {
 		<div className='flex justify-center items-center'>
 			<div className="settings_bg justify-center">
 				<div>
-					<Paper className='settings_box'>
-						<button className='close_button' onClick={close}>X</button>
-						<form className='settings_option mt-5' onSubmit={updateUsername}>
-							Username: <input type='text' value={username} onChange={usernameChange} />
-							<button className='update_button' onClick={updateUsername}>UPDATE</button> 
-						</form>
-						<form className='settings_option' onSubmit={updatePp}>
-							Modifier photo de profile: <input type='file' accept='/image/*' onChange={ppChange} />
-							<button className='update_button' onClick={updatePp}>UPDATE</button>
-						</form>
-					</Paper>
+					<ClickAwayListener onClickAway={close}>
+						<Paper className='settings_box'>
+							<button className='close_button' onClick={close}>X</button>
+							<form className='settings_option mt-5' onSubmit={updateUsername}>
+								Username: <input type='text' value={username} onChange={usernameChange} />
+								<button className='update_button' onClick={updateUsername}>UPDATE</button> 
+							</form>
+							<form className='settings_option' onSubmit={updatePp}>
+								Modifier photo de profile: <input type='file' accept='/image/*' onChange={ppChange} />
+								<button className='update_button' onClick={updatePp}>UPDATE</button>
+							</form>
+						</Paper>
+					</ClickAwayListener>
 					<ToastContainer />
 				</div>
 			</div>

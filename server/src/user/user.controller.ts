@@ -45,16 +45,24 @@ export class UserController {
 		return {username: newUsername.username};
 	}
 
+	
 	@Patch('avatar')
 	@UseInterceptors(FileInterceptor('file', storage))
 	async changeAvatar(
 		@Request() req: any,
 		@UploadedFile() file:any,
 		// @Body() newAvatar: newAvatar
-	) {
-		this.userService.changeAvatar(req.user.id, file.filename);
-		return {file};
-	}
+		) {
+			this.userService.changeAvatar(req.user.id, file.filename);
+			return {file};
+		}
+		
+	@Get('avatar/:username')
+	async getAvatar(
+		@Param('username') username: string
+		) {
+			return await this.userService.getAvatar(username);
+		}
 
 	//dev
 	@Public()
@@ -62,25 +70,26 @@ export class UserController {
 	async getAllUsers() {
 		return await this.userService.getAllUsers();
 	}
-  
+	
 	//dev
 	@Public()
 	@Get('create/:login')
 	createFakeUser(@Param('login') login: string): Promise<User> {
 		return this.userService.createOne(login);
 	}
-
+	
 	//dev
 	@Public()
 	@Get('delete/:login')
 	deleteFakeUser(@Param('login') login: string) {
 		return this.userService.deleteOne(login);
 	}
-
+	
 	@Get(':username')
 	async getUserData(
 		@Param('username') username: string
 		) {
 			return await this.userService.findOneByUsername(username);
+		}
 	}
-}
+	
