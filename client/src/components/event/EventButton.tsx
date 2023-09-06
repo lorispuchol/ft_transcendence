@@ -55,14 +55,6 @@ function AcceptFriend({ login }: ButtonProps) {
 	)
 }
 
-function GoToConv({event}: EventButtonProps) {
-	return (
-		<div className="w-max">
-		</div>
-	)
-}
-
-
 export default function EventButton ({ event }: EventButtonProps) {
 
 	if (event.type === "friendRequest")
@@ -71,10 +63,6 @@ export default function EventButton ({ event }: EventButtonProps) {
 				<AcceptFriend login={event.sender} />
 				<RefuseFriend login={event.sender} />
 			</div>
-		)
-	if (event.type === "message") 
-		return (
-			<GoToConv event={event}/>
 		)
 	return (<strong>need fix</strong>)
 }

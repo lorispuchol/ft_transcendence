@@ -67,7 +67,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			}
 			loginsToEvent.push(member.user.login);
 		})
-		console.log(members)
 		Promise.all(promises).then(() => {
 			toEmits.map((socket) => socket.emit('message', {chan: value[0], msg: msg}));
 			loginsToEvent.map((login) => {

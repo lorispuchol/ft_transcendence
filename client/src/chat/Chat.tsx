@@ -5,13 +5,14 @@ import Loading from "../utils/Loading";
 import ErrorHandling from "../utils/Error";
 import { useLocation } from "react-router-dom";
 import { Socket, io } from "socket.io-client";
-import './chat.css'
+import './chat.scss'
 import { ChanMode, ChannelData, MessageData, ParticipantData } from "./interfaceData";
 import { SocketChatContext, UserContext } from "../utils/Context";
 import ChannelNav from "./ChannelNav";
 import { Avatar } from "@mui/material";
 import { Tag } from "@mui/icons-material";
 import ListMembers from "./ListMember";
+import { defaultAvatar } from "../pages/Profile/Profile";
 
 interface Response {
 	status: string | number,
@@ -59,7 +60,6 @@ function ChanButtonConv({chan, focusConv, setFocusConv}: ButtonConvProps) {
 	)
 }
 
-
 function DmButtonConv({chan, focusConv, setFocusConv}: ButtonConvProps) {
 
 	const user = useContext(UserContext);
@@ -78,13 +78,14 @@ function DmButtonConv({chan, focusConv, setFocusConv}: ButtonConvProps) {
 	let displayAvatar: string = "";
 	if (resMembers.data![0].user.username === user) {
 		displayUsername = resMembers.data![1].user.username
-		// displayAvatar = resMembers.data![1].user.avatar
+		displayAvatar = resMembers.data![1].user.avatar
 	}
 	else {
 		displayUsername = resMembers.data![0].user.username
-		// displayAvatar = resMembers.data![0].user.avatar
+		displayAvatar = resMembers.data![0].user.avatar
 	}
-
+	if (!displayAvatar)
+		displayAvatar = defaultAvatar;
 	return (
 		<button
 			className={`button-conv ${chan.name === focusConv && 'focused'}`}
@@ -126,11 +127,7 @@ function ListConv({focusConv, setFocusConv}: focusConvProps) {
 				))
 			}
 			{
-				dms.length ? 
-					chans.length ?
-						<hr />
-						: null
-					:null
+				dms.length && chans.length ? <hr /> : null
 			}
 			{
 				chans.map((chan) => (
@@ -147,7 +144,6 @@ export default function Chat() {
 
 	const [socket, setSocket]: [Socket | null, Function] = useState(null);
 
-	console.log(focusConv)
 	useEffect(() => {
 		const token = localStorage.getItem("token");
 		const option = { transportOptions: { polling: { extraHeaders: { token: token }}}};

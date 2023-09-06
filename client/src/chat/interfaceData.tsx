@@ -1,6 +1,7 @@
 export enum ChanMode {
 	PUBLIC = "public",
 	PRIVATE = "private",
+	PROTECTED = "protected",
 	DM = "dm"
 }
 
@@ -19,7 +20,7 @@ export enum RelationshipStatus {
 }
 
 export interface UserData {
-	avatar: string | null, // Buffer ? FormData?
+	avatar: string,
 	login: string,
 	username: string,
 	nb_victory: number,

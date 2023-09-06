@@ -1,7 +1,7 @@
 import { List, ListItem, ListItemText } from "@mui/material";
 import { FormEvent, useContext, useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
-import "./chat.css";
+import "./chat.scss";
 import { GetRequest } from "../utils/Request";
 import Loading from "../utils/Loading";
 import ErrorHandling from "../utils/Error";
