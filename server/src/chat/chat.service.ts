@@ -7,6 +7,7 @@ import { ChanMode, Channel } from "./entities/channel.entity";
 import { Message } from "./entities/message.entity";
 import { RelationshipService } from "src/relationship/relationship.service";
 import { UserService } from "src/user/user.service";
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class ChatService {
@@ -33,6 +34,34 @@ export class ChatService {
 		})
 		parts.forEach((part) => chans.push(part.channel))
 		return chans;
+	}
+
+	async createChannel(firstUser: User, name: string, mode: ChanMode, password?: string) {
+
+		if((!password && mode === ChanMode.PROTECTED) ||
+			(password && (mode === ChanMode.PRIVATE || mode === ChanMode.PUBLIC))) {
+			throw new HttpException("forbidden", HttpStatus.FORBIDDEN);
+		}
+
+		const newChan: Channel = await this.channelRepository.create({
+			name: name,
+			mode: mode
+		})
+		if(password) {
+			const salt = await bcrypt.genSalt();
+			const hash = await bcrypt.hash(password, salt);
+			newChan.password = hash;
+		}
+		
+		const firstMember: Participant = new Participant()
+		firstMember.channel = newChan;
+		firstMember.distinction = MemberDistinc.OWNER;
+		firstMember.user = firstUser;
+
+		await this.channelRepository.save(newChan);
+		await this.participantRepository.save(firstMember);
+
+		return newChan
 	}
 
 	async createDm(user1: User, user2: User) {
@@ -123,8 +152,6 @@ export class ChatService {
 				channel: channel
 			} as FindOptionsWhere<Channel>
 		})
-		// return messages;
-
 		const u: User = await this.userService.findOneByLogin(user);
 		const displayMessages: Message[] = [];
 		const request = messages.map( async (msg) => {	
@@ -132,11 +159,5 @@ export class ChatService {
 				displayMessages.push(msg)
 		})
 		return Promise.all(request).then(() => displayMessages);
-	}
-
-	async getAvatarDm(chan: string, userReq: string) {
-		const members: Participant[] = await this.getAllMembers(chan);
-		const searchMember = members.filter((member) => member.user.login !== userReq)
-		return searchMember[0].user.avatar;
 	}
 }

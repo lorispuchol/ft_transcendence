@@ -5,6 +5,7 @@ import { Participant } from "./participant_chan_x_user.entity";
 export enum ChanMode {
 	PUBLIC = "public",
 	PRIVATE = "private",
+	PROTECTED = "protected",
 	DM = "dm"
 }
 

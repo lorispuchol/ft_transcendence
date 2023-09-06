@@ -1,6 +1,7 @@
-import { Controller, Get, Param, Request } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Request } from "@nestjs/common";
 import { ChatService } from "./chat.service";
 import { UserService } from "src/user/user.service";
+import { NewChannelWithPassword, NewChannelWithoutPassword } from "./channel.dto";
 
 @Controller('chat')
 export class ChatController {
@@ -15,18 +16,36 @@ export class ChatController {
 			await this.userService.findOneByLogin(req.user.login)
 		)
 	}
+	
+	@Post('createChanWithoutPw')
+	async createChan( 
+		@Request() req: any,
+		@Body() datasChan: NewChannelWithoutPassword
+	) {
+		return await this.chatService.createChannel(
+			await this.userService.findOneByLogin(req.user.login),
+			datasChan.channelName,
+			datasChan.mode,
+		)
+	}
+
+	@Post('createChanWithPw')
+	async createChanWithPw(
+		@Request() req: any,
+		@Body() datasChan: NewChannelWithPassword
+	) {
+		return await this.chatService.createChannel(
+			await this.userService.findOneByLogin(req.user.login),
+			datasChan.channelName,
+			datasChan.mode,
+			datasChan.password
+		)
+	}
 
 	@Get('getMembers/:chan')
 	async GetMembers( 
 		@Param('chan') chan: string) {
 			return await this.chatService.getAllMembers(chan);
-	}
-
-	@Get('getAvatarDm/:chan')
-	async GetAvatarDm( 
-		@Request() req: any,
-		@Param('chan') chan: string) {
-			return await this.chatService.getAvatarDm(chan, req.user.login);
 	}
 
 	@Get('getDm/:receiver')

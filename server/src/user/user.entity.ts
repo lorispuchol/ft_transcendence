@@ -37,7 +37,7 @@ export class User extends BaseEntity {
 		nullable: true,
 		default: null,
 	})
-	avatar: FormData; //  || string || Buffer
+	avatar: string;
 
 	@Column({
 		type: 'integer',

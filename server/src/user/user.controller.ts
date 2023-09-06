@@ -1,10 +1,9 @@
-import { Body, Controller, Get, Param, Patch, Post, Request, UploadedFile, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Get, Param, Patch, Request, UploadedFile, UseInterceptors,} from "@nestjs/common";
 import { UserService } from "./user.service";
 import { Public } from "src/auth/constants";
 import { User } from "./user.entity";
 import { newUsername } from "./user.dto";
 import { newAvatar } from "./user.dto";
-import { profile } from "console";
 
 import { randomUUID } from "crypto";
 import { diskStorage } from "multer";
