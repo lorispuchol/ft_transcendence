@@ -1,6 +1,6 @@
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useParams } from 'react-router-dom';
 import './NavBar.scss'
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import menu_btn from './img/menu_btn.png';
 import kirby from './img/kirby.jpeg';
 import Avatar from '@mui/material/Avatar';
@@ -8,11 +8,33 @@ import { defaultAvatar } from '../../pages/Profile/Profile';
 import EventList from '../event/EventList';
 import { Paper } from '@mui/material';
 import { UserContext } from '../../utils/Context';
+import { GetRequest } from '../../utils/Request';
+
+interface UserData {
+	avatar: string,
+	login: string,
+	username: string,
+	nb_victory: number,
+	nb_defeat: number,
+}
+
+interface Response {
+	status: string,
+	data?: UserData,
+	error?: string,
+}
 
 export const NavBar = () => {
 	const pages = [['GAMING', '/game'], ['CHAT', '/chat']];
 	const [select, setSelect]: [string, Function] = useState(useLocation().pathname);
 	const username = useContext(UserContext);
+
+	const param = useParams();
+
+	const [response, setResponse]: [Response, Function] = useState({status: "loading"});
+	useEffect(() => {
+		GetRequest("/user/" + param.username).then((response) => setResponse(response));
+	}, [param.username]);
 
 	function hanldeClick(path: string) {
 		setSelect(path);

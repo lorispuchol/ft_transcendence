@@ -40,7 +40,7 @@ export default function Profile() {
 		GetRequest("/user/" + param.username).then((response) => setResponse(response));
 	}, [param.username]);
 	if (response.status === "loading")
-	return (<Loading />);
+		return (<Loading />);
 	if (response.status !== "OK")
 		return (<ErrorHandling status={response.status} message={response.error} />);
 	if (!response.data?.username)
@@ -52,7 +52,6 @@ export default function Profile() {
 		nb_victory: response.data.nb_victory,
 		nb_defeat: response.data.nb_defeat,
 	}
-	console.log(profile.avatar);
 
 
 	return (
