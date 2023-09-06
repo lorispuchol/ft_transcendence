@@ -89,11 +89,11 @@ function Create({close}: any) {
 	  return (
 		<div>
 			<FormControl className="flex flex-col items-center">
-				<FormLabel className="text-inherit mb-3">Create your own channel</FormLabel>
+				<FormLabel className="text-inherit text-size mb-3">Create your own channel</FormLabel>
 				<form onSubmit={submitChannel}>
-					<FormGroup color='inherit'>
-						<TextField className="mb-3 text-inherit" value={datasChan.channelName} onChange={changeName} name="name" placeholder="Channel Name" />	
-						<TextField className="mb-3 text-inherit" disabled={datasChan.mode !== ChanMode.PROTECTED} type="password" placeholder="Password" value={datasChan.password} onChange={changePw} name="password" />	
+					<FormGroup>
+						<input className="input w-full max-w-xs bg-white mb-3 text-inherit text-black" value={datasChan.channelName} onChange={changeName} name="name" placeholder="Channel Name" />	
+						<input className="input w-full max-w-xs bg-white mb-3 text-inherit" disabled={datasChan.mode !== ChanMode.PROTECTED} type="password" placeholder="Password" value={datasChan.password} onChange={changePw} name="password" />	
 					</FormGroup>
 					<RadioGroup
 						className="mb-3"
@@ -135,7 +135,7 @@ function PopUp({children, close}: any) {
 			</Paper>
 		</div>
 	)
-} 
+}
 
 export default function ChannelNav() {
 
@@ -144,13 +144,12 @@ export default function ChannelNav() {
 	return (
 		<>
 			<div className="chan-nav">
-				<button onClick={() => setActivePopUp("explore")}>
-					<TravelExplore />
+				<button className="tooltip btn btn-neutral h-1/3 w-1/3 m-5" data-tip="Explore Channels" onClick={() => setActivePopUp("explore")}>
+					<TravelExplore fontSize="large"/>
 				</button>
-				<button  onClick={() => setActivePopUp("create")}>
-					<AddCircleOutline />
+				<button className="tooltip btn btn-neutral h-1/3 w-1/3 m-5" data-tip="Create Channel" onClick={() => setActivePopUp("create")}>
+					<AddCircleOutline fontSize="large"/>
 				</button>
-
 				{
 					activePopUp !== "" &&
 						<PopUp close={() => setActivePopUp("")}>
