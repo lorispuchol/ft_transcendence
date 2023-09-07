@@ -134,22 +134,33 @@ function Explore() {
 		return (<ErrorHandling status={response.status} message={response.error} />);
 
 	if (!response.data)
-		return <div>There is No channel to join</div>
+		return null
+	if (!response.data[0])
+		return <div className="m-4">No channels to join</div>
 	return (
-		<div className="explore-box">
-			{
-				response.data.map(( chan ) => <div key={chan.name}>{chan.name}</div>)
-			}
-		</div>
+		<ul className="m-5">
+			{/* <li className="flex flex-col justify-between">
+				{response.data.map(( chan ) => 
+				<div className="flex justify-between" key={chan.name}>
+					{chan.name}
+					<button className="w-fit btn btn-active bg-white btn-neutral hover:bg-purple-900 m-0">JOIN</button>
+				</div>)}
+			</li> */}
+			{response.data.map(( chan ) => 
+			<li className="flex justify-between w-full" key={chan.name}>
+				{chan.name}
+				<button className="w-fit btn btn-active bg-white btn-neutral hover:bg-purple-900 m-0">JOIN</button>
+			</li>)}
+		</ul>
 	)
 }
 
 function PopUp({children, close}: any) {
 	return (
 		<div className="popup-bg" onClick={close}>
-			<Paper elevation={10} className="popup-box rounded-lg bg-inherit" onClick={e => e.stopPropagation()}>
+			<Paper elevation={10} className="popup-box rounded-lg bg-inherit min-w-[14rem] min-h-[18rem]" onClick={e => e.stopPropagation()}>
 				<div className="flex flex-row justify-end w-full">	
-					<button className="text-inherit rounded-full" onClick={close}>
+					<button className="text-inherit rounded-full hover:bg-zinc-400" onClick={close}>
 						<Clear />
 					</button>
 				</div>

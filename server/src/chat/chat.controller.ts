@@ -23,6 +23,16 @@ export class ChatController {
 			await this.userService.findOneByLogin(req.user.login)
 		)
 	}
+
+	@Post('joinChan/:chan')
+	async joinChan (
+		@Request() req: any,
+		@Param('chan') chan: string ) {
+		return this.chatService.joinChan(
+			await this.userService.findOneByLogin(req.user.login),
+			chan
+		)
+	}
 	
 	@Post('createChanWithoutPw')
 	async createChan( 

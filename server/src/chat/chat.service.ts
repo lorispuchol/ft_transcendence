@@ -38,12 +38,16 @@ export class ChatService {
 
 	async getNoConvs(user: User): Promise<Channel[]> {
 		const chans: Channel[] = [];
-		const parts: Participant[] = await this.participantRepository.find()
+		const parts: Participant[] = await this.participantRepository.find({})
 		parts.forEach((part) => {
 			if(part.channel.mode !== ChanMode.PRIVATE && part.channel.mode !== ChanMode.DM && part.user.id !== user.id)
 				chans.push(part.channel)
 		})
 		return chans;
+	}
+
+	async joinChan(user: User, chanName: string) {
+
 	}
 
 	async createChannel(firstUser: User, name: string, mode: ChanMode, password?: string) {

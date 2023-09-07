@@ -28,6 +28,8 @@ export default function ListMembers({chan}: ListMembersProps) {
 		return (<ErrorHandling status={response.status} message={response.error} />);
 
 	if (!response.data)
+		return null	
+	if (!response.data[0])
 		return <div>there is only you in this channel</div>
 	return (
 		<div>
