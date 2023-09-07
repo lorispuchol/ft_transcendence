@@ -16,6 +16,13 @@ export class ChatController {
 			await this.userService.findOneByLogin(req.user.login)
 		)
 	}
+
+	@Get('getNoConvs')
+	async getNoConvs( @Request() req: any ) {
+		return this.chatService.getNoConvs(
+			await this.userService.findOneByLogin(req.user.login)
+		)
+	}
 	
 	@Post('createChanWithoutPw')
 	async createChan( 

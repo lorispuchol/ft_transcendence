@@ -1,11 +1,19 @@
 import { Add, AddCircleOutline, Clear, TravelExplore } from "@mui/icons-material";
-import { FormControl, FormControlLabel, FormGroup, FormLabel, Paper, Radio, RadioGroup, TextField } from "@mui/material";
-import { useContext, useState } from "react";
+import { FormControl, FormControlLabel, FormGroup, FormLabel, Paper, Radio, RadioGroup } from "@mui/material";
+import { useContext, useEffect, useState } from "react";
 import './chat.scss'
-import { PostRequest } from "../utils/Request";
+import { GetRequest, PostRequest } from "../utils/Request";
 import { ToastContainer, toast } from "react-toastify";
 import { SocketChatContext } from "../utils/Context";
-import { ChanMode } from "./interfaceData";
+import { ChanMode, ChannelData } from "./interfaceData";
+import Loading from "../utils/Loading";
+import ErrorHandling from "../utils/Error";
+
+interface Response {
+	status: string | number,
+	data?: ChannelData[],
+	error?: string,
+}
 
 function logError(error: string[]) {
 	toast.error(error[0], {
@@ -89,7 +97,7 @@ function Create({close}: any) {
 	  return (
 		<div>
 			<FormControl className="flex flex-col items-center">
-				<FormLabel className="text-inherit text-size mb-3">Create your own channel</FormLabel>
+				<FormLabel className=" text-inherit mb-3 text-base font-semibold">CREATE YOUR OWN CHANNEL</FormLabel>
 				<form onSubmit={submitChannel}>
 					<FormGroup>
 						<input className="input w-full max-w-xs bg-white mb-3 text-inherit text-black" value={datasChan.channelName} onChange={changeName} name="name" placeholder="Channel Name" />	
@@ -107,7 +115,7 @@ function Create({close}: any) {
 						<FormControlLabel value={ChanMode.PRIVATE} control={<Radio color="default"/>} label="Private" />
 						<FormControlLabel value={ChanMode.PROTECTED} control={<Radio color="default"/>} label="Protected" />
 					</RadioGroup>
-					<button className="w-full bg-white rounded transition hover:bg-blue-600 h-8" type="submit" ><Add/></button>
+					<button className="w-full btn btn-active bg-white btn-neutral hover:bg-purple-900" type="submit" ><Add/></button>
 				</form>
 			</FormControl>
 		</div>
@@ -115,9 +123,23 @@ function Create({close}: any) {
 }
 
 function Explore() {
+
+	const [response, setResponse]: [Response, Function] = useState({status: "loading"});
+	useEffect(() => {
+			GetRequest("/chat/getNoConvs/").then((response) => setResponse(response));
+	}, []);
+	if (response.status === "loading")
+		return (<Loading />);
+	if (response.status !== "OK")
+		return (<ErrorHandling status={response.status} message={response.error} />);
+
+	if (!response.data)
+		return <div>There is No channel to join</div>
 	return (
-		<div>
-			<TravelExplore />
+		<div className="explore-box">
+			{
+				response.data.map(( chan ) => <div key={chan.name}>{chan.name}</div>)
+			}
 		</div>
 	)
 }
