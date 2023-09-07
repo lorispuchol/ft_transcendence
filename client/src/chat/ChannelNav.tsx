@@ -1,11 +1,19 @@
 import { Add, AddCircleOutline, Clear, TravelExplore } from "@mui/icons-material";
-import { FormControl, FormControlLabel, FormGroup, FormLabel, Paper, Radio, RadioGroup, TextField } from "@mui/material";
-import { useContext, useState } from "react";
+import { FormControl, FormControlLabel, FormGroup, FormLabel, Paper, Radio, RadioGroup } from "@mui/material";
+import { useContext, useEffect, useState } from "react";
 import './chat.scss'
-import { PostRequest } from "../utils/Request";
+import { GetRequest, PostRequest } from "../utils/Request";
 import { ToastContainer, toast } from "react-toastify";
 import { SocketChatContext } from "../utils/Context";
-import { ChanMode } from "./interfaceData";
+import { ChanMode, ChannelData } from "./interfaceData";
+import Loading from "../utils/Loading";
+import ErrorHandling from "../utils/Error";
+
+interface Response {
+	status: string | number,
+	data?: ChannelData[],
+	error?: string,
+}
 
 function logError(error: string[]) {
 	toast.error(error[0], {
@@ -89,11 +97,11 @@ function Create({close}: any) {
 	  return (
 		<div>
 			<FormControl className="flex flex-col items-center">
-				<FormLabel className="text-inherit mb-3">Create your own channel</FormLabel>
+				<FormLabel className=" text-inherit mb-3 text-base font-semibold">CREATE YOUR OWN CHANNEL</FormLabel>
 				<form onSubmit={submitChannel}>
-					<FormGroup color='inherit'>
-						<TextField className="mb-3 text-inherit" value={datasChan.channelName} onChange={changeName} name="name" placeholder="Channel Name" />	
-						<TextField className="mb-3 text-inherit" disabled={datasChan.mode !== ChanMode.PROTECTED} type="password" placeholder="Password" value={datasChan.password} onChange={changePw} name="password" />	
+					<FormGroup>
+						<input className="input w-full max-w-xs bg-white mb-3 text-inherit text-black" value={datasChan.channelName} onChange={changeName} name="name" placeholder="Channel Name" />	
+						<input className="input w-full max-w-xs bg-white mb-3 text-inherit" disabled={datasChan.mode !== ChanMode.PROTECTED} type="password" placeholder="Password" value={datasChan.password} onChange={changePw} name="password" />	
 					</FormGroup>
 					<RadioGroup
 						className="mb-3"
@@ -107,7 +115,7 @@ function Create({close}: any) {
 						<FormControlLabel value={ChanMode.PRIVATE} control={<Radio color="default"/>} label="Private" />
 						<FormControlLabel value={ChanMode.PROTECTED} control={<Radio color="default"/>} label="Protected" />
 					</RadioGroup>
-					<button className="w-full bg-white rounded transition hover:bg-blue-600 h-8" type="submit" ><Add/></button>
+					<button className="w-full btn btn-active bg-white btn-neutral hover:bg-purple-900" type="submit" ><Add/></button>
 				</form>
 			</FormControl>
 		</div>
@@ -115,9 +123,23 @@ function Create({close}: any) {
 }
 
 function Explore() {
+
+	const [response, setResponse]: [Response, Function] = useState({status: "loading"});
+	useEffect(() => {
+			GetRequest("/chat/getNoConvs/").then((response) => setResponse(response));
+	}, []);
+	if (response.status === "loading")
+		return (<Loading />);
+	if (response.status !== "OK")
+		return (<ErrorHandling status={response.status} message={response.error} />);
+
+	if (!response.data)
+		return <div>There is No channel to join</div>
 	return (
-		<div>
-			<TravelExplore />
+		<div className="explore-box">
+			{
+				response.data.map(( chan ) => <div key={chan.name}>{chan.name}</div>)
+			}
 		</div>
 	)
 }
@@ -135,7 +157,7 @@ function PopUp({children, close}: any) {
 			</Paper>
 		</div>
 	)
-} 
+}
 
 export default function ChannelNav() {
 
@@ -144,13 +166,12 @@ export default function ChannelNav() {
 	return (
 		<>
 			<div className="chan-nav">
-				<button onClick={() => setActivePopUp("explore")}>
-					<TravelExplore />
+				<button className="tooltip btn btn-neutral h-1/3 w-1/3 m-5" data-tip="Explore Channels" onClick={() => setActivePopUp("explore")}>
+					<TravelExplore fontSize="large"/>
 				</button>
-				<button  onClick={() => setActivePopUp("create")}>
-					<AddCircleOutline />
+				<button className="tooltip btn btn-neutral h-1/3 w-1/3 m-5" data-tip="Create Channel" onClick={() => setActivePopUp("create")}>
+					<AddCircleOutline fontSize="large"/>
 				</button>
-
 				{
 					activePopUp !== "" &&
 						<PopUp close={() => setActivePopUp("")}>
