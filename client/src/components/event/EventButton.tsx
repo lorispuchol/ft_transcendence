@@ -64,5 +64,7 @@ export default function EventButton ({ event }: EventButtonProps) {
 				<RefuseFriend login={event.sender} />
 			</div>
 		)
-	return (<strong>need fix</strong>)
+	if (event.type !== "message")
+		return (<strong>need fix</strong>)
+	return null
 }

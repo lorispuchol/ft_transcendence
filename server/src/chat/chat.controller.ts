@@ -19,16 +19,16 @@ export class ChatController {
 
 	@Get('getNoConvs')
 	async getNoConvs( @Request() req: any ) {
-		return this.chatService.getNoConvs(
+		return await this.chatService.getNoConvs(
 			await this.userService.findOneByLogin(req.user.login)
 		)
 	}
 
-	@Post('joinChan/:chan')
-	async joinChan (
+	@Post('joinPubChan/:chan')
+	async joinPubChan (
 		@Request() req: any,
 		@Param('chan') chan: string ) {
-		return this.chatService.joinChan(
+		return await this.chatService.joinPubChan(
 			await this.userService.findOneByLogin(req.user.login),
 			chan
 		)

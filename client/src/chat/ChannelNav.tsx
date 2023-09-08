@@ -15,6 +15,20 @@ interface Response {
 	error?: string,
 }
 
+interface JoinButtonProps {
+	chan: string,
+	reRender: number;
+	setRerender: Function
+}
+
+function logWarn(warn: string) {
+	toast.warn(warn, {
+		position: "bottom-left",
+		autoClose: 2000,
+		hideProgressBar: true,
+	});
+}
+
 function logError(error: string[]) {
 	toast.error(error[0], {
 		position: "bottom-left",
@@ -32,6 +46,32 @@ function logSuccess(msg: string) {
 	});
 }
 
+
+
+function JoinButton ({chan, reRender, setRerender}: JoinButtonProps) {
+
+	const socket = useContext(SocketChatContext);
+
+	function join () {
+		PostRequest("/chat/joinPubChan/" + chan, {}).then((response: any) => {
+			if (response.status === "OK") {
+				if (response.data.status === "KO")
+					logWarn(response.data.description)
+				else {
+					socket!.emit('message',chan, "Hello Everybody!");
+					logSuccess(response.data.description)
+					setRerender(reRender + 1);
+				}	
+			}
+			else
+				logError(response.error)
+		});
+	}
+
+	return (
+		<button onClick={join} className="w-fit btn btn-active bg-white btn-neutral hover:bg-purple-900 m-0">JOIN</button>
+	)
+}
 
 function Create({close}: any) {
 
@@ -113,7 +153,7 @@ function Create({close}: any) {
 					>
 						<FormControlLabel value={ChanMode.PUBLIC} control={<Radio color="default"/>} label="Public" />
 						<FormControlLabel value={ChanMode.PRIVATE} control={<Radio color="default"/>} label="Private" />
-						<FormControlLabel value={ChanMode.PROTECTED} control={<Radio color="default"/>} label="Protected" />
+						<FormControlLabel value={ChanMode.PROTECTED} control={<Radio color="default"/>} label="Protected by a password" />
 					</RadioGroup>
 					<button className="w-full btn btn-active bg-white btn-neutral hover:bg-purple-900" type="submit" ><Add/></button>
 				</form>
@@ -124,10 +164,12 @@ function Create({close}: any) {
 
 function Explore() {
 
+	const [reRender, setReRender]: [number, Function] = useState(0);
+
 	const [response, setResponse]: [Response, Function] = useState({status: "loading"});
 	useEffect(() => {
 			GetRequest("/chat/getNoConvs/").then((response) => setResponse(response));
-	}, []);
+	}, [reRender]);
 	if (response.status === "loading")
 		return (<Loading />);
 	if (response.status !== "OK")
@@ -138,18 +180,11 @@ function Explore() {
 	if (!response.data[0])
 		return <div className="m-4">No channels to join</div>
 	return (
-		<ul className="m-5">
-			{/* <li className="flex flex-col justify-between">
-				{response.data.map(( chan ) => 
-				<div className="flex justify-between" key={chan.name}>
-					{chan.name}
-					<button className="w-fit btn btn-active bg-white btn-neutral hover:bg-purple-900 m-0">JOIN</button>
-				</div>)}
-			</li> */}
-			{response.data.map(( chan ) => 
-			<li className="flex justify-between w-full" key={chan.name}>
-				{chan.name}
-				<button className="w-fit btn btn-active bg-white btn-neutral hover:bg-purple-900 m-0">JOIN</button>
+		<ul className="m-5 w-full flex flex-col justify-start overflow-y-scroll">
+			{response.data.map(( chan ) =>
+			<li className="flex justify-between w-full px-2 items-center my-1" key={chan.name}>
+				<p className="text-lg">#{chan.name}</p>
+				<JoinButton chan={chan.name} reRender={reRender} setRerender={setReRender}/>
 			</li>)}
 		</ul>
 	)
@@ -158,7 +193,7 @@ function Explore() {
 function PopUp({children, close}: any) {
 	return (
 		<div className="popup-bg" onClick={close}>
-			<Paper elevation={10} className="popup-box rounded-lg bg-inherit min-w-[14rem] min-h-[18rem]" onClick={e => e.stopPropagation()}>
+			<Paper elevation={10} className="popup-box rounded-lg bg-inherit min-w-[14rem] min-h-[18rem] max-h-[32rem]" onClick={e => e.stopPropagation()}>
 				<div className="flex flex-row justify-end w-full">	
 					<button className="text-inherit rounded-full hover:bg-zinc-400" onClick={close}>
 						<Clear />
