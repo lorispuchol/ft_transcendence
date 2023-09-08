@@ -23,7 +23,6 @@ export function countDown(ctx: CanvasRenderingContext2D, dteStart: number, timer
 	const y = height * 0.5;
 	const rad = 0.02 * Math.sqrt(width * width + height * height);
 	
-	ctx.clearRect(0,0,width, height);
 	ctx.beginPath();
 	ctx.arc(x, y, rad * 0.8, 0, angle, false);
 	ctx.arc(x, y, rad, angle, Math.PI*2, true);

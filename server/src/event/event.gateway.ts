@@ -30,7 +30,8 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 	async handleConnection(client: Socket, ...args: any[]) {
 		const decoded: any = this.jwtService.decode(<string>client.handshake.headers.token);
 		const newLogin: string = decoded.login;
-		const newUser: User = await this.eventService.getUserData(newLogin);
+		const user: User = await this.eventService.getUserData(newLogin);
+		const newUser = {avatar: user.avatar, login: user.login, username: user.username};
 		this.users.set(client, newLogin);
 		
 		this.users.forEach(async (login, cli) => {
@@ -42,15 +43,34 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 		});
 	}
 
-	handleDisconnect(client: Socket) {
+	async handleDisconnect(client: Socket) {
 		const offLogin: string = this.users.get(client);
-		this.users.delete(client);
+		const user: User = await this.eventService.getUserData(offLogin);
+		const offUser = {avatar: user.avatar, login: user.login, username: user.username};
 
 		this.users.forEach(async (login, cli) => {
 			if (await this.eventService.isBlocked(login, offLogin))
-				return ;
+			return ;
 			cli.emit("status/" + offLogin, "offline");
+			cli.emit("userDisconnect", offUser);
 		})
+		this.users.delete(client);
+	}
+
+	@SubscribeMessage('getConnected')
+	getConnected(client: Socket) {
+		const user = this.users.get(client);
+
+		this.users.forEach(async (login) => {
+			if (await this.eventService.isBlocked(login, user) || await this.eventService.isBlocked(login, user))
+				return ;
+			if (user !== login)
+			{
+				const data: User = await this.eventService.getUserData(login);
+				const toSend = {avatar: data.avatar, login: data.login, username: data.username};
+				client.emit("everyone", toSend);
+			}
+		});
 	}
 
 	@SubscribeMessage('getEvents')

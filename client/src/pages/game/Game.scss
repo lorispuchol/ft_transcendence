@@ -30,6 +30,24 @@
 	color: c.$secondary;
 }
 
+.demo {
+	//position: absolute;
+	z-index: 1;
+}
+
+.forfeit_button {
+	padding: 8px;
+	color: white !important;
+	letter-spacing: 1px;
+	background-color: rgba(190, 40, 40, 0.953) !important;
+}
+
+////////////compenent with canvas////////////
+
+.canvas_container {
+	position: relative;
+}
+
 .classique {
 	background-color: #625d6a9f;
 	outline: 4px solid c.$teritary;
@@ -39,93 +57,41 @@
 	z-index: 1;
 }
 
-.demo {
-	//position: absolute;
-	z-index: 1;
-}
-
-.menu_container {
-	position: relative;
-}
-
-.menu_wrapper {
+.prompt_wrapper {
 	position: absolute;
-	display: flex;
-	align-items: center;
-	justify-content: center;
+	// display: flex;
+	// align-items: center;
+	// justify-content: center;
 	width: 100%;
 	height: 100%;
 	z-index: 2;
+
+	font-size: 2vw;
 }
 
-.menu{
-	background-color: rgb(196, 187, 212) !important;
-	outline: 4px solid c.$primary;
-	border-color: c.$primary;
-	width:35vw;
-	height: 20vw;
-	display: grid;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
+.get_ready {
+	position: absolute;
+	color: white;
+	font-size: 5vw;
+
+	text-shadow: -2px 0 black, 0 2px black, 2px 0 black, 0 -2px black;
+
+  	color: white;
 }
 
-.menu_buttons {
-	grid-column: 2/3;
-	grid-row: 1 / span 2;
-	border-left: 4px solid;
-	border-color: inherit;
-	display: flex;
-	flex-direction: column;
-	// justify-content: center;
+.key {
+	position: absolute;
+	background: none;
+	border: 3px solid;
+	color: white;
 }
 
-.menu_buttons > button {
-	margin: auto;
-	font-size: 3vw;
-	height: min-content;
-	width: min-content;
-	color: c.$secondary;
-	background-color: c.$primary;
-	filter: brightness(1.2);
+.blinking {
+	animation: blinker 1.3s linear infinite;
 }
 
-.menu_buttons > Button:hover{
-	background-color: c.$primary;
-	filter: brightness(1.1);
-}
-
-.defy {
-	margin: auto;
-	background-color: c.$primary;
-	height: 11vw;
-	width: 15vw;
-}
-
-.forfeit_button {
-	padding: 8px;
-	background-color: rgba(190, 40, 40, 0.953) !important;
-}
-
-.menu_select {
-	display: flex;
-	width: 100%;
-	//overflow: hidden;
-	outline: 2px solid c.$primary;
-}
-
-.menu_select > Button {
-	color: c.$secondary;
-	background-color: inherit;
-	height: 4.965vw;
-	border: 0px !important;
-	justify-content: space-between;
-}
-
-.menu_select > Button:hover{
-	background-color: c.$primary;
-	filter: brightness(1.1);
-}
-
-.button_focus {
-	background-color: c.$primary !important;
-	filter: brightness(1.2);
-}
+@keyframes blinker {
+	50% {
+	  opacity: 0;
+	}
+  }
