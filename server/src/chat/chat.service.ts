@@ -35,15 +35,44 @@ export class ChatService {
 		parts.forEach((part) => chans.push(part.channel))
 		return chans;
 	}
+ //////////////////////////////////////////
 
 	async getNoConvs(user: User): Promise<Channel[]> {
-		const chans: Channel[] = [];
-		const parts: Participant[] = await this.participantRepository.find()
-		parts.forEach((part) => {
-			if(part.channel.mode !== ChanMode.PRIVATE && part.channel.mode !== ChanMode.DM && part.user.id !== user.id)
-				chans.push(part.channel)
+		
+		const convs: Channel[] = await this.getConvs(user);
+		const allChans: Channel[] = await this.channelRepository.find();
+		let Noconvs: Channel[] = [];
+
+		allChans.map(chan => {
+			if(convs.find((value: Channel) => value.id === chan.id))
+				return ;
+			if (chan.mode !== ChanMode.DM && chan.mode !== ChanMode.PRIVATE)
+				Noconvs.push(chan);
 		})
-		return chans;
+		return Noconvs;
+	}
+	
+	async addMemberToChan(user: User, channel: Channel) {
+		
+		// add check if user is already member
+		// return ({status: "KO", description: "An error occured"})
+		return ({status: "KO", description: user.username + " is already member of " + channel.name})
+
+		const newMember: Participant = new Participant()
+		newMember.channel = channel;
+		newMember.distinction = MemberDistinc.MEMBER;
+		newMember.user = user;
+		await this.participantRepository.save(newMember);
+		return ({status: "OK", description: user.username + " added to " + channel.name})
+	}
+
+	async joinPubChan(user: User, chanName: string) {
+		const channel: Channel = await this.findChanByName(chanName);
+
+		if (channel.mode !== ChanMode.PUBLIC)
+			return ({status: "KO", description: "Channel is not public"})
+		else
+			return (await this.addMemberToChan(user, channel))
 	}
 
 	async createChannel(firstUser: User, name: string, mode: ChanMode, password?: string) {

@@ -36,7 +36,7 @@ export interface RelationData{
 export interface ChannelData {
 	id: number, 
 	name: string,
-	mode: string,
+	mode: ChanMode,
 	password: string | null;
 }
 
