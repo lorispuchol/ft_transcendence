@@ -3,11 +3,12 @@ import { FormControl, FormControlLabel, FormGroup, FormLabel, Paper, Radio, Radi
 import { useContext, useEffect, useState } from "react";
 import './chat.scss'
 import { GetRequest, PostRequest } from "../utils/Request";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import { SocketChatContext } from "../utils/Context";
 import { ChanMode, ChannelData } from "./interfaceData";
 import Loading from "../utils/Loading";
 import ErrorHandling from "../utils/Error";
+import { logError, logSuccess, logWarn } from "./Chat";
 
 interface Response {
 	status: string | number,
@@ -21,31 +22,6 @@ interface JoinButtonProps {
 	password: string,
 	reRender: number,
 	setRerender: Function
-}
-
-function logWarn(warn: string) {
-	toast.warn(warn, {
-		position: "bottom-left",
-		autoClose: 2000,
-		hideProgressBar: true,
-	});
-}
-
-function logError(error: string[]) {
-	toast.error(error[0], {
-		position: "bottom-left",
-		autoClose: 2000,
-		hideProgressBar: true,
-	});
-}
-
-
-function logSuccess(msg: string) {
-	toast.success(msg, {
-		position: "bottom-left",
-		autoClose: 2000,
-		hideProgressBar: true,
-	});
 }
 
 function JoinButton ({channelName, mode, password, reRender, setRerender}: JoinButtonProps) {

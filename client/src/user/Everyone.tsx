@@ -33,7 +33,7 @@ interface Response {
 }
 
 
-export function ProfileElement({ user }: ProfileElementProps) {
+function ProfileElement({ user }: ProfileElementProps) {
 	const avatar: any = user.avatar ? user.avatar : defaultAvatar;
 	const [render, setRender]: [number, Function] = useState(0);
 	const [message, setMessage]: [string, Function] = useState("");

@@ -13,6 +13,7 @@ import { Avatar } from "@mui/material";
 import { Tag } from "@mui/icons-material";
 import ListMembers from "./ListMember";
 import { defaultAvatar } from "../pages/Profile/Profile";
+import { toast } from "react-toastify";
 
 interface Response {
 	status: string | number,
@@ -43,6 +44,30 @@ interface MessagesListenerProps {
 	msg: MessageData,
 }
 
+export function logWarn(warn: string) {
+	toast.warn(warn, {
+		position: "bottom-left",
+		autoClose: 2000,
+		hideProgressBar: true,
+	});
+}
+
+export function logError(error: string[]) {
+	toast.error(error[0], {
+		position: "bottom-left",
+		autoClose: 2000,
+		hideProgressBar: true,
+	});
+}
+
+
+export function logSuccess(msg: string) {
+	toast.success(msg, {
+		position: "bottom-left",
+		autoClose: 2000,
+		hideProgressBar: true,
+	});
+}
 
 function ChanButtonConv({chan, focusConv, setFocusConv}: ButtonConvProps) {
 
