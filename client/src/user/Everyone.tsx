@@ -19,7 +19,7 @@ interface ProfileElementProps {
 
 interface UserData {
 	id: number,
-	avatar: string | null,
+	avatar: string,
 	login: string,
 	username: string,
 	nb_victory: number,
@@ -33,7 +33,7 @@ interface Response {
 }
 
 
-function ProfileElement({ user }: ProfileElementProps) {
+export function ProfileElement({ user }: ProfileElementProps) {
 	const avatar: any = user.avatar ? user.avatar : defaultAvatar;
 	const [render, setRender]: [number, Function] = useState(0);
 	const [message, setMessage]: [string, Function] = useState("");

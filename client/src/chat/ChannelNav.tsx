@@ -16,10 +16,10 @@ interface Response {
 }
 
 interface JoinButtonProps {
-	chan: string,
+	channelName: string,
 	mode: ChanMode,
-	setInputPw: Function,
-	reRender: number;
+	password: string,
+	reRender: number,
 	setRerender: Function
 }
 
@@ -48,32 +48,41 @@ function logSuccess(msg: string) {
 	});
 }
 
-function InputPassword({chan, mode, setInputPw, reRender, setRerender}: JoinButtonProps) {
-
-}
-
-function JoinButton ({chan, mode, setInputPw, reRender, setRerender}: JoinButtonProps) {
+function JoinButton ({channelName, mode, password, reRender, setRerender}: JoinButtonProps) {
 
 	const socket = useContext(SocketChatContext);
 
 	function join () {
-		if (mode === ChanMode.PROTECTED) {
-			setInputPw(true)
-			return ;
+		if (mode === ChanMode.PUBLIC) {
+			PostRequest("/chat/joinPubChan/" + channelName, {}).then((response: any) => {
+				if (response.status === "OK") {
+					if (response.data.status === "KO")
+						logWarn(response.data.description)
+					else {
+						socket!.emit('message',channelName, "Hello Everybody!");
+						logSuccess(response.data.description)
+						setRerender(reRender + 1);
+					}	
+				}
+				else
+					logError(response.error)
+			});
 		}
-		PostRequest("/chat/joinPubChan/" + chan, {}).then((response: any) => {
-			if (response.status === "OK") {
-				if (response.data.status === "KO")
-					logWarn(response.data.description)
-				else {
-					socket!.emit('message',chan, "Hello Everybody!");
-					logSuccess(response.data.description)
-					setRerender(reRender + 1);
-				}	
-			}
-			else
-				logError(response.error)
-		});
+		else if (mode === ChanMode.PROTECTED) {
+			PostRequest("/chat/joinProtectedChan/", {channelName, password}).then((response: any) => {
+				if (response.status === "OK") {
+					if (response.data.status === "KO")
+						logWarn(response.data.description)
+					else {
+						socket!.emit('message',channelName, "Hello Everybody!");
+						logSuccess(response.data.description)
+						setRerender(reRender + 1);
+					}	
+				}
+				else
+					logError(response.error)		
+			});
+		}
 	}
 
 	return (
@@ -149,7 +158,7 @@ function Create({close}: any) {
 				<form onSubmit={submitChannel}>
 					<FormGroup>
 						<input className="input w-full max-w-xs bg-white mb-3 text-inherit text-black" value={datasChan.channelName} onChange={changeName} name="name" placeholder="Channel Name" />	
-						<input className="input w-full max-w-xs bg-white mb-3 text-inherit" disabled={datasChan.mode !== ChanMode.PROTECTED} type="password" placeholder="Password" value={datasChan.password} onChange={changePw} name="password" />	
+						<input className="input w-full max-w-xs bg-white mb-3 text-inherit text-black" disabled={datasChan.mode !== ChanMode.PROTECTED} type="password" placeholder="Password" value={datasChan.password} onChange={changePw} name="password" />	
 					</FormGroup>
 					<RadioGroup
 						className="mb-3"
@@ -173,37 +182,48 @@ function Create({close}: any) {
 function Explore() {
 
 	const [reRender, setReRender]: [number, Function] = useState(0);
-	const [inputPw, setInputPw]: [boolean, Function] = useState(false);
-
 	const [response, setResponse]: [Response, Function] = useState({status: "loading"});
+	const [inputPw, setInputPw]: [Map<string, string>, Function] = useState(new Map());
+
+
 	useEffect(() => {
-			GetRequest("/chat/getNoConvs/").then((response) => setResponse(response));
+			GetRequest("/chat/getNoConvs/").then((response) => {
+				setResponse(response)
+				let temp: Map<string, string> = new Map();
+				response.data.map((chan: any) => temp.set(chan.name, ""))
+				setInputPw(temp)
+			});
 	}, [reRender]);
 	if (response.status === "loading")
 		return (<Loading />);
 	if (response.status !== "OK")
 		return (<ErrorHandling status={response.status} message={response.error} />);
-
 	if (!response.data)
 		return null
 	if (!response.data[0])
 		return <div className="m-4">No channels to join</div>
+
+	function changeMap(chanName: string, value: string) {
+		let temp: Map<string, string> = new Map(inputPw);
+		temp.set(chanName, value);
+		console.log(temp)
+		setInputPw(temp);
+	}
+	
 	return (				 
 		<ul className="m-5 w-full h-full flex flex-col justify-start overflow-y-scroll">
-			{response.data.map(( chan ) => {
-				if (inputPw === true)
-					return (
-						<div key="++" className="flex my-1 w-full justify-center">
-							<p>InputPassword</p>
-						</div>
-					)
-				else
-					return (
-						<li className="flex justify-between w-full px-2 items-center my-1" key={chan.name}>
+			{response.data.map(( chan ) => {				
+				return (
+					<li className="flex justify-between w-full px-2 items-center my-1" key={chan.name}>
+						<div className=" w-full flex- flex-col">
 							<p className="text-lg">#{chan.name}</p>
-							<JoinButton chan={chan.name} mode={chan.mode} setInputPw={setInputPw} reRender={reRender} setRerender={setReRender}/>
-						</li>
-					)
+							<div className="flex flex-row justify-between">
+								<input value={inputPw.get(chan.name)} type="password" className="input bg-white text-inherit text-black w-64 h-12" disabled={chan.mode !== ChanMode.PROTECTED} placeholder="Password" onChange={(e) => changeMap(chan.name, e.target.value)}/>
+								<JoinButton channelName={chan.name} mode={chan.mode} password={inputPw.get(chan.name)!} reRender={reRender} setRerender={setReRender}/>
+							</div>
+						</div>
+					</li>
+				)
 			})}
 		</ul>
 	)

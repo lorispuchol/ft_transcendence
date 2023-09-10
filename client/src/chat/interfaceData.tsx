@@ -20,6 +20,7 @@ export enum RelationshipStatus {
 }
 
 export interface UserData {
+	id: number,
 	avatar: string,
 	login: string,
 	username: string,

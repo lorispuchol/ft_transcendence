@@ -3,6 +3,7 @@ import { GetRequest } from "../utils/Request";
 import ErrorHandling from "../utils/Error";
 import Loading from "../utils/Loading";
 import { ParticipantData } from "./interfaceData";
+import { ProfileElement } from "../user/Everyone";
 
 interface ResponseMembers {
 	status: string | number,
@@ -34,7 +35,11 @@ export default function ListMembers({chan}: ListMembersProps) {
 	return (
 		<div>
 			{
-				response.data.map(( member ) => <div key={member.user.login}>{member.user.username}</div>)
+				response.data.map(( member ) => 
+					<div className="my-3" key={member.user.login}>
+						<ProfileElement user={member.user}/>
+					</div>
+				)
 			}
 		</div>
 	)
