@@ -36,7 +36,7 @@ function checkPoint(changeScores: Function, score: any, ctx: CanvasRenderingCont
 	return false;
 }
 
-export default function LocalGame( { setPlayers, returnToMenu }: any ) {
+export default function LocalGame( { setPlayers }: any ) {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const [prompt, setPrompt]: [boolean, Function] = useState(true);
 	const [winner, setWinner]: [string, Function] = useState("");
@@ -44,6 +44,7 @@ export default function LocalGame( { setPlayers, returnToMenu }: any ) {
 	const [rightReady, setRightReady]: [string, Function] = useState("blinking");
 	
 	useEffect(() => {
+		setPlayers({p1: {score:0, avatar: "", username: "player 1"}, p2: {score:0, avatar: "", username: "player 2"}});
 		const ctx = canvasRef!.current!.getContext('2d')!;
 		const screen = {w: 3200, h: 1800}
 		ctx.canvas.width = screen.w;

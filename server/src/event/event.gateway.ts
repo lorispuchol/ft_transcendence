@@ -4,12 +4,13 @@ import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect,
 import { Server, Socket } from "socket.io";
 import { client_url } from "src/auth/constants";
 import { EventService } from "./event.service";
-import { Inject, ParseIntPipe, forwardRef } from "@nestjs/common";
+import { Inject, forwardRef } from "@nestjs/common";
 import { User } from "src/user/user.entity";
 
 interface Event {
 	type: string,
 	sender: string,
+	gameMode?: string
 }
 
 @WebSocketGateway({
@@ -71,6 +72,7 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 				client.emit("everyone", toSend);
 			}
 		});
+		client.emit("everyone", {avatar: null, login: "oui", username: "francis"});
 	}
 
 	@SubscribeMessage('getEvents')
@@ -108,4 +110,32 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 		client.emit("status/" + userLogin, userStatus);
 	}
 
+	@SubscribeMessage('challenge')
+	async challenge (@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+		const login: string = this.users.get(client);
+
+		if ( await this.eventService.isBlocked(login, data.to))
+			client.emit("defy", {login: data.to, response: "KO"});
+		
+		const event: Event = {type: "gameRequest", sender: login, gameMode: data.mode};
+		this.newEvent(data.to, event);
+	}
+
+	@SubscribeMessage('acceptGame')
+	acceptGame(@MessageBody() userLogin: string, @ConnectedSocket() client: Socket) {
+		const login: string = this.users.get(client);
+		this.deleteEvent(login, {type: "gameRequest", sender: userLogin});
+
+		const userSocket: Socket = [...this.users.entries()].filter(({ 1: value}) => userLogin === value).map(([key]) => key)[0];
+		userSocket.emit("defy", {login: login, response: "OK"});
+	}
+
+	@SubscribeMessage('refuseGame')
+	refuseGame(@MessageBody() userLogin: string, @ConnectedSocket() client: Socket) {
+		const login: string = this.users.get(client);
+		this.deleteEvent(login, {type: "gameRequest", sender: userLogin});
+
+		const userSocket: Socket = [...this.users.entries()].filter(({ 1: value}) => userLogin === value).map(([key]) => key)[0];
+		userSocket.emit("defy", {login: login, response: "KO"});
+	}
 }

@@ -1,9 +1,11 @@
 import './Game.scss';
 import { Chip, Paper } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import GameMenu from "./GameMenu";
 import bird from "./bird.png";
-import MatchMaking from "./MatchMaking";
+import MatchMaking from "./online/MatchMaking";
+import LocalGame from './local/LocalGame';
+import { useLocation } from 'react-router-dom';
 
 interface Player {
 	score: number,
@@ -41,15 +43,28 @@ function PlayerCard( { player }: any ) {
 }
 
 export default function Game() {
+	const location = useLocation();
 	const [players, setPlayers]: [Players, Function] = useState({p1: null, p2: null});
-	const [setting, setSetting]: [Setting, Function] = useState({type: "menu", mode: "classic"});
-	const [defy, setDefy]: [string | null, Function] = useState(null);
+	const [defy, setDefy]: [string | null, Function] = useState(location.state ? location.state.to : null);
+	const [setting, setSetting]: [Setting, Function] = useState(location.state ? {type: "online", mode: location.state.mode} : {type: "menu", mode: "classic"});
+
+	useEffect(() => {
+		setDefy(location.state ? location.state.to : null);
+		setSetting(location.state ? {type: "online", mode: location.state.mode} : {type: "menu", mode: "classic"});
+	}, [location])
+
+	function returnToMenu() {
+		setSetting({type: "menu", mode: setting.mode});
+		setPlayers({p1: null, p2: null});
+	}
 
 	function modeSelect() {
 		switch(setting.type) {
 			case "menu":
 				return (<GameMenu setSetting={setSetting} setDefy={setDefy}/>);
 			case "local":
+				return (<LocalGame setPlayers={setPlayers}/>)
+			case "online":
 				return (<MatchMaking setting={setting} setSetting={setSetting} setPlayers={setPlayers} defy={defy}/>);
 		}
 	}
@@ -62,7 +77,7 @@ export default function Game() {
 				<PlayerCard player={players.p2}/>
 			</div>
 			{setting.type !== "menu" &&
-				<div className="flex justify-center"><button onClick={()=> {setSetting({type: "menu", mode: "classic"}); setPlayers({p1: null, p2: null})}}>
+				<div className="flex justify-center"><button onClick={returnToMenu}>
 					<Paper className="forfeit_button font-bold">MENU</Paper>
 				</button></div>}
 		</>

@@ -1,9 +1,10 @@
-import { Button, ButtonGroup, Paper } from "@mui/material";
+import { Button, ButtonGroup, CircularProgress, Paper } from "@mui/material";
 import DemoGame from "./local/DemoGame";
 import './GameMenu.scss';
 import { Public, RocketLaunch, SportsTennis, Weekend } from "@mui/icons-material";
 import { useContext, useEffect, useState } from "react";
 import { EventContext } from "../../utils/Context";
+import Loader from "../../components/Loading/Loader";
 
 interface MenuProps {
 	setSetting: Function,
@@ -20,6 +21,8 @@ export default function GameMenu({ setSetting, setDefy }: MenuProps) {
 	const [type, setType]: [string, Function] = useState("local");
 	const [mode, setMode]: [string, Function] = useState("classic");
 	const [users, setUsers]: [UserData[], Function] = useState([]);
+	const [waitResponse, setWaitResponse]: [boolean, Function] = useState(false);
+	const [select, setSelect]: [string | null, Function] = useState(null);
 	const socket = useContext(EventContext)!;
 
 	useEffect(() => {
@@ -27,15 +30,30 @@ export default function GameMenu({ setSetting, setDefy }: MenuProps) {
 			setUsers((prev: UserData[]) => [...prev, newUser])
 		}
 		function delUser(oldUser: UserData) {
-			setUsers((prev: UserData[]) => prev.filter((user) => user.login !== oldUser.login))
+			setUsers((prev: UserData[]) => prev.filter((user) => user.login !== oldUser.login));
+			if (select === oldUser.login)
+				setSelect(null);
+		}
+		function handleDefy(data: any) {
+			if (data.login !== select)
+				return ;
+			if (data.response === "OK")
+			{
+				setDefy(select);
+				setSetting({type: "online", mode: mode})
+			}
+			else
+				setWaitResponse(false);
 		}
 		socket.on('everyone', addUser);
 		socket.on('userDisconnect', delUser);
+		socket.on("defy", handleDefy);
 		socket.emit("getConnected");
 
 		return () => {
 			socket.off('everyone', addUser);
 			socket.off('userDisconnect', delUser);
+			socket.off("defy", handleDefy);
 		};
 	}, [socket])
 
@@ -43,6 +61,13 @@ export default function GameMenu({ setSetting, setDefy }: MenuProps) {
 		if (type === value || mode === value)
 			return "button_focus";
 		return "";
+	}
+
+	function send_defy() {
+		if (!select)
+			return ;
+		socket.emit("challenge", {to: select, mode: mode});
+		setWaitResponse(true);
 	}
 
 	return (
@@ -61,16 +86,28 @@ export default function GameMenu({ setSetting, setDefy }: MenuProps) {
 							<Button key="turbo" className={focus("turbo")} onClick={() => setMode("turbo")}><RocketLaunch />turbo</Button>
 						</ButtonGroup>
 					</div>
+					{waitResponse ?
+						<div className="menu_buttons wait">
+							<div />
+							<CircularProgress />
+							<strong>waiting for response</strong>
+							<div />
+						</div>
+					:
 					<div className="menu_buttons">
 						<Button key="play" onClick={() => setSetting({type: type, mode: mode})}>play</Button>
-						<div className="defy">
-							{
-								users.map((user: UserData) => (
-									<div key={user.login}>{user.username}</div>
-								))
-							}
-						</div>
+							<div className="defy">
+								<div className="defy_list">
+								{
+									users.map((user: UserData) => (
+										<div id="user" key={user.login} className={select === user.login? "defy_focus": ""} onClick={() => setSelect(user.login)}>{user.username}</div>
+									))
+								}
+								</div>
+							<Button key="defy" onClick={send_defy}>defy</Button>
+							</div>
 					</div>
+					}
 				</Paper>
 			</div>
 			<DemoGame />
