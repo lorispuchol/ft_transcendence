@@ -53,11 +53,20 @@ export class ChatService {
 	}
 	
 	async addMemberToChan(user: User, channel: Channel) {
-		
-		// add check if user is already member
-		// return ({status: "KO", description: "An error occured"})
-		return ({status: "KO", description: user.username + " is already member of " + channel.name})
 
+		let checkParts: Participant[] = await this.participantRepository.find({
+			where: {
+				user: user.id
+			} as FindOptionsWhere<User>
+		})
+		checkParts = checkParts.filter((part) => part.channel.id === channel.id)
+
+		if (checkParts.length !== 0) {
+			if (checkParts.length > 1)
+				return ({status: "KO", description: "An error occured"})
+			else
+				return ({status: "KO", description: user.username + " is already member of " + channel.name})
+		}
 		const newMember: Participant = new Participant()
 		newMember.channel = channel;
 		newMember.distinction = MemberDistinc.MEMBER;
@@ -66,13 +75,17 @@ export class ChatService {
 		return ({status: "OK", description: user.username + " added to " + channel.name})
 	}
 
-	async joinPubChan(user: User, chanName: string) {
+	async joinChan(user: User, chanName: string, password: string) {
+
 		const channel: Channel = await this.findChanByName(chanName);
 
-		if (channel.mode !== ChanMode.PUBLIC)
-			return ({status: "KO", description: "Channel is not public"})
-		else
-			return (await this.addMemberToChan(user, channel))
+		if (channel.mode === ChanMode.DM)
+			return ({status: "KO", description: "impssible to do this action"})
+		if (channel.mode === ChanMode.PRIVATE)
+			return ({status: "KO", description: "Channel is private"})
+		if (!password && channel.mode === ChanMode.PROTECTED)
+			return ({status: "KO", description: "Channel is protected by a password"})
+		return (await this.addMemberToChan(user, channel))
 	}
 
 	async createChannel(firstUser: User, name: string, mode: ChanMode, password?: string) {

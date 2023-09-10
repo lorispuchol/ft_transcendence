@@ -45,8 +45,13 @@ export class SetPasswordChannel {
 
 	@IsNotEmpty()
 	@IsString()
-	@IsStrongPassword({minLength: 8, minLowercase: 1, minNumbers: 1, minUppercase: 1, minSymbols: 0})
+	@Validate(PasswordChannelMatch)
 	password: string;
+
+	@IsNotEmpty()
+	@IsString()
+	@IsStrongPassword({minLength: 8, minLowercase: 1, minNumbers: 1, minUppercase: 1, minSymbols: 0})
+	NewPassword: string;
 }
 
 export class JoinChannelWithPassword {

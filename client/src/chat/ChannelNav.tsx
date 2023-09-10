@@ -17,6 +17,8 @@ interface Response {
 
 interface JoinButtonProps {
 	chan: string,
+	mode: ChanMode,
+	setInputPw: Function,
 	reRender: number;
 	setRerender: Function
 }
@@ -46,13 +48,19 @@ function logSuccess(msg: string) {
 	});
 }
 
+function InputPassword({chan, mode, setInputPw, reRender, setRerender}: JoinButtonProps) {
 
+}
 
-function JoinButton ({chan, reRender, setRerender}: JoinButtonProps) {
+function JoinButton ({chan, mode, setInputPw, reRender, setRerender}: JoinButtonProps) {
 
 	const socket = useContext(SocketChatContext);
 
 	function join () {
+		if (mode === ChanMode.PROTECTED) {
+			setInputPw(true)
+			return ;
+		}
 		PostRequest("/chat/joinPubChan/" + chan, {}).then((response: any) => {
 			if (response.status === "OK") {
 				if (response.data.status === "KO")
@@ -165,6 +173,7 @@ function Create({close}: any) {
 function Explore() {
 
 	const [reRender, setReRender]: [number, Function] = useState(0);
+	const [inputPw, setInputPw]: [boolean, Function] = useState(false);
 
 	const [response, setResponse]: [Response, Function] = useState({status: "loading"});
 	useEffect(() => {
@@ -179,13 +188,23 @@ function Explore() {
 		return null
 	if (!response.data[0])
 		return <div className="m-4">No channels to join</div>
-	return (
-		<ul className="m-5 w-full flex flex-col justify-start overflow-y-scroll">
-			{response.data.map(( chan ) =>
-			<li className="flex justify-between w-full px-2 items-center my-1" key={chan.name}>
-				<p className="text-lg">#{chan.name}</p>
-				<JoinButton chan={chan.name} reRender={reRender} setRerender={setReRender}/>
-			</li>)}
+	return (				 
+		<ul className="m-5 w-full h-full flex flex-col justify-start overflow-y-scroll">
+			{response.data.map(( chan ) => {
+				if (inputPw === true)
+					return (
+						<div key="++" className="flex my-1 w-full justify-center">
+							<p>InputPassword</p>
+						</div>
+					)
+				else
+					return (
+						<li className="flex justify-between w-full px-2 items-center my-1" key={chan.name}>
+							<p className="text-lg">#{chan.name}</p>
+							<JoinButton chan={chan.name} mode={chan.mode} setInputPw={setInputPw} reRender={reRender} setRerender={setReRender}/>
+						</li>
+					)
+			})}
 		</ul>
 	)
 }

@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Post, Request } from "@nestjs/common";
 import { ChatService } from "./chat.service";
 import { UserService } from "src/user/user.service";
-import { NewChannelWithPassword, NewChannelWithoutPassword } from "./channel.dto";
+import { JoinChannelWithPassword, NewChannelWithPassword, NewChannelWithoutPassword } from "./channel.dto";
 
 @Controller('chat')
 export class ChatController {
@@ -24,13 +24,26 @@ export class ChatController {
 		)
 	}
 
+
+	@Post('joinProtectedChan/')
+	async joinProtectedChan (
+		@Request() req: any,
+		@Body() dataJoin: JoinChannelWithPassword) {
+		return await this.chatService.joinChan(
+			await this.userService.findOneByLogin(req.user.login),
+			dataJoin.channelName,
+			dataJoin.password
+		)
+	}
+
 	@Post('joinPubChan/:chan')
 	async joinPubChan (
 		@Request() req: any,
 		@Param('chan') chan: string ) {
-		return await this.chatService.joinPubChan(
+		return await this.chatService.joinChan(
 			await this.userService.findOneByLogin(req.user.login),
-			chan
+			chan,
+			null
 		)
 	}
 	
