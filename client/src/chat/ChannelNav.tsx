@@ -179,9 +179,9 @@ function Explore() {
 	if (!response.data[0])
 		return <div className="m-4">No channels to join</div>
 
-	function changeMap(chanName: string, value: string) {
+	function changeMap(chanName: string, pw: string) {
 		let temp: Map<string, string> = new Map(inputPw);
-		temp.set(chanName, value);
+		temp.set(chanName, pw);
 		console.log(temp)
 		setInputPw(temp);
 	}
@@ -228,10 +228,10 @@ export default function ChannelNav() {
 		<>
 			<div className="chan-nav">
 				<button className="tooltip btn btn-neutral h-1/3 w-1/3 m-5" data-tip="Explore Channels" onClick={() => setActivePopUp("explore")}>
-					<TravelExplore fontSize="large"/>
+					<TravelExplore sx={{ width: 64, height: 64 }}/>
 				</button>
 				<button className="tooltip btn btn-neutral h-1/3 w-1/3 m-5" data-tip="Create Channel" onClick={() => setActivePopUp("create")}>
-					<AddCircleOutline fontSize="large"/>
+					<AddCircleOutline sx={{ width: 64, height: 64 }}/>
 				</button>
 				{
 					activePopUp !== "" &&

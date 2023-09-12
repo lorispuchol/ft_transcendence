@@ -13,7 +13,7 @@ import { Avatar } from "@mui/material";
 import { Tag } from "@mui/icons-material";
 import ListMembers from "./ListMember";
 import { defaultAvatar } from "../pages/Profile/Profile";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 
 interface Response {
 	status: string | number,
@@ -69,8 +69,33 @@ export function logSuccess(msg: string) {
 	});
 }
 
+export function logInfo(msg: string) {
+	toast.info(msg, {
+		position: "bottom-left",
+		autoClose: 2000,
+		hideProgressBar: true,
+	});
+}
+
 function ChanButtonConv({chan, focusConv, setFocusConv}: ButtonConvProps) {
 
+	const [resMembers, setResMembers]: [ResMembers, Function] = useState({status: "loading"});
+	const user = useContext(UserContext);
+
+	useEffect(() => {
+		GetRequest("/chat/getMembers/" + chan.name).then((res) => setResMembers(res))
+	}, [chan]);
+
+	if (resMembers.status === "loading")
+		return (<Loading />);
+	if (resMembers.status !== "OK")
+		return (<ErrorHandling status={resMembers.status} message={resMembers.error} />);
+	if (!resMembers.data)
+		return null;
+	if (resMembers.data!.find((member) => member.user.login === user)
+		&& resMembers.data!.find((member) => member.user.login === user)!.distinction <= -2)
+		return null;
+	
 	return (
 		<button
 			className={`button-conv ${chan.name === focusConv && 'focused'}`}
@@ -151,9 +176,7 @@ function ListConv({focusConv, setFocusConv}: focusConvProps) {
 					<DmButtonConv key={chan.name} chan={chan} focusConv={focusConv} setFocusConv={setFocusConv} />
 				))
 			}
-			{
-				dms.length && chans.length ? <hr /> : null
-			}
+			{dms.length && chans.length ? <hr /> : null}
 			{
 				chans.map((chan) => (
 					<ChanButtonConv key={chan.name} chan={chan} focusConv={focusConv} setFocusConv={setFocusConv} />
@@ -195,6 +218,7 @@ export default function Chat() {
 				</div>
 				<div className="list-member">
 					{focusConv ? <ListMembers chan={focusConv} /> : null}
+					<ToastContainer />
 				</div>
 			</div>
 		</SocketChatContext.Provider>

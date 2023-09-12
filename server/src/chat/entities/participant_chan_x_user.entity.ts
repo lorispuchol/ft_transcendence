@@ -4,7 +4,8 @@ import { Channel } from "./channel.entity";
 
 
 export enum MemberDistinc {
-	BANNED = -1,
+	BANNED = -2,
+	MUTE = -1,
 	INVITED = 0,
 	MEMBER = 1,
 	ADMIN = 2,
@@ -27,5 +28,5 @@ export class Participant extends BaseEntity {
 		enum: MemberDistinc,
 		default: MemberDistinc.OWNER
 	})
-	distinction: number;
+	distinction: MemberDistinc;
 }

@@ -6,7 +6,8 @@ export enum ChanMode {
 }
 
 export enum MemberDistinc {
-	BANNED = -1,
+	BANNED = -2,
+	MUTE = -1,
 	INVITED = 0,
 	MEMBER = 1,
 	ADMIN = 2,
@@ -44,7 +45,7 @@ export interface ChannelData {
 export interface ParticipantData {
 	user: UserData,
 	channel: ChannelData
-	distinction: number 
+	distinction: MemberDistinc
 }
 
 export interface MessageData {

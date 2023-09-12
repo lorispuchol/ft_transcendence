@@ -64,6 +64,8 @@ export class ChatService {
 		if (checkParts.length !== 0) {
 			if (checkParts.length > 1)
 				return ({status: "KO", description: "An error occured"})
+			else if (checkParts[0].distinction === MemberDistinc.BANNED)
+				return ({status: "KO", description: "You are banned from this channel"})
 			else
 				return ({status: "KO", description: user.username + " is already member of " + channel.name})
 		}
