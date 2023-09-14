@@ -12,13 +12,20 @@ import MessageButton from "./MessageButton";
 import Friendbutton from "../components/Relationship/Friendbutton";
 import BlockButton from "../components/Relationship/BlockButton";
 import { logInfo } from "./Chat";
-import { OneMemberContext, RerenderListMembersContext, SetRerenderListMembersContext, UserContext, UserParticipantContext } from "../utils/Context";
+import { RerenderListContext, SetDisplayMemberContext, SetRerenderListContext, UserContext } from "../utils/Context";
 import './chat.scss'
 import '../user/user.scss'
 import { ArrowForward } from "@mui/icons-material";
-import { KickButton } from "./ControlChanButton";
+import KickButton from "../components/ChatButton/KickButton";
+
 
 interface MemberProps {
+	member: UserData,
+	userPart: ParticipantData,
+	memberPart: ParticipantData,
+}
+
+interface MemberButtonProps {
 	member: UserData,
 	setDisplayProfile: Function,
 }
@@ -65,18 +72,17 @@ function Profile({ member, isDm}: ProfileProps) {
 	)
 }
 
-function Member({ member, setDisplayProfile }: MemberProps) {
-
-	const userPart: ParticipantData = useContext(UserParticipantContext)!;
-	const memberPart: ParticipantData = useContext(OneMemberContext)!;
+function Member({ member, userPart, memberPart}: MemberProps) {
+	
+	const setDisplayProfile: Function = useContext(SetDisplayMemberContext);
+	const rrList: number = useContext(RerenderListContext);
+	const setRrList: Function = useContext(SetRerenderListContext);
+	
 	const control: boolean = ((userPart.distinction >= MemberDistinc.ADMIN) && (memberPart.distinction <= MemberDistinc.ADMIN));
-
-	const rerenderList = useContext(RerenderListMembersContext);
-	const setRerenderList = useContext(SetRerenderListMembersContext);
 
 	function close () {
 		setDisplayProfile(null);
-		setRerenderList(rerenderList + 1); // a mettre dans le onCLick des button kick ban
+		setRrList(rrList + 1);
 	}
 
 	return (
@@ -84,14 +90,13 @@ function Member({ member, setDisplayProfile }: MemberProps) {
 			<button onClick={close}><ArrowForward /></button>
 			<Profile member={member} isDm={false} />
 			<div className="flex flex-row items-center justify-center my-8">
-				{/* <KickButton /> */}
-				<button disabled={!control}>KICK</button>
+				<KickButton disabled={!control} activeUserPart={userPart} memberPart={memberPart} />
 			</div>
 		</div>
 	)
 }
 
-function MemberButton({ member, setDisplayProfile}: MemberProps) {
+function MemberButton({ member, setDisplayProfile}: MemberButtonProps) {
 	
 	const avatar: any = member.avatar ? member.avatar : defaultAvatar;
 	const user = useContext(UserContext);
@@ -142,18 +147,17 @@ export default function ListMembers({chan}: ListMembersProps) {
 		return <Profile member={response.data[0].user} isDm={true} />
 	if (displayProfile) {
 		return (
-			<RerenderListMembersContext.Provider value={reRenderList}>
-			<SetRerenderListMembersContext.Provider value={setRerenderList}>					
-				<UserParticipantContext.Provider value={userParticipant}>
-				<OneMemberContext.Provider value={response.data.find((member) => member.user.id === (displayProfile as UserData)!.id)!}>
-					
-					<Member member={displayProfile} setDisplayProfile={setDisplayProfile} />
-				
-				</OneMemberContext.Provider>
-				</UserParticipantContext.Provider>
-			</SetRerenderListMembersContext.Provider>
-			</RerenderListMembersContext.Provider>
-
+			<SetDisplayMemberContext.Provider value={setDisplayProfile}>
+			<SetRerenderListContext.Provider value={setRerenderList}>
+			<RerenderListContext.Provider value={reRenderList}>
+				<Member
+					member={displayProfile}
+					userPart={userParticipant}
+					memberPart={response.data.find((member) => member.user.id === (displayProfile as UserData)!.id)!}
+				/>
+			</RerenderListContext.Provider>
+			</SetRerenderListContext.Provider>
+			</SetDisplayMemberContext.Provider>		
 		)
 	}
 

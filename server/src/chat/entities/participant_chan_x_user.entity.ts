@@ -4,6 +4,7 @@ import { Channel } from "./channel.entity";
 
 
 export enum MemberDistinc {
+	KICK = -2,
 	BANNED = -1,
 	INVITED = 0,
 	MEMBER = 1,

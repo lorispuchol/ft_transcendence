@@ -25,6 +25,14 @@ export class ChatService {
 		private userService: UserService
 	) {}
 
+	getDistStr(dist: MemberDistinc): string {
+		if (dist === MemberDistinc.MEMBER) return "member"
+		if (dist === MemberDistinc.INVITED) return "invited"
+		if (dist === MemberDistinc.KICK) return "kicked"
+		if (dist === MemberDistinc.ADMIN) return "admin"
+		if (dist === MemberDistinc.BANNED) return "banned"
+	}
+
 	async saveNewMember(user: User, channel: Channel, dist: MemberDistinc) {
 		
 		const newMember: Participant = new Participant();
@@ -34,6 +42,13 @@ export class ChatService {
 		newMember.user = user;
 
 		await this.participantRepository.save(newMember);
+	}
+
+	async deleteMember(user: User, channel: Channel) {
+		await this.participantRepository.delete({
+			user: {id: user.id},
+			channel: {id: channel.id}
+		});
 	}
 	
 	async getConvs(user: User): Promise<Channel[]> {
@@ -63,8 +78,6 @@ export class ChatService {
 	}
 
 	async findOneParticipant(channel: Channel, user: User): Promise<Participant> {
-		
-
 		const parts: Participant[] = await this.participantRepository.find({
 			where: {
 				channel: channel.id
@@ -73,34 +86,10 @@ export class ChatService {
 		return parts.find((part) => part.user.id === user.id)
 	}
 
-	async inviteMember(requester: User, chanName: string, guestlogin: string) {
-		const guest: User = await this.userService.findOneByLogin(guestlogin)
-		if (!guest)
-			throw new HttpException("User not found", HttpStatus.FORBIDDEN);
-		const channel: Channel = await this.findChanByName(chanName)
-		if (!channel)
-			throw new HttpException("Channel not found", HttpStatus.FORBIDDEN);
-		if (channel.mode === ChanMode.DM)
-			throw new HttpException("Channel is a Dm", HttpStatus.FORBIDDEN);
-			
-		const reqPart: Participant = await this.findOneParticipant(channel, requester)
-		const memberPart: Participant = await this.findOneParticipant(channel, guest)
-
-		if (reqPart && !memberPart) {
-			this.saveNewMember(guest, channel, MemberDistinc.INVITED);
-			return ({status: "OK", description: "Invitation send to " + guest.username})
-		}
-		else
-			throw new HttpException("You are not a member or guest can't join this channel", HttpStatus.FORBIDDEN);
-	}
-
-	async changeDistinction(requester: User, chanName: string, login: string, distinction: MemberDistinc) {
+	async setDistinction(requester: User, chanName: string, login: string, distinction: MemberDistinc) {
 		
-		function getDistStr(dist: MemberDistinc): string {
-			if (dist === MemberDistinc.MEMBER) return "member"
-			if (dist === MemberDistinc.ADMIN) return "admin"
-			if (dist === MemberDistinc.BANNED) return "banned"
-		}
+		if (distinction === MemberDistinc.OWNER)
+			return ({status: "KO", description: "Impossible to set someone as owner"})
 
 		const member: User = await this.userService.findOneByLogin(login)
 		if (!member)
@@ -110,55 +99,71 @@ export class ChatService {
 			throw new HttpException("Channel not found", HttpStatus.FORBIDDEN);
 		if (channel.mode === ChanMode.DM)
 			throw new HttpException("Channel is a Dm", HttpStatus.FORBIDDEN);
-			
+
 		const reqPart: Participant = await this.findOneParticipant(channel, requester)
 		const memberPart: Participant = await this.findOneParticipant(channel, member)
-	
-		if (!reqPart || !memberPart || memberPart.distinction <= MemberDistinc.INVITED)
-			throw new HttpException("Member not found", HttpStatus.FORBIDDEN);
+
+		if (!reqPart) 
+			throw new HttpException("You are not part of " + channel.name, HttpStatus.FORBIDDEN);
+
+		if (!memberPart) {
+			if (distinction === MemberDistinc.INVITED) {
+				this.saveNewMember(member, channel, MemberDistinc.INVITED);
+				return ({status: "OK", description: "Invitation for " + channel.name + " send to " + member.username})
+			}
+			else
+				throw new HttpException(member.username + " is not part of " + channel.name, HttpStatus.FORBIDDEN);
+		}
+
+		/// a tester
+		if (distinction === MemberDistinc.INVITED) {
+			if (memberPart.distinction === MemberDistinc.INVITED)
+				return ({status: "KO", description: memberPart.user.username + " is already invited"})
+			throw new HttpException("Impossible to set " + member.username + " as invited", HttpStatus.FORBIDDEN);
+		}
+		///
+
 		if (reqPart.distinction < MemberDistinc.ADMIN || memberPart.distinction > MemberDistinc.ADMIN)
-			throw new HttpException("You are not authorized to do this action", HttpStatus.FORBIDDEN);	
-		if (distinction === MemberDistinc.OWNER || distinction === MemberDistinc.INVITED)
-			return ({status: "KO", description: "Impossible to set a member as owner or as guest"})
+			throw new HttpException("You are not ability to do this action", HttpStatus.FORBIDDEN);
 		if (memberPart.distinction === distinction)
-			return ({status: "KO", description: memberPart.user.username + " is already " + getDistStr(distinction)})
+			return ({status: "KO", description: memberPart.user.username + " is already " + this.getDistStr(distinction)})
+		if (memberPart.distinction <= MemberDistinc.INVITED)
+			throw new HttpException(member.username + " is not part of " + channel.name + ": " + this.getDistStr(memberPart.distinction), HttpStatus.FORBIDDEN);
+		if (distinction === MemberDistinc.KICK) {
+			this.deleteMember(member, channel);
+			return ({status: "OK", description: member.username + " kicked from " + channel.name})
+		}
+		// if (distinction === MemberDistinc.INVITED)
+		// 	throw new HttpException("Impossible to set " + member.username + " as invited", HttpStatus.FORBIDDEN);
 		this.saveNewMember(member, channel, distinction)
-		return ({status: "OK", description: memberPart.user.username + " is now " + getDistStr(distinction)})
+		return ({status: "OK", description: memberPart.user.username + " is now " + this.getDistStr(distinction)})
 	}
 
-	async addMemberToChan(user: User, channel: Channel) {
+	async addMemberToChan(user: User, channel: Channel, distinction: MemberDistinc) {
 
-		let checkParts: Participant[] = await this.participantRepository.find({
-			where: {
-				user: user.id
-			} as FindOptionsWhere<User>
-		})
-		checkParts = checkParts.filter((part) => part.channel.id === channel.id)
+		let checkParts: Participant = await this.findOneParticipant(channel, user);
 
-		if (checkParts.length !== 0) {
-			if (checkParts.length > 1)
-				return ({status: "KO", description: "An error occured"})
-			else if (checkParts[0].distinction <= MemberDistinc.BANNED)
+		if (checkParts) {
+			if (checkParts.distinction <= MemberDistinc.BANNED)
 				return ({status: "KO", description: "You are banned from this channel"})
-			else if (checkParts[0].distinction > MemberDistinc.INVITED)
-				return ({status: "KO", description: user.username + " is already member of " + channel.name})
+			else if (checkParts.distinction >= MemberDistinc.INVITED)
+				return ({status: "KO", description: user.username + " is already " + this.getDistStr(checkParts.distinction)})
 		}
-		this.saveNewMember(user, channel, MemberDistinc.MEMBER)
+		this.saveNewMember(user, channel, distinction)
 		return ({status: "OK", description: user.username + " added to " + channel.name})
 	}
 
 	async joinChan(user: User, chanName: string, password: string) {
-
 		const channel: Channel = await this.findChanByName(chanName);
 		if (!channel)
-			return ({status: "KO", description: "Channel not found"})
+			return ({status: "KO", description: chanName + " not found"})
 		if (channel.mode === ChanMode.DM)
-			return ({status: "KO", description: "impssible to do this action"})
+			return ({status: "KO", description: chanName + " is a Dm"})
 		if (channel.mode === ChanMode.PRIVATE)
-			return ({status: "KO", description: "Channel is private"})
+			return ({status: "KO", description: chanName + " is private"})
 		if (!password && channel.mode === ChanMode.PROTECTED)
-			return ({status: "KO", description: "Channel is protected by a password"})
-		return (await this.addMemberToChan(user, channel))
+			return ({status: "KO", description: chanName + " is protected by a password"})
+		return (await this.addMemberToChan(user, channel, MemberDistinc.MEMBER))
 	}
 
 	async createChannel(firstUser: User, name: string, mode: ChanMode, password?: string) {
@@ -167,7 +172,6 @@ export class ChatService {
 			(password && (mode === ChanMode.PRIVATE || mode === ChanMode.PUBLIC))) {
 			throw new HttpException("forbidden", HttpStatus.FORBIDDEN);
 		}
-
 		const newChan: Channel = await this.channelRepository.create({
 			name: name,
 			mode: mode
@@ -177,7 +181,6 @@ export class ChatService {
 			const hash = await bcrypt.hash(password, salt);
 			newChan.password = hash;
 		}
-		
 		await this.channelRepository.save(newChan);
 		await this.saveNewMember(firstUser, newChan, MemberDistinc.OWNER)
 		return newChan

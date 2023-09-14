@@ -71,6 +71,11 @@ export class JoinChannelWithPassword {
 }
 
 export class Distinction {
+
+	@IsString()
+	@IsNotEmpty()
+	@MaxLength(16)
+	@MinLength(2)
 	login: string;
 
 	@IsEnum(MemberDistinc)
