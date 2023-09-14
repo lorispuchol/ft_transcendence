@@ -6,7 +6,7 @@ import ErrorHandling from "../utils/Error";
 import { useLocation } from "react-router-dom";
 import { Socket, io } from "socket.io-client";
 import './chat.scss'
-import { ChanMode, ChannelData, MessageData, ParticipantData } from "./interfaceData";
+import { ChanMode, ChannelData, MemberDistinc, MessageData, ParticipantData } from "./interfaceData";
 import { SocketChatContext, UserContext } from "../utils/Context";
 import ChannelNav from "./ChannelNav";
 import { Avatar } from "@mui/material";
@@ -92,8 +92,8 @@ function ChanButtonConv({chan, focusConv, setFocusConv}: ButtonConvProps) {
 		return (<ErrorHandling status={resMembers.status} message={resMembers.error} />);
 	if (!resMembers.data)
 		return null;
-	if (resMembers.data!.find((member) => member.user.login === user)
-		&& resMembers.data!.find((member) => member.user.login === user)!.distinction <= -2)
+	if (resMembers.data!.find((member) => member.user.username === user)
+		&& resMembers.data!.find((member) => member.user.username === user)!.distinction <= MemberDistinc.INVITED)
 		return null;
 	
 	return (
@@ -221,6 +221,7 @@ export default function Chat() {
 					<ToastContainer />
 				</div>
 			</div>
+			<ToastContainer />
 		</SocketChatContext.Provider>
 	);
 }

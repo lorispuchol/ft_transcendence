@@ -9,7 +9,7 @@ import { Channel } from "./entities/channel.entity";
 import { Message } from "./entities/message.entity";
 import { RelationshipModule } from "src/relationship/relationship.module";
 import { EventModule } from "src/event/event.module";
-import { IsChannelNameAvailable, IsMode, PasswordChannelMatch } from "./channel.decorator";
+import { IsChannelNameAvailable, PasswordChannelMatch } from "./channel.decorator";
 
 
 @Module({
@@ -19,7 +19,7 @@ import { IsChannelNameAvailable, IsMode, PasswordChannelMatch } from "./channel.
 		RelationshipModule,
 		TypeOrmModule.forFeature([Participant, Channel, Message], 'lorisforever'),],
 	controllers: [ChatController],
-	providers: [ChatGateway, ChatService, IsChannelNameAvailable, PasswordChannelMatch, IsMode],
+	providers: [ChatGateway, ChatService, IsChannelNameAvailable, PasswordChannelMatch],
 	exports: [ChatService]
 })
 export class ChatModule {}

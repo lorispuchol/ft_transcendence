@@ -4,8 +4,7 @@ import { Channel } from "./channel.entity";
 
 
 export enum MemberDistinc {
-	BANNED = -2,
-	MUTE = -1,
+	BANNED = -1,
 	INVITED = 0,
 	MEMBER = 1,
 	ADMIN = 2,
@@ -29,4 +28,7 @@ export class Participant extends BaseEntity {
 		default: MemberDistinc.OWNER
 	})
 	distinction: MemberDistinc;
+
+	@Column({type: 'boolean', default: false})
+	mute: boolean; // au lieu d'un bool peut etre stocker le temps de demute;
 }
