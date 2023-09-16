@@ -16,7 +16,8 @@ import { RerenderListContext, SetDisplayMemberContext, SetRerenderListContext, U
 import './chat.scss'
 import '../user/user.scss'
 import { ArrowForward } from "@mui/icons-material";
-import KickButton from "../components/ChatButton/KickButton";
+import { ControlButton } from "../components/ChatButton/ControlButtons";
+import { MuteButton } from "../components/ChatButton/MuteButton";
 
 
 interface MemberProps {
@@ -77,7 +78,7 @@ function Member({ member, userPart, memberPart}: MemberProps) {
 	const setDisplayProfile: Function = useContext(SetDisplayMemberContext);
 	const rrList: number = useContext(RerenderListContext);
 	const setRrList: Function = useContext(SetRerenderListContext);
-	
+
 	const control: boolean = ((userPart.distinction >= MemberDistinc.ADMIN) && (memberPart.distinction <= MemberDistinc.ADMIN));
 
 	function close () {
@@ -89,9 +90,19 @@ function Member({ member, userPart, memberPart}: MemberProps) {
 		<div className="profile-module">
 			<button onClick={close}><ArrowForward /></button>
 			<Profile member={member} isDm={false} />
-			<div className="flex flex-row items-center justify-center my-8">
-				<KickButton disabled={!control} activeUserPart={userPart} memberPart={memberPart} />
-			</div>
+			{control && (
+				<div className="flex flex-row items-center justify-center my-8">
+					<ControlButton memberPart={memberPart} distinction={MemberDistinc.KICK} />
+					<ControlButton memberPart={memberPart} distinction={MemberDistinc.BANNED}/>
+					{memberPart.distinction === MemberDistinc.ADMIN ?  
+						<ControlButton memberPart={memberPart} distinction={MemberDistinc.MEMBER}/>
+						: memberPart.distinction === MemberDistinc.MEMBER ?
+							<ControlButton memberPart={memberPart} distinction={MemberDistinc.ADMIN}/>
+							: null
+					}
+					<MuteButton memberPart={memberPart} />
+				</div>
+			)}
 		</div>
 	)
 }
