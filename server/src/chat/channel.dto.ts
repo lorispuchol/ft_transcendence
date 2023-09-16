@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty, IsString, IsStrongPassword, MaxLength, MinLength, NotContains, Validate } from "class-validator";
+import { IsDate, IsEnum, IsNotEmpty, IsString, IsStrongPassword, MaxLength, MinLength, NotContains, Validate } from "class-validator";
 import { IsChannelNameAvailable, PasswordChannelMatch } from "./channel.decorator";
 import { ChanMode } from "./entities/channel.entity";
 import { MemberDistinc } from "./entities/participant_chan_x_user.entity";
@@ -80,4 +80,12 @@ export class Distinction {
 
 	@IsEnum(MemberDistinc)
 	distinction: MemberDistinc;
+}
+
+export class Mute {
+	@IsString()
+	@IsNotEmpty()
+	@MaxLength(16)
+	@MinLength(2)
+	login: string;
 }

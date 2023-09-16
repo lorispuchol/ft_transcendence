@@ -46,7 +46,7 @@ export interface ParticipantData {
 	user: UserData,
 	channel: ChannelData,
 	distinction: MemberDistinc,
-	mute: Date
+	muteDate: Date
 }
 
 export interface MessageData {

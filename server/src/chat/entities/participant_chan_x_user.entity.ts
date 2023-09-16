@@ -30,6 +30,6 @@ export class Participant extends BaseEntity {
 	})
 	distinction: MemberDistinc;
 
-	@Column({type: 'timestamp', nullable: true, default: null})
-	mute: Date;
+	@Column({type: 'timestamp', default: new Date()})
+	muteDate: Date;
 }

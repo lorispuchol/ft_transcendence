@@ -3,7 +3,6 @@ import { MemberDistinc, ParticipantData } from "../../chat/interfaceData";
 import { PostRequest } from "../../utils/Request";
 import { logError, logSuccess, logWarn } from "../../chat/Chat";
 import { RerenderListContext, SetDisplayMemberContext, SetRerenderListContext } from "../../utils/Context";
-import dayjs from "dayjs";
 
 interface MuteButtonProps {
 	memberPart: ParticipantData,
@@ -17,10 +16,10 @@ export function MuteButton({ memberPart}: MuteButtonProps) {
 	const setDisplayMember: Function = useContext(SetDisplayMemberContext);
 	const setRr: Function = useContext(SetRerenderListContext);
 	const rr: number = useContext(RerenderListContext);
-	// const isMute: boolean = memberPart.mut
-	var ne = dayjs();
-	console.log(ne);
 
+	var muteDate: Date = new Date();
+	muteDate.setMinutes(muteDate.getMinutes() + 1)
+	const disable: boolean = (new Date(memberPart.muteDate) as any).getTime() > new Date().getTime()	
 
 	function mute() {
 		PostRequest("/chat/mute/" + memberPart.channel.name, {login: login}).then((response: any) => {
@@ -38,7 +37,7 @@ export function MuteButton({ memberPart}: MuteButtonProps) {
 		});
 	}
 	return (
-		<button onClick={mute}>
+		<button disabled={disable} onClick={mute}>
 			<p>MUTE</p>
 		</button>
 	);

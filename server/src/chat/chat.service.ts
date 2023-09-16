@@ -33,13 +33,14 @@ export class ChatService {
 		if (dist === MemberDistinc.BANNED) return "banned"
 	}
 
-	async saveNewMember(user: User, channel: Channel, dist: MemberDistinc) {
+	async saveNewMember(user: User, channel: Channel, dist: MemberDistinc, muteDate: Date) {
 		
 		const newMember: Participant = new Participant();
 
 		newMember.channel = channel;
 		newMember.distinction = dist;
 		newMember.user = user;
+		newMember.muteDate = muteDate
 
 		await this.participantRepository.save(newMember);
 	}
@@ -86,6 +87,41 @@ export class ChatService {
 		return parts.find((part) => part.user.id === user.id)
 	}
 
+	async mute(requester: User, chanName: string, login: string) {		
+		var muteDate: Date = new Date();
+		muteDate.setMinutes(muteDate.getMinutes() + 1)
+
+		const member: User = await this.userService.findOneByLogin(login)
+		if (!member)
+			throw new HttpException("User not found", HttpStatus.FORBIDDEN);
+		const channel: Channel = await this.findChanByName(chanName)
+		if (!channel)
+			throw new HttpException("Channel not found", HttpStatus.FORBIDDEN);
+		if (channel.mode === ChanMode.DM)
+			throw new HttpException("Channel is a Dm", HttpStatus.FORBIDDEN);
+
+		
+		const reqPart: Participant = await this.findOneParticipant(channel, requester)
+		const memberPart: Participant = await this.findOneParticipant(channel, member)
+
+		if (!reqPart) 
+			throw new HttpException("You are not part of " + channel.name, HttpStatus.FORBIDDEN);
+		if (!memberPart)
+			throw new HttpException(member.username + " is not part of " + channel.name, HttpStatus.FORBIDDEN);
+
+		if (memberPart.user.id === reqPart.user.id)
+			throw new HttpException("Impossible to change your own accessiblity", HttpStatus.FORBIDDEN);
+
+		if (reqPart.distinction < MemberDistinc.ADMIN || memberPart.distinction > MemberDistinc.ADMIN)
+			throw new HttpException("You are not ability to do this action", HttpStatus.FORBIDDEN);
+		if (memberPart.distinction <= MemberDistinc.INVITED)
+			throw new HttpException(member.username + " is not part of " + channel.name + ": " + this.getDistStr(memberPart.distinction), HttpStatus.FORBIDDEN);
+		if (memberPart.muteDate > new Date())
+			return ({status: "KO", description: memberPart.user.username + " is already mute until " +  new Date(memberPart.muteDate).toLocaleTimeString()})
+		this.saveNewMember(member, channel, memberPart.distinction, muteDate)
+		return ({status: "OK", description: memberPart.user.username + " is now mute until " +  new Date(muteDate).toLocaleTimeString()})
+	}
+
 	async setDistinction(requester: User, chanName: string, login: string, distinction: MemberDistinc) {
 		
 		if (distinction === MemberDistinc.OWNER)
@@ -108,12 +144,15 @@ export class ChatService {
 
 		if (!memberPart) {
 			if (distinction === MemberDistinc.INVITED) {
-				this.saveNewMember(member, channel, MemberDistinc.INVITED);
+				this.saveNewMember(member, channel, MemberDistinc.INVITED, memberPart.muteDate);
 				return ({status: "OK", description: "Invitation for " + channel.name + " send to " + member.username})
 			}
 			else
 				throw new HttpException(member.username + " is not part of " + channel.name, HttpStatus.FORBIDDEN);
-		}
+		}		
+		if (memberPart.user.id === reqPart.user.id)
+			throw new HttpException("Impossible to change your own accessiblity", HttpStatus.FORBIDDEN);
+
 		if (distinction === MemberDistinc.INVITED) {
 			if (memberPart.distinction === MemberDistinc.INVITED)
 				return ({status: "KO", description: memberPart.user.username + " is already invited"})
@@ -130,7 +169,7 @@ export class ChatService {
 			this.deleteMember(member, channel);
 			return ({status: "OK", description: member.username + " kicked from " + channel.name})
 		}
-		this.saveNewMember(member, channel, distinction)
+		this.saveNewMember(member, channel, distinction, memberPart.muteDate)
 		return ({status: "OK", description: memberPart.user.username + " is now " + this.getDistStr(distinction)})
 	}
 
@@ -144,7 +183,7 @@ export class ChatService {
 			else if (checkParts.distinction >= MemberDistinc.INVITED)
 				return ({status: "KO", description: user.username + " is already " + this.getDistStr(checkParts.distinction)})
 		}
-		this.saveNewMember(user, channel, distinction)
+		this.saveNewMember(user, channel, distinction, new Date())
 		return ({status: "OK", description: user.username + " added to " + channel.name})
 	}
 
@@ -177,7 +216,7 @@ export class ChatService {
 			newChan.password = hash;
 		}
 		await this.channelRepository.save(newChan);
-		await this.saveNewMember(firstUser, newChan, MemberDistinc.OWNER)
+		await this.saveNewMember(firstUser, newChan, MemberDistinc.OWNER, new Date())
 		return newChan
 	}
 
@@ -188,8 +227,8 @@ export class ChatService {
 		})
 		await this.channelRepository.save(newMp);
 
-		await this.saveNewMember(user1, newMp, MemberDistinc.OWNER)
-		await this.saveNewMember(user2, newMp, MemberDistinc.OWNER)
+		await this.saveNewMember(user1, newMp, MemberDistinc.OWNER, new Date())
+		await this.saveNewMember(user2, newMp, MemberDistinc.OWNER, new Date())
 
 		return newMp
 	}

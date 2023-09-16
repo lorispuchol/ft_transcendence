@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Post, Request } from "@nestjs/common";
 import { ChatService } from "./chat.service";
 import { UserService } from "src/user/user.service";
-import { Distinction, JoinChannelWithPassword, NewChannelWithPassword, NewChannelWithoutPassword } from "./channel.dto";
+import { Distinction, JoinChannelWithPassword, Mute, NewChannelWithPassword, NewChannelWithoutPassword } from "./channel.dto";
 
 @Controller('chat')
 export class ChatController {
@@ -21,6 +21,18 @@ export class ChatController {
 	async getNoConvs( @Request() req: any ) {
 		return await this.chatService.getNoConvs(
 			await this.userService.findOneByLogin(req.user.login)
+		)
+	}
+
+	@Post('mute/:chan')
+	async mute (
+		@Request() req: any,
+		@Param('chan') chan: string,
+		@Body() muteData: Mute) {
+		return await this.chatService.mute(
+			await this.userService.findOneByLogin(req.user.login),
+			chan,
+			muteData.login,
 		)
 	}
 
