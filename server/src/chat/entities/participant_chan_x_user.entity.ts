@@ -30,6 +30,6 @@ export class Participant extends BaseEntity {
 	})
 	distinction: MemberDistinc;
 
-	@Column({type: 'boolean', default: false})
-	mute: boolean; // au lieu d'un bool peut etre stocker le temps de demute;
+	@Column({type: 'timestamp', nullable: true, default: null})
+	mute: Date;
 }

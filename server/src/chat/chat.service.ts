@@ -114,14 +114,11 @@ export class ChatService {
 			else
 				throw new HttpException(member.username + " is not part of " + channel.name, HttpStatus.FORBIDDEN);
 		}
-
-		/// a tester
 		if (distinction === MemberDistinc.INVITED) {
 			if (memberPart.distinction === MemberDistinc.INVITED)
 				return ({status: "KO", description: memberPart.user.username + " is already invited"})
 			throw new HttpException("Impossible to set " + member.username + " as invited", HttpStatus.FORBIDDEN);
 		}
-		///
 
 		if (reqPart.distinction < MemberDistinc.ADMIN || memberPart.distinction > MemberDistinc.ADMIN)
 			throw new HttpException("You are not ability to do this action", HttpStatus.FORBIDDEN);
@@ -133,8 +130,6 @@ export class ChatService {
 			this.deleteMember(member, channel);
 			return ({status: "OK", description: member.username + " kicked from " + channel.name})
 		}
-		// if (distinction === MemberDistinc.INVITED)
-		// 	throw new HttpException("Impossible to set " + member.username + " as invited", HttpStatus.FORBIDDEN);
 		this.saveNewMember(member, channel, distinction)
 		return ({status: "OK", description: memberPart.user.username + " is now " + this.getDistStr(distinction)})
 	}
