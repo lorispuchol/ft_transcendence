@@ -15,9 +15,10 @@ import { logInfo } from "./Chat";
 import { RerenderListContext, SetDisplayMemberContext, SetRerenderListContext, UserContext } from "../utils/Context";
 import './chat.scss'
 import '../user/user.scss'
-import { ArrowForward } from "@mui/icons-material";
+import { ArrowForward, VolumeOff } from "@mui/icons-material";
 import { ControlButton } from "../components/ChatButton/ControlButtons";
 import { MuteButton } from "../components/ChatButton/MuteButton";
+import { InviteModule } from "../components/ChatButton/InviteModule";
 
 
 interface MemberProps {
@@ -29,6 +30,7 @@ interface MemberProps {
 interface MemberButtonProps {
 	member: UserData,
 	setDisplayProfile: Function,
+	muted: boolean,
 }
 interface ResponseMembers {
 	status: string | number,
@@ -91,7 +93,7 @@ function Member({ member, userPart, memberPart}: MemberProps) {
 			<button onClick={close}><ArrowForward /></button>
 			<Profile member={member} isDm={false} />
 			{control && (
-				<div className="flex flex-row items-center justify-center my-8">
+				<div className="flex flex-row items-center justify-center my-8 flex-wrap">
 					<ControlButton memberPart={memberPart} distinction={MemberDistinc.KICK} />
 					<ControlButton memberPart={memberPart} distinction={MemberDistinc.BANNED}/>
 					{memberPart.distinction === MemberDistinc.ADMIN ?  
@@ -107,7 +109,7 @@ function Member({ member, userPart, memberPart}: MemberProps) {
 	)
 }
 
-function MemberButton({ member, setDisplayProfile}: MemberButtonProps) {
+function MemberButton({ member, setDisplayProfile, muted}: MemberButtonProps) {
 	
 	const avatar: any = member.avatar ? member.avatar : defaultAvatar;
 	const user = useContext(UserContext);
@@ -126,6 +128,7 @@ function MemberButton({ member, setDisplayProfile}: MemberButtonProps) {
 							<p className="ml-3 mr-2 text-ellipsis overflow-hidden text-white">{member.username + " (me)"}</p>
 						:	<p className="ml-3 mr-2 text-ellipsis overflow-hidden text-white">{member.username}</p>
 				}
+				{muted && <VolumeOff />}
 			</button>
 		</div>
 	)
@@ -174,24 +177,29 @@ export default function ListMembers({chan}: ListMembersProps) {
 
 	return (
 		<div>
+			{owner.length ? <p className="w-full flex flex-row items-center justify-center uppercase">{owner[0].channel.mode}</p> : null}
 			{owner.length ? <p>Owner</p> : null}
 			{
 				owner.map((own) => 
-					<MemberButton member={own.user} setDisplayProfile={setDisplayProfile} key={own.user.login}/>
+					<MemberButton member={own.user} setDisplayProfile={setDisplayProfile} muted={false} key={own.user.login}/>
 				)
 			}
 			{admins.length ? <p>Admins</p> : null}
 			{
 				admins.map((admin) =>
-					<MemberButton member={admin.user} setDisplayProfile={setDisplayProfile} key={admin.user.login}/>
+					<MemberButton member={admin.user} setDisplayProfile={setDisplayProfile} muted={(new Date(admin.muteDate) as any).getTime() > new Date().getTime()} key={admin.user.login} />
 				)
 			}
 			{members.length ? <p>Members</p> : null}
 			{
-				members.map((member) =>
-					<MemberButton member={member.user} setDisplayProfile={setDisplayProfile} key={member.user.login}/>
+				members.map((member) => {
+					return <MemberButton member={member.user} setDisplayProfile={setDisplayProfile} muted={(new Date(member.muteDate) as any).getTime() > new Date().getTime()} key={member.user.login} />
+				}
 				)
 			}
+			<div>
+				<InviteModule chan={chan} />
+			</div>
 		</div>
 	)
 }

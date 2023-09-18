@@ -116,10 +116,16 @@ export class ChatService {
 			throw new HttpException("You are not ability to do this action", HttpStatus.FORBIDDEN);
 		if (memberPart.distinction <= MemberDistinc.INVITED)
 			throw new HttpException(member.username + " is not part of " + channel.name + ": " + this.getDistStr(memberPart.distinction), HttpStatus.FORBIDDEN);
-		if (memberPart.muteDate > new Date())
-			return ({status: "KO", description: memberPart.user.username + " is already mute until " +  new Date(memberPart.muteDate).toLocaleTimeString()})
+		if (memberPart.muteDate > new Date()){
+			let displayDate: Date = new Date(memberPart.muteDate)
+			displayDate.setHours(displayDate.getHours() + 2)
+			return ({status: "KO", description: memberPart.user.username + " is already mute until " +  new Date(displayDate).toLocaleTimeString()})
+		}
 		this.saveNewMember(member, channel, memberPart.distinction, muteDate)
-		return ({status: "OK", description: memberPart.user.username + " is now mute until " +  new Date(muteDate).toLocaleTimeString()})
+
+		let displayDate: Date = new Date(muteDate)
+		displayDate.setHours(displayDate.getHours() + 2)
+		return ({status: "OK", description: memberPart.user.username + " is now mute until " +  new Date(displayDate).toLocaleTimeString()})
 	}
 
 	async setDistinction(requester: User, chanName: string, login: string, distinction: MemberDistinc) {

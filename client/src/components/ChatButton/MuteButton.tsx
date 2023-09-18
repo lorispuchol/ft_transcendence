@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { MemberDistinc, ParticipantData } from "../../chat/interfaceData";
+import { ParticipantData } from "../../chat/interfaceData";
 import { PostRequest } from "../../utils/Request";
 import { logError, logSuccess, logWarn } from "../../chat/Chat";
 import { RerenderListContext, SetDisplayMemberContext, SetRerenderListContext } from "../../utils/Context";
@@ -10,15 +10,13 @@ interface MuteButtonProps {
 
 // Mute is different than other Button
 /// Upgrade Degrade Kick and Ban are identique
-export function MuteButton({ memberPart}: MuteButtonProps) {
+export function MuteButton({ memberPart }: MuteButtonProps) {
 	
 	const login = memberPart.user.login;
 	const setDisplayMember: Function = useContext(SetDisplayMemberContext);
 	const setRr: Function = useContext(SetRerenderListContext);
 	const rr: number = useContext(RerenderListContext);
 
-	var muteDate: Date = new Date();
-	muteDate.setMinutes(muteDate.getMinutes() + 1)
 	const disable: boolean = (new Date(memberPart.muteDate) as any).getTime() > new Date().getTime()	
 
 	function mute() {
@@ -37,7 +35,7 @@ export function MuteButton({ memberPart}: MuteButtonProps) {
 		});
 	}
 	return (
-		<button disabled={disable} onClick={mute}>
+		<button className="btn" disabled={disable} onClick={mute}>
 			<p>MUTE</p>
 		</button>
 	);

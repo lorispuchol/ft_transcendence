@@ -34,7 +34,7 @@ export function ControlButton({ memberPart, distinction }: ControlButtonProps) {
 		});
 	}
 	return (
-		<button onClick={changeDistinction}>
+		<button className="btn" onClick={changeDistinction}>
 			{distinction === MemberDistinc.BANNED && <p>BAN</p>}
 			{distinction === MemberDistinc.KICK && <p>KICK</p>}
 			{distinction === MemberDistinc.MEMBER && <p>DEGRADE AS MEMBER</p>}
