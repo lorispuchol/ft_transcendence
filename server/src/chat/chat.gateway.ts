@@ -92,9 +92,13 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		const decoded: any = this.jwtService.decode(<string>client.handshake.headers.token)
 		const reqUser: User = await this.userService.findOneByLogin(decoded.login);
 		const Guest: User = await this.userService.findOneByUsername(value[1]);
-
+		
 		if (!Guest)
-			return;
-		return ;
+			return client.emit('inviteRes', {status: "KO", description: "User not found"});
+		const result: any = await this.chatService.setDistinction(reqUser, value[0], Guest.login, MemberDistinc.INVITED);
+		if (result.status === "OK") {
+			this.eventGateaway.newEvent(Guest.login, {type: "channelInvitation", sender: value[0]}); // ici le sender est le channel
+		}
+		return client.emit('inviteRes', {status: result.status, description: result.description});
 	}
 }

@@ -5,10 +5,11 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { User } from "src/user/user.entity";
 import { Relationship } from "src/relationship/relationship.entity";
 import { UserModule } from "src/user/user.module";
+import { Participant } from "src/chat/entities/participant_chan_x_user.entity";
 
 @Module({
 	imports: [
-		TypeOrmModule.forFeature([User, Relationship], 'lorisforever'),
+		TypeOrmModule.forFeature([User, Relationship, Participant], 'lorisforever'),
 		UserModule,
 	],
 	providers: [EventService, EventGateway],

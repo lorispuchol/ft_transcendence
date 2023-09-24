@@ -104,7 +104,7 @@ function MessageInput({ chan }: MessagesProps) {
 export default function Chatting({chan}: ChattingProps ) {
 
 	return (
-		<div className="flex flex-col w-full items-center pb-3">
+		<div className="flex flex-col w-full items-center pb-3 justify-end">
 			<Messages chan={chan} />
 			<MessageInput chan={chan} />
 		</div>

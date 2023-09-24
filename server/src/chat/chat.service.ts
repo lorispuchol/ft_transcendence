@@ -135,42 +135,44 @@ export class ChatService {
 
 		const member: User = await this.userService.findOneByLogin(login)
 		if (!member)
-			throw new HttpException("User not found", HttpStatus.FORBIDDEN);
+			return ({status: "KO", description: "User not found"})
 		const channel: Channel = await this.findChanByName(chanName)
 		if (!channel)
-			throw new HttpException("Channel not found", HttpStatus.FORBIDDEN);
+			return ({status: "KO", description: "Channel not found"})
 		if (channel.mode === ChanMode.DM)
-			throw new HttpException("Channel is a Dm", HttpStatus.FORBIDDEN);
+			return ({status: "KO", description: "Channel is a Dm"})
 
 		const reqPart: Participant = await this.findOneParticipant(channel, requester)
 		const memberPart: Participant = await this.findOneParticipant(channel, member)
 
 		if (!reqPart) 
-			throw new HttpException("You are not part of " + channel.name, HttpStatus.FORBIDDEN);
+			return ({status: "KO", description: "You are not part of " + channel.name})
 
 		if (!memberPart) {
 			if (distinction === MemberDistinc.INVITED) {
-				this.saveNewMember(member, channel, MemberDistinc.INVITED, memberPart.muteDate);
+				this.saveNewMember(member, channel, MemberDistinc.INVITED, new Date());
 				return ({status: "OK", description: "Invitation for " + channel.name + " send to " + member.username})
 			}
 			else
-				throw new HttpException(member.username + " is not part of " + channel.name, HttpStatus.FORBIDDEN);
+				return ({status: "OK", description: member.username + " is not part of " + channel.name})
 		}		
 		if (memberPart.user.id === reqPart.user.id)
-			throw new HttpException("Impossible to change your own accessiblity", HttpStatus.FORBIDDEN);
+				return ({status: "OK", description: "Impossible to change your own accessiblity"})
 
 		if (distinction === MemberDistinc.INVITED) {
 			if (memberPart.distinction === MemberDistinc.INVITED)
 				return ({status: "KO", description: memberPart.user.username + " is already invited"})
-			throw new HttpException("Impossible to set " + member.username + " as invited", HttpStatus.FORBIDDEN);
+			return ({status: "KO", description: "Impossible to set " + member.username + " as invited"})
 		}
 
 		if (reqPart.distinction < MemberDistinc.ADMIN || memberPart.distinction > MemberDistinc.ADMIN)
-			throw new HttpException("You are not ability to do this action", HttpStatus.FORBIDDEN);
+			return ({status: "KO", description: "You are not ability to do this action"})
+
 		if (memberPart.distinction === distinction)
 			return ({status: "KO", description: memberPart.user.username + " is already " + this.getDistStr(distinction)})
 		if (memberPart.distinction <= MemberDistinc.INVITED)
-			throw new HttpException(member.username + " is not part of " + channel.name + ": " + this.getDistStr(memberPart.distinction), HttpStatus.FORBIDDEN);
+			return ({status: "KO", description: member.username + " is not part of " + channel.name + ": " + this.getDistStr(memberPart.distinction)})
+
 		if (distinction === MemberDistinc.KICK) {
 			this.deleteMember(member, channel);
 			return ({status: "OK", description: member.username + " kicked from " + channel.name})
