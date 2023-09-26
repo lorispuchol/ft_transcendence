@@ -10,8 +10,3 @@ export class newUsername {
 	@Validate(IsUsernameAvailable)
 	username: string;
 }
-
-export class newAvatar	{
-	@IsNotEmpty()
-	avatar: string;
-}

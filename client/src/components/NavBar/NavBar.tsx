@@ -63,8 +63,6 @@ export const NavBar = () => {
 		const mobile_notif_off = document.querySelector(".mobile_notif_off")
 		const width = window.outerWidth;
 
-		// console.log(width);
-		// console.log('i');
 		if (width > 637)
 		{
 			if (nav_links)
