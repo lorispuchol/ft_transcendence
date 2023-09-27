@@ -1,4 +1,3 @@
-import { List, ListItem, ListItemText } from "@mui/material";
 import { FormEvent, useContext, useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
 import "./chat.scss";
@@ -6,7 +5,9 @@ import { GetRequest } from "../utils/Request";
 import Loading from "../utils/Loading";
 import ErrorHandling from "../utils/Error";
 import { MessageData } from "./interfaceData";
-import { SocketChatContext } from "../utils/Context";
+import { SocketChatContext, UserContext } from "../utils/Context";
+import { defaultAvatar } from "../pages/Profile/Profile";
+import { Send } from "@mui/icons-material";
 
 interface ChattingProps {
 	chan: string;
@@ -32,7 +33,7 @@ function Messages({chan}: MessagesProps) {
 	const [response, setResponse]: [Response, Function] = useState({status: "loading"});
 	const [messages, setMessages]: [MessageData[], Function] = useState([]);
 	const socket: Socket | null = useContext(SocketChatContext);
-
+	const userName = useContext(UserContext);
 
 	useEffect(() => {
 		GetRequest("/chat/getMessages/" + chan).then((res) => {setResponse(res); setMessages(res.data)})
@@ -61,30 +62,23 @@ function Messages({chan}: MessagesProps) {
 	messages.sort((a, b) =>
 		(new Date(a.date) as any) - (new Date(b.date) as any)
 	)
-
 	return (
-		<div>
-			<List
-				sx={{
-		  			width: '100%',
-		  			maxWidth: 800,
-		  			bgcolor: 'background.paper',
-		  			position: 'relative',
-		  			overflow: 'auto',
-		  			maxHeight: 600,
-		  			'& ul': { padding: 0 },
-				}}>
+		<div className="w-full flex flex-col overflow-hidden overflow-scroll px-5 mb-3">
 			{messages.map((message: MessageData) => (
-				<ListItem key={message.id}	title={`Sent at ${new Date(message.date).toLocaleTimeString()}`}>
-					<div /*className="user-column"*/>
-        				<span className="user">{message.sender.username + " :"}</span>
+			<div key={message.id} className={`chat ${message.sender.username === userName ? 'chat-start' : 'chat-end'}`}>
+				<div className="chat-image avatar">
+					<div className="w-10 rounded-full">
+						<img src={message.sender.avatar ? message.sender.avatar : defaultAvatar} alt={message.sender.username} />
 					</div>
-            		<ListItemText className="message">{message.content}</ListItemText>
-            		<span className="date">{new Date(message.date).toLocaleTimeString()}</span>
-          		</ListItem>
-        	))}
+				</div>
+				<div className="chat-header">
+					{message.sender.username}
+					<time className="text-xs opacity-50 mx-1">{new Date(message.date).toLocaleTimeString()}</time>
+				</div>
+				<div className="chat-bubble break-words">{message.content}</div>
+			</div>
+			))}
 			<div ref={messageRef} />
-			</List>
 		</div>
 	)
 }
@@ -102,6 +96,7 @@ function MessageInput({ chan }: MessagesProps) {
 	return (
 		<form onSubmit={submitForm}>
 			<input autoFocus value={value} placeholder="type" onChange={(e) => {setValue(e.currentTarget.value);}} />
+			<button className="btn send-button rounded-full w-12" type="submit"><Send /></button>
 		</form>
 	);
 }
@@ -109,10 +104,9 @@ function MessageInput({ chan }: MessagesProps) {
 export default function Chatting({chan}: ChattingProps ) {
 
 	return (
-		<>
-			<strong>chating in: {chan}</strong>
+		<div className="flex flex-col w-full items-center pb-3 justify-end">
 			<Messages chan={chan} />
 			<MessageInput chan={chan} />
-		</>
+		</div>
 	);
 }

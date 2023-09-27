@@ -223,6 +223,8 @@ export class RelationshipService{
 		
 		if (relation1)
 			return ({status: relation1.status});
+		if (relation2 && relation2.status === RelationshipStatus.ACCEPTED)
+			return ({status: relation2.status});
 		return ({status: "noRelation"});
 	}
 

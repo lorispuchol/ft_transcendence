@@ -24,6 +24,33 @@ export class ChatService {
 		private relationshipService: RelationshipService,
 		private userService: UserService
 	) {}
+
+	getDistStr(dist: MemberDistinc): string {
+		if (dist === MemberDistinc.MEMBER) return "member"
+		if (dist === MemberDistinc.INVITED) return "invited"
+		if (dist === MemberDistinc.KICK) return "kicked"
+		if (dist === MemberDistinc.ADMIN) return "admin"
+		if (dist === MemberDistinc.BANNED) return "banned"
+	}
+
+	async saveNewMember(user: User, channel: Channel, dist: MemberDistinc, muteDate: Date) {
+		
+		const newMember: Participant = new Participant();
+
+		newMember.channel = channel;
+		newMember.distinction = dist;
+		newMember.user = user;
+		newMember.muteDate = muteDate
+
+		await this.participantRepository.save(newMember);
+	}
+
+	async deleteMember(user: User, channel: Channel) {
+		await this.participantRepository.delete({
+			user: {id: user.id},
+			channel: {id: channel.id}
+		});
+	}
 	
 	async getConvs(user: User): Promise<Channel[]> {
 		const chans: Channel[] = [];
@@ -37,13 +64,148 @@ export class ChatService {
 	}
 
 	async getNoConvs(user: User): Promise<Channel[]> {
-		const chans: Channel[] = [];
-		const parts: Participant[] = await this.participantRepository.find()
-		parts.forEach((part) => {
-			if(part.channel.mode !== ChanMode.PRIVATE && part.channel.mode !== ChanMode.DM && part.user.id !== user.id)
-				chans.push(part.channel)
+		
+		const convs: Channel[] = await this.getConvs(user);
+		const allChans: Channel[] = await this.channelRepository.find();
+		let Noconvs: Channel[] = [];
+
+		allChans.map(chan => {
+			if(convs.find((value: Channel) => value.id === chan.id))
+				return ;
+			if (chan.mode !== ChanMode.DM && chan.mode !== ChanMode.PRIVATE)
+				Noconvs.push(chan);
 		})
-		return chans;
+		return Noconvs;
+	}
+
+	async findOneParticipant(channel: Channel, user: User): Promise<Participant> {
+		const parts: Participant[] = await this.participantRepository.find({
+			where: {
+				channel: channel.id
+			} as FindOptionsWhere<Channel>
+		})
+		return parts.find((part) => part.user.id === user.id)
+	}
+
+	async mute(requester: User, chanName: string, login: string) {		
+		var muteDate: Date = new Date();
+		muteDate.setMinutes(muteDate.getMinutes() + 1)
+
+		const member: User = await this.userService.findOneByLogin(login)
+		if (!member)
+			throw new HttpException("User not found", HttpStatus.FORBIDDEN);
+		const channel: Channel = await this.findChanByName(chanName)
+		if (!channel)
+			throw new HttpException("Channel not found", HttpStatus.FORBIDDEN);
+		if (channel.mode === ChanMode.DM)
+			throw new HttpException("Channel is a Dm", HttpStatus.FORBIDDEN);
+
+		
+		const reqPart: Participant = await this.findOneParticipant(channel, requester)
+		const memberPart: Participant = await this.findOneParticipant(channel, member)
+
+		if (!reqPart) 
+			throw new HttpException("You are not part of " + channel.name, HttpStatus.FORBIDDEN);
+		if (!memberPart)
+			throw new HttpException(member.username + " is not part of " + channel.name, HttpStatus.FORBIDDEN);
+
+		if (memberPart.user.id === reqPart.user.id)
+			throw new HttpException("Impossible to change your own accessiblity", HttpStatus.FORBIDDEN);
+
+		if (reqPart.distinction < MemberDistinc.ADMIN || memberPart.distinction > MemberDistinc.ADMIN)
+			throw new HttpException("You are not ability to do this action", HttpStatus.FORBIDDEN);
+		if (memberPart.distinction <= MemberDistinc.INVITED)
+			throw new HttpException(member.username + " is not part of " + channel.name + ": " + this.getDistStr(memberPart.distinction), HttpStatus.FORBIDDEN);
+		if (memberPart.muteDate > new Date()){
+			let displayDate: Date = new Date(memberPart.muteDate)
+			displayDate.setHours(displayDate.getHours() + 2)
+			return ({status: "KO", description: memberPart.user.username + " is already mute until " +  new Date(displayDate).toLocaleTimeString()})
+		}
+		this.saveNewMember(member, channel, memberPart.distinction, muteDate)
+
+		let displayDate: Date = new Date(muteDate)
+		displayDate.setHours(displayDate.getHours() + 2)
+		return ({status: "OK", description: memberPart.user.username + " is now mute until " +  new Date(displayDate).toLocaleTimeString()})
+	}
+
+	async setDistinction(requester: User, chanName: string, login: string, distinction: MemberDistinc) {
+		
+		if (distinction === MemberDistinc.OWNER)
+			return ({status: "KO", description: "Impossible to set someone as owner"})
+
+		const member: User = await this.userService.findOneByLogin(login)
+		if (!member)
+			return ({status: "KO", description: "User not found"})
+		const channel: Channel = await this.findChanByName(chanName)
+		if (!channel)
+			return ({status: "KO", description: "Channel not found"})
+		if (channel.mode === ChanMode.DM)
+			return ({status: "KO", description: "Channel is a Dm"})
+
+		const reqPart: Participant = await this.findOneParticipant(channel, requester)
+		const memberPart: Participant = await this.findOneParticipant(channel, member)
+
+		if (!reqPart) 
+			return ({status: "KO", description: "You are not part of " + channel.name})
+
+		if (!memberPart) {
+			if (distinction === MemberDistinc.INVITED) {
+				this.saveNewMember(member, channel, MemberDistinc.INVITED, new Date());
+				return ({status: "OK", description: "Invitation for " + channel.name + " send to " + member.username})
+			}
+			else
+				return ({status: "OK", description: member.username + " is not part of " + channel.name})
+		}		
+		if (memberPart.user.id === reqPart.user.id)
+				return ({status: "OK", description: "Impossible to change your own accessiblity"})
+
+		if (distinction === MemberDistinc.INVITED) {
+			if (memberPart.distinction === MemberDistinc.INVITED)
+				return ({status: "KO", description: memberPart.user.username + " is already invited"})
+			return ({status: "KO", description: "Impossible to set " + member.username + " as invited"})
+		}
+
+		if (reqPart.distinction < MemberDistinc.ADMIN || memberPart.distinction > MemberDistinc.ADMIN)
+			return ({status: "KO", description: "You are not ability to do this action"})
+
+		if (memberPart.distinction === distinction)
+			return ({status: "KO", description: memberPart.user.username + " is already " + this.getDistStr(distinction)})
+		if (memberPart.distinction <= MemberDistinc.INVITED)
+			return ({status: "KO", description: member.username + " is not part of " + channel.name + ": " + this.getDistStr(memberPart.distinction)})
+
+		if (distinction === MemberDistinc.KICK) {
+			this.deleteMember(member, channel);
+			return ({status: "OK", description: member.username + " kicked from " + channel.name})
+		}
+		this.saveNewMember(member, channel, distinction, memberPart.muteDate)
+		return ({status: "OK", description: memberPart.user.username + " is now " + this.getDistStr(distinction)})
+	}
+
+	async addMemberToChan(user: User, channel: Channel, distinction: MemberDistinc) {
+
+		let checkParts: Participant = await this.findOneParticipant(channel, user);
+
+		if (checkParts) {
+			if (checkParts.distinction <= MemberDistinc.BANNED)
+				return ({status: "KO", description: "You are banned from this channel"})
+			else if (checkParts.distinction >= MemberDistinc.INVITED)
+				return ({status: "KO", description: user.username + " is already " + this.getDistStr(checkParts.distinction)})
+		}
+		this.saveNewMember(user, channel, distinction, new Date())
+		return ({status: "OK", description: user.username + " added to " + channel.name})
+	}
+
+	async joinChan(user: User, chanName: string, password: string) {
+		const channel: Channel = await this.findChanByName(chanName);
+		if (!channel)
+			return ({status: "KO", description: chanName + " not found"})
+		if (channel.mode === ChanMode.DM)
+			return ({status: "KO", description: chanName + " is a Dm"})
+		if (channel.mode === ChanMode.PRIVATE)
+			return ({status: "KO", description: chanName + " is private"})
+		if (!password && channel.mode === ChanMode.PROTECTED)
+			return ({status: "KO", description: chanName + " is protected by a password"})
+		return (await this.addMemberToChan(user, channel, MemberDistinc.MEMBER))
 	}
 
 	async createChannel(firstUser: User, name: string, mode: ChanMode, password?: string) {
@@ -52,7 +214,6 @@ export class ChatService {
 			(password && (mode === ChanMode.PRIVATE || mode === ChanMode.PUBLIC))) {
 			throw new HttpException("forbidden", HttpStatus.FORBIDDEN);
 		}
-
 		const newChan: Channel = await this.channelRepository.create({
 			name: name,
 			mode: mode
@@ -62,15 +223,8 @@ export class ChatService {
 			const hash = await bcrypt.hash(password, salt);
 			newChan.password = hash;
 		}
-		
-		const firstMember: Participant = new Participant()
-		firstMember.channel = newChan;
-		firstMember.distinction = MemberDistinc.OWNER;
-		firstMember.user = firstUser;
-
 		await this.channelRepository.save(newChan);
-		await this.participantRepository.save(firstMember);
-
+		await this.saveNewMember(firstUser, newChan, MemberDistinc.OWNER, new Date())
 		return newChan
 	}
 
@@ -79,20 +233,11 @@ export class ChatService {
 			name: user1.login + "+" + user2.login,
 			mode: ChanMode.DM
 		})
-		
-		const newPart1: Participant = new Participant()
-		newPart1.channel = newMp;
-		newPart1.distinction = MemberDistinc.OWNER;
-		newPart1.user = user1;
-
-		const newPart2: Participant = new Participant()
-		newPart2.channel = newMp;
-		newPart2.distinction = MemberDistinc.OWNER;
-		newPart2.user = user2;
-
 		await this.channelRepository.save(newMp);
-		await this.participantRepository.save(newPart1);
-		await this.participantRepository.save(newPart2);
+
+		await this.saveNewMember(user1, newMp, MemberDistinc.OWNER, new Date())
+		await this.saveNewMember(user2, newMp, MemberDistinc.OWNER, new Date())
+
 		return newMp
 	}
 
@@ -126,6 +271,8 @@ export class ChatService {
 
 	async getDm(user1: User, user2: User): Promise<Channel> {
 		
+		if (!user2)
+			throw new HttpException("User not found", HttpStatus.FORBIDDEN);
 		if (user1.login === user2.login)
 			throw new HttpException("forbidden", HttpStatus.FORBIDDEN);
 		const name: string = user1.login + "+" + user2.login
@@ -163,6 +310,8 @@ export class ChatService {
 			} as FindOptionsWhere<Channel>
 		})
 		const u: User = await this.userService.findOneByLogin(user);
+		if (!u)
+			throw new HttpException("forbidden", HttpStatus.FORBIDDEN);
 		const displayMessages: Message[] = [];
 		const request = messages.map( async (msg) => {	
 			if (!await this.relationshipService.ReqIsBlocked(msg.sender, u))

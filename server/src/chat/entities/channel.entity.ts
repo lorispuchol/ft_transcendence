@@ -29,7 +29,7 @@ export class Channel extends BaseEntity {
 		enum: ChanMode,
 		default: ChanMode.PUBLIC
 	})
-	mode: string
+	mode: ChanMode
 
 	
 	@Column({

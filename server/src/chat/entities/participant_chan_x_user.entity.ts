@@ -4,6 +4,7 @@ import { Channel } from "./channel.entity";
 
 
 export enum MemberDistinc {
+	KICK = -2,
 	BANNED = -1,
 	INVITED = 0,
 	MEMBER = 1,
@@ -27,5 +28,8 @@ export class Participant extends BaseEntity {
 		enum: MemberDistinc,
 		default: MemberDistinc.OWNER
 	})
-	distinction: number;
+	distinction: MemberDistinc;
+
+	@Column({type: 'timestamp', default: new Date()})
+	muteDate: Date;
 }

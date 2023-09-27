@@ -5,6 +5,7 @@ import { Relationship, RelationshipStatus } from "src/relationship/relationship.
 import { FindOptionsWhere, Repository } from "typeorm";
 import { UserService } from "src/user/user.service";
 import { User } from "src/user/user.entity";
+import { MemberDistinc, Participant } from "src/chat/entities/participant_chan_x_user.entity";
 
 interface Event {
 	type: string,
@@ -17,6 +18,8 @@ export class EventService {
 		private	eventGateway: EventGateway,
 		@InjectRepository(Relationship, 'lorisforever')
 			private relationshipRepository: Repository<Relationship>,
+		@InjectRepository(Participant, 'lorisforever')
+			private participantRepository: Repository<Participant>,
 		private userService: UserService,
 	) {}
 
@@ -43,8 +46,23 @@ export class EventService {
 		});
 
 		const logins: string[] = [];
-		pendingInvitations.forEach((invitation) => logins.push(invitation.requester.username))
+		pendingInvitations.forEach((invitation) => logins.push(invitation.requester.username)) // pourquoi username et pas login ?
 		return logins;
+	}
+
+	async getPendingInvitationsChannel(login: string): Promise<string[]> {
+		
+		const user: User = await this.userService.findOneByLogin(login);
+		const pendingInvitationsChannel: Participant[] = await this.participantRepository.find({
+			where: {
+				user: user.id,
+				distinction: MemberDistinc.INVITED
+			} as FindOptionsWhere<User>
+		});
+
+		const channels: string[] = [];
+		pendingInvitationsChannel.forEach((invitationChan) => channels.push(invitationChan.channel.name))
+		return channels;
 	}
 
 	async getBlockeds(login: string) {

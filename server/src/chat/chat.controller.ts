@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Post, Request } from "@nestjs/common";
 import { ChatService } from "./chat.service";
 import { UserService } from "src/user/user.service";
-import { NewChannelWithPassword, NewChannelWithoutPassword } from "./channel.dto";
+import { Distinction, JoinChannelWithPassword, Mute, NewChannelWithPassword, NewChannelWithoutPassword } from "./channel.dto";
 
 @Controller('chat')
 export class ChatController {
@@ -19,8 +19,55 @@ export class ChatController {
 
 	@Get('getNoConvs')
 	async getNoConvs( @Request() req: any ) {
-		return this.chatService.getNoConvs(
+		return await this.chatService.getNoConvs(
 			await this.userService.findOneByLogin(req.user.login)
+		)
+	}
+
+	@Post('mute/:chan')
+	async mute (
+		@Request() req: any,
+		@Param('chan') chan: string,
+		@Body() muteData: Mute) {
+		return await this.chatService.mute(
+			await this.userService.findOneByLogin(req.user.login),
+			chan,
+			muteData.login,
+		)
+	}
+
+	@Post('setDistinction/:chan')
+	async setDistinction (
+		@Request() req: any,
+		@Param('chan') chan: string,
+		@Body() distinctionData: Distinction) {
+		return await this.chatService.setDistinction(
+			await this.userService.findOneByLogin(req.user.login),
+			chan,
+			distinctionData.login,
+			distinctionData.distinction
+		)
+	}
+
+	@Post('joinProtectedChan/')
+	async joinProtectedChan (
+		@Request() req: any,
+		@Body() dataJoin: JoinChannelWithPassword) {
+		return await this.chatService.joinChan(
+			await this.userService.findOneByLogin(req.user.login),
+			dataJoin.channelName,
+			dataJoin.password
+		)
+	}
+
+	@Post('joinPubChan/:chan')
+	async joinPubChan (
+		@Request() req: any,
+		@Param('chan') chan: string ) {
+		return await this.chatService.joinChan(
+			await this.userService.findOneByLogin(req.user.login),
+			chan,
+			null
 		)
 	}
 	
