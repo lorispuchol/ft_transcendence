@@ -35,6 +35,7 @@ export default function GameMenu({ setSetting, setDefy }: MenuProps) {
 				setSelect(null);
 		}
 		function handleDefy(data: any) {
+			console.log(select);
 			if (data.login !== select)
 				return ;
 			if (data.response === "OK")
@@ -48,14 +49,17 @@ export default function GameMenu({ setSetting, setDefy }: MenuProps) {
 		socket.on('everyone', addUser);
 		socket.on('userDisconnect', delUser);
 		socket.on("defy", handleDefy);
-		socket.emit("getConnected");
-
+		
 		return () => {
 			socket.off('everyone', addUser);
 			socket.off('userDisconnect', delUser);
 			socket.off("defy", handleDefy);
 		};
-	}, [socket])
+	}, [socket, select])
+	
+	useEffect(() => {
+		socket.emit("getConnected");
+	}, [])
 
 	function focus(value: string) {
 		if (type === value || mode === value)

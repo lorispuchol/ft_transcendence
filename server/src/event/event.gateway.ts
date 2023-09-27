@@ -72,7 +72,6 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 				client.emit("everyone", toSend);
 			}
 		});
-		client.emit("everyone", {avatar: null, login: "oui", username: "francis"});
 	}
 
 	@SubscribeMessage('getEvents')
