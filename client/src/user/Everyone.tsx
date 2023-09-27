@@ -18,7 +18,8 @@ interface ProfileElementProps {
 }
 
 interface UserData {
-	avatar: string | null,
+	id: number,
+	avatar: string,
 	login: string,
 	username: string,
 }

@@ -101,5 +101,7 @@ export default function EventButton ({ event }: EventButtonProps) {
 				<RefuseGame login={event.sender} />
 			</div>
 		)
-	return (<strong>need fix</strong>)
+	if (event.type !== "message")
+		return (<strong>need fix</strong>)
+	return null
 }

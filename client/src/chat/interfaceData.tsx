@@ -6,6 +6,7 @@ export enum ChanMode {
 }
 
 export enum MemberDistinc {
+	KICK = -2,
 	BANNED = -1,
 	INVITED = 0,
 	MEMBER = 1,
@@ -20,6 +21,7 @@ export enum RelationshipStatus {
 }
 
 export interface UserData {
+	id: number,
 	avatar: string,
 	login: string,
 	username: string,
@@ -36,14 +38,15 @@ export interface RelationData{
 export interface ChannelData {
 	id: number, 
 	name: string,
-	mode: string,
+	mode: ChanMode,
 	password: string | null;
 }
 
 export interface ParticipantData {
 	user: UserData,
-	channel: ChannelData
-	distinction: number 
+	channel: ChannelData,
+	distinction: MemberDistinc,
+	muteDate: Date
 }
 
 export interface MessageData {

@@ -46,20 +46,3 @@ export class PasswordChannelMatch {
 		return "unknow channel name or wrong password";
 	}
 }
-
-@ValidatorConstraint({ async: true })
-@Injectable()
-export class IsMode {
-	constructor() {}
-
-	async validate(value: ChanMode) {
-		if (value !== ChanMode.PUBLIC &&
-			value !== ChanMode.PRIVATE && 
-			value !== ChanMode.PROTECTED)
-			return false
-		return true
-	}
-	defaultMessage(args: ValidationArguments) {
-		return `Channel mode ${(args.object as any).mode} is not an existing mode`;
-	}
-}

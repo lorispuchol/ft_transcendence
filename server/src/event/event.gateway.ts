@@ -80,7 +80,10 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 		const events: Event[] = [];
 		
 		const friendReq: string[] = await this.eventService.getPendingInvitations(login);
+		const channelReq: string[] = await this.eventService.getPendingInvitationsChannel(login);
+
 		friendReq.map((login: string) => events.push({type: "friendRequest", sender: login}));
+		channelReq.map((channel: string) => events.push({type: "channelInvitation", sender: channel})); // ici le sender est le channel
 	
 		events.map((event) => client.emit("event", event));
 	}

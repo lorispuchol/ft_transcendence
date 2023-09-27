@@ -6,13 +6,14 @@ import ErrorHandling from "../utils/Error";
 import { useLocation } from "react-router-dom";
 import { Socket, io } from "socket.io-client";
 import './chat.scss'
-import { ChanMode, ChannelData, MessageData, ParticipantData } from "./interfaceData";
+import { ChanMode, ChannelData, MemberDistinc, MessageData, ParticipantData } from "./interfaceData";
 import { SocketChatContext, UserContext } from "../utils/Context";
 import ChannelNav from "./ChannelNav";
 import { Avatar } from "@mui/material";
 import { Tag } from "@mui/icons-material";
 import ListMembers from "./ListMember";
 import { defaultAvatar } from "../pages/Profile/Profile";
+import { ToastContainer, toast } from "react-toastify";
 
 interface Response {
 	status: string | number,
@@ -43,9 +44,58 @@ interface MessagesListenerProps {
 	msg: MessageData,
 }
 
+export function logWarn(warn: string) {
+	toast.warn(warn, {
+		position: "bottom-left",
+		autoClose: 2000,
+		hideProgressBar: true,
+	});
+}
+
+export function logError(error: string[]) {
+	toast.error(error[0], {
+		position: "bottom-left",
+		autoClose: 2000,
+		hideProgressBar: true,
+	});
+}
+
+
+export function logSuccess(msg: string) {
+	toast.success(msg, {
+		position: "bottom-left",
+		autoClose: 2000,
+		hideProgressBar: true,
+	});
+}
+
+export function logInfo(msg: string) {
+	toast.info(msg, {
+		position: "bottom-left",
+		autoClose: 2000,
+		hideProgressBar: true,
+	});
+}
 
 function ChanButtonConv({chan, focusConv, setFocusConv}: ButtonConvProps) {
 
+	const [resMembers, setResMembers]: [ResMembers, Function] = useState({status: "loading"});
+	const user = useContext(UserContext);
+
+	useEffect(() => {
+		GetRequest("/chat/getMembers/" + chan.name).then((res) => setResMembers(res))
+	}, [chan]);
+
+	if (resMembers.status === "loading")
+		return (<Loading />);
+	if (resMembers.status !== "OK")
+		return (<ErrorHandling status={resMembers.status} message={resMembers.error} />);
+	if (!resMembers.data)
+		return null;
+	if (resMembers.data!.find((member) => member.user.username === user)
+		&& resMembers.data!.find((member) => member.user.username === user)!.distinction <= MemberDistinc.INVITED)
+		return null;
+	
 	return (
 		<button
 			className={`button-conv ${chan.name === focusConv && 'focused'}`}
@@ -126,9 +176,7 @@ function ListConv({focusConv, setFocusConv}: focusConvProps) {
 					<DmButtonConv key={chan.name} chan={chan} focusConv={focusConv} setFocusConv={setFocusConv} />
 				))
 			}
-			{
-				dms.length && chans.length ? <hr /> : null
-			}
+			{dms.length && chans.length ? <hr /> : null}
 			{
 				chans.map((chan) => (
 					<ChanButtonConv key={chan.name} chan={chan} focusConv={focusConv} setFocusConv={setFocusConv} />
@@ -170,8 +218,10 @@ export default function Chat() {
 				</div>
 				<div className="list-member">
 					{focusConv ? <ListMembers chan={focusConv} /> : null}
+					<ToastContainer />
 				</div>
 			</div>
+			<ToastContainer />
 		</SocketChatContext.Provider>
 	);
 }
