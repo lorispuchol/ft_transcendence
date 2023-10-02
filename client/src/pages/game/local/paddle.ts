@@ -77,6 +77,36 @@ function movement(height: number, pad: Pad) {
 		pad.ly += speed;
 }
 
+export function handlePaddleGetReady(ctx: CanvasRenderingContext2D, pad: Pad, ready: boolean[], setLeftReady: Function, setRightReady: Function) {
+	const height = ctx.canvas.height;
+	const borderGap: number = height * 0.006;
+	const speed: number = height * 0.02;
+
+	if (rightKey.length !== 0)
+	{
+		setRightReady("border-green-500");
+		ready[1] = true;
+	}
+	if (leftKey.length !== 0)
+	{
+		setLeftReady("border-green-500");
+		ready[0] = true;
+	}
+
+
+	if (rightKey[0] === "ArrowUp" && pad.ry >= borderGap)
+		pad.ry -= speed;
+	else if (rightKey[0] === "ArrowDown" && pad.ry <= height - pad.h - borderGap)
+		pad.ry += speed;
+	
+	if (leftKey[0] === "w" && pad.ly >= borderGap)
+		pad.ly -= speed;
+	else if (leftKey[0] === "s" && pad.ly <= height - pad.h - borderGap)
+		pad.ly += speed;
+
+	drawPaddle(ctx, pad);
+}
+
 export default function handlePaddle(ctx: CanvasRenderingContext2D, pad: Pad) {
 	movement(ctx.canvas.height, pad);
 	drawPaddle(ctx, pad);

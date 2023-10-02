@@ -25,8 +25,14 @@ export default function UserStatus({ login }: UserStatusprops) {
 	const [userStatus, setUserStatus]: [string, Function] = useState("loading");
 
 	useEffect(() => {
-		socket.on('status/' + login, (status: string) => setUserStatus(status));
+		function getStatus(status: string) {
+			setUserStatus(status)
+		}
+
+		socket.on('status/' + login, getStatus);
 		socket.emit('getStatus', login);
+
+		return () => {socket.off('status/' + login, getStatus)};
 	}, [socket, login])
 
 	if (userStatus === "loading")

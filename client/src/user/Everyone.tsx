@@ -22,8 +22,6 @@ interface UserData {
 	avatar: string,
 	login: string,
 	username: string,
-	nb_victory: number,
-	nb_defeat: number,
 }
 
 interface Response {
@@ -55,7 +53,7 @@ function ProfileElement({ user }: ProfileElementProps) {
 			<div className="status"><UserStatus login={user.login} /></div>
 			<div className="py-2"><Avatar src={avatar} alt={user.username}/></div>
 			<div className="px-4">
-				<NavLink to={'/profile/' + user.login}>
+				<NavLink to={'/profile/' + user.username}>
 					<Paper className="everyone_username">{user.username}</Paper>
 				</NavLink>
 			</div>
@@ -78,7 +76,7 @@ function ProfileElement({ user }: ProfileElementProps) {
 export default function Everyone() {
 	const [response, setResponse]: [Response, Function] = useState({status: "loading"});
 	const [users, setUsers]: [UserData[], Function] = useState([]);
-	const socket = useContext(EventContext);
+	const socket = useContext(EventContext)!;
 	const username = useContext(UserContext);
 
 	useEffect(() => {
@@ -96,7 +94,9 @@ export default function Everyone() {
 					});
 			}
 
-			socket!.on('everyone', everyoneListener);
+			socket.on('everyone', everyoneListener);
+
+			return () => {socket.off('everyone', everyoneListener)};
 	}, [socket]);
 	if (response.status === "loading")
 		return (<Loading />);
@@ -108,7 +108,7 @@ export default function Everyone() {
 				{users.length > 1 ? 
 					users.map((user: UserData) => (
 						username !== user.username &&
-									<ProfileElement key={user.id} user={user} />
+									<ProfileElement key={user.login} user={user} />
 					))
 					:
 					<Paper className="nobody">nobody there</Paper>

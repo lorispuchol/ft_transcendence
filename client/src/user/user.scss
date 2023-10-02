@@ -18,6 +18,10 @@
 	grid-template-columns: repeat(auto-fit, minmax(808px, 1fr));
 }
 
+.everyone_list::-webkit-scrollbar {
+	display: none !important;
+  }
+
 .everyone_list > div {
 	margin-bottom: 0px;
 }

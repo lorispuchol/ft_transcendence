@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
-import handleBall, { Ball, init_ball } from "./local/ball";
-import './Game.scss';
-import { ScreenSize } from "./local/LocalGame";
+import handleBall, { Ball, init_ball } from "./ball";
+import '../Game.scss';
+import { ScreenSize } from "./LocalGame";
 
 function wallHit(screen: ScreenSize, ball: Ball) {
 	if (ball.y >= (screen.h - ball.rad) || ball.y <= ball.rad)
