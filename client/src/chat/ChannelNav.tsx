@@ -240,8 +240,6 @@ export default function ChannelNav() {
 						</PopUp>
 				}
 			</div>
-			<ToastContainer />
 		</>
-		
 	)
 }

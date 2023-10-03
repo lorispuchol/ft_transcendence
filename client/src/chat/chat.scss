@@ -14,7 +14,7 @@ hr {
 /* ////////////////////////////  List Conv  /////////////////////////////////// */
 
 .list-conv {
-	border-radius: 0.25rem;
+	border-radius: 0.25rem 0 0 0.25rem;
 	flex-basis: 20%;
 	flex-grow: 0;
 	flex-shrink: 0;
@@ -65,7 +65,7 @@ hr {
 /* ////////////////////////////////  Chatting and ChanNav //////////////////////////// */
 
 .chatting {
-	border-radius: 0.25rem;
+	border-radius: 0 0 0 0;
 	display: flex;
 	flex-basis: 60%;
 	flex-grow: 0;
@@ -115,7 +115,7 @@ hr {
 
 /* ////////////////////////////////  ListMember  //////////////////////////// */
 .list-member {
-	border-radius: 0.25rem;
+	border-radius: 0 0.25rem 0.25rem 0;
 	background-color: #46506c;
 	flex-basis: 20%;
 	flex-grow: 0;
