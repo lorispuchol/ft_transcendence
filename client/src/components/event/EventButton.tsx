@@ -2,7 +2,8 @@ import { Close, Done } from "@mui/icons-material";
 import { Button } from "@mui/material";
 import { DeleteRequest, PatchRequest } from "../../utils/Request";
 import ErrorHandling from "../../utils/Error";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { SocketChatContext } from "../../utils/Context";
 
 interface Event {
 	type: string,
@@ -45,9 +46,15 @@ function RefuseChannel({ channel }: ButtonChannelProps) {
 function AcceptChannel({ channel }: ButtonChannelProps) {
 	const [response, setResponse]: [Response, Function] = useState({status: "inactive"});
 
+	const socket = useContext(SocketChatContext);
+
 	function handleClick() {
-		PatchRequest("/chat/acceptChannel/" + channel, {}).then((response) => {setResponse(response)});
-	}
+		PatchRequest("/chat/acceptChannel/" + channel, {}).then((response) => {
+			setResponse(response)
+			if (response.status === "OK")
+				socket!.emit('message', channel, "Hello Everybody!");
+		});
+}
 	if (response.status === "KO")
 			return (<ErrorHandling status={response.status} message={response.error} />);
 	if (response.data?.status === "KO")
