@@ -32,6 +32,11 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 		const decoded: any = this.jwtService.decode(<string>client.handshake.headers.token);
 		const newLogin: string = decoded.login;
 		const user: User = await this.eventService.getUserData(newLogin);
+		if (!user)
+		{
+			client.disconnect();
+			return ;
+		}
 		const newUser = {avatar: user.avatar, login: user.login, username: user.username};
 		this.users.set(client, newLogin);
 		
@@ -47,6 +52,8 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 	async handleDisconnect(client: Socket) {
 		const offLogin: string = this.users.get(client);
 		const user: User = await this.eventService.getUserData(offLogin);
+		if (!user)
+			return ;
 		const offUser = {avatar: user.avatar, login: user.login, username: user.username};
 
 		this.users.forEach(async (login, cli) => {
