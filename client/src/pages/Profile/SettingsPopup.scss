@@ -35,9 +35,29 @@
 	margin-bottom: 4px;
 }
 
+.settings_option input[type=text]:focus {
+	border: 2px solid black;
+}
+
+input[type=file]::file-selector-button {
+	background-color: c.$primary;
+	filter: brightness(1.5) !important;
+	color: black;
+	border-radius: 4px;
+}
+
+.username_input {
+	background-color: white;
+	border: 2px solid gray;
+  	border-radius: 4px;
+	outline: none;
+}
+
+
 .update_button {
-	border-radius: 0.25rem; /* 4px */
-	box-shadow: 0 0 0 0.200rem rgba(0, 0, 0, 1);
-	background-color: c.$secondary;
 	margin-left: 8px;
+	border-radius: 0.25rem; /* 4px */
+	box-shadow: 0 0 0 0.100rem rgba(0, 0, 0, 1);
+	background-color: c.$primary;
+	filter: brightness(1.5) !important;
 }
