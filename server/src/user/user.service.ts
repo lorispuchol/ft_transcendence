@@ -39,6 +39,13 @@ export class UserService {
 		return this.userRepository.findOneBy({username});
 	}
 
+	async getAvatar(username: string): Promise<string | undefined> {
+		const user = await this.userRepository.findOneBy({username});
+		if (!user)
+			return
+		return user.avatar
+	}
+
 	async changeUsername(userId: number, newUsername: string) {
 		this.userRepository.update({id: userId}, {username: newUsername});
 		return ("OK")
