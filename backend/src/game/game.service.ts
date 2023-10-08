@@ -6,9 +6,11 @@ export class PongGame {
 		private p2: string,
 	) {}
 
-	start() {
+	public start() {
 		
 	}
+
+	public input
 }
 
 @Injectable()

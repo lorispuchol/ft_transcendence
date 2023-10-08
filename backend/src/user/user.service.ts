@@ -56,7 +56,6 @@ export class UserService {
 		return ("OK")
 	}
 
-	////dev
 	async getAllUsers() {
 		return this.userRepository.find();
 	}

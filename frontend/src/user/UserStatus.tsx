@@ -4,7 +4,7 @@ import { EventContext } from "../utils/Context";
 import { Circle } from "@mui/icons-material";
 
 interface UserStatusprops {
-	login: string
+	userId: number
 }
 
 function renderColor(status: string) {
@@ -20,7 +20,7 @@ function renderColor(status: string) {
 	}
 }
 
-export default function UserStatus({ login }: UserStatusprops) {
+export default function UserStatus({ userId }: UserStatusprops) {
 	const socket: Socket = useContext(EventContext)!;
 	const [userStatus, setUserStatus]: [string, Function] = useState("loading");
 
@@ -29,11 +29,11 @@ export default function UserStatus({ login }: UserStatusprops) {
 			setUserStatus(status)
 		}
 
-		socket.on('status/' + login, getStatus);
-		socket.emit('getStatus', login);
+		socket.on('status/' + userId, getStatus);
+		socket.emit('getStatus', userId);
 
-		return () => {socket.off('status/' + login, getStatus)};
-	}, [socket, login])
+		return () => {socket.off('status/' + userId, getStatus)};
+	}, [socket, userId])
 
 	if (userStatus === "loading")
 		return (<Circle sx={{color:renderColor("")}}/>);

@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 interface Event {
 	type: string,
 	sender: string,
+	senderId: number,
 	gameMode?: string,
 }
 
@@ -16,8 +17,12 @@ interface EventButtonProps {
 	event: Event
 }
 
-interface ButtonProps {
-	login: string,
+interface FriendProps {
+	login: string
+}
+
+interface GameProps {
+	senderId: number,
 	mode?: string
 }
 
@@ -27,7 +32,7 @@ interface Response {
 	error?: string,
 }
 
-function RefuseFriend({ login }: ButtonProps) {
+function RefuseFriend({ login }: FriendProps) {
 	const [response, setResponse]: [Response, Function] = useState({status: "inactive"});
 
 	function handleClick() {
@@ -43,7 +48,7 @@ function RefuseFriend({ login }: ButtonProps) {
 	)
 }
 
-function AcceptFriend({ login }: ButtonProps) {
+function AcceptFriend({ login }: FriendProps) {
 	const [response, setResponse]: [Response, Function] = useState({status: "inactive"});
 
 	function handleClick() {
@@ -59,13 +64,13 @@ function AcceptFriend({ login }: ButtonProps) {
 	)
 }
 
-function AcceptGame({ login, mode }: ButtonProps) {
+function AcceptGame({ senderId, mode }: GameProps) {
 	const socket = useContext(EventContext)!;
 	const navigate = useNavigate();
 
 	function handleClick() {
-		navigate("/game", {replace: true, state: {to: login, mode: mode}})
-		socket.emit("acceptGame", login);
+		socket.emit("acceptGame", senderId);
+		navigate("/game", {replace: true, state: {to: senderId, mode: mode}})
 	}
 
 	return (
@@ -73,11 +78,11 @@ function AcceptGame({ login, mode }: ButtonProps) {
 	)
 }
 
-function RefuseGame({ login }: ButtonProps) {
+function RefuseGame({ senderId }: GameProps) {
 	const socket = useContext(EventContext)!;
 
 	function handleClick() {
-		socket.emit("refuseGame", login);
+		socket.emit("refuseGame", senderId);
 	}
 
 	return (
@@ -97,8 +102,8 @@ export default function EventButton ({ event }: EventButtonProps) {
 	if (event.type === "gameRequest")
 		return (
 			<div className="grid grid-cols-2">
-				<AcceptGame login={event.sender} mode={event.gameMode}/>
-				<RefuseGame login={event.sender} />
+				<AcceptGame senderId={event.senderId} mode={event.gameMode}/>
+				<RefuseGame senderId={event.senderId} />
 			</div>
 		)
 	if (event.type !== "message")

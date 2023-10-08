@@ -10,18 +10,13 @@ interface Props {
 	setting: Setting,
 	setSetting: Function,
 	setPlayers: Function,
-	defy: string | null,
-}
-
-interface Player {
-	score: number,
-	avatar: string,
-	username: string,
+	defy: number | null,
 }
 
 export default function MatchMaking({ setting, setPlayers, setSetting, defy }: Props) {
 	const [socket, setSocket]: [Socket | null, Function] = useState(null);
 	const [openent, setOpenent]: [boolean, Function] = useState(false);
+	const currentMode: string = setting.mode;
 
 	useEffect(() => {
 		const token = localStorage.getItem("token");
@@ -31,7 +26,7 @@ export default function MatchMaking({ setting, setPlayers, setSetting, defy }: P
 		
 		function handleSearch(players: Players | null) {
 			if (!players)
-				setSetting({type: "menu", mode: setting.mode});
+				setSetting({type: "menu", mode: currentMode});
 			else
 			{
 				setPlayers(players);
@@ -45,7 +40,7 @@ export default function MatchMaking({ setting, setPlayers, setSetting, defy }: P
 		return () => {
 			newSocket.close();
 		};
-	}, [setSocket])
+	}, [setSocket, defy, setPlayers, setSetting, currentMode])
 	if (!socket)
 		return (<Loading />);
 	

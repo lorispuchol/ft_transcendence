@@ -58,7 +58,7 @@ function Profile({ member, isDm}: ProfileProps) {
 		<div className="flex flex-col items-center my-3">
 			<div className="relative m-2">
 				<div className=""><Avatar sx={{ width: 128, height: 128 }} src={avatar} alt={member.username}/></div>
-				<div className="absolute top-[100px] left-[100px]"><UserStatus login={member.login} /></div>
+				<div className="absolute top-[100px] left-[100px]"><UserStatus userId={member.id} /></div>
 			</div>
 			<div className="tooltip tooltip-bottom" data-tip="go to profile"> 
 				<NavLink to={'/profile/' + member.login}>
@@ -121,7 +121,7 @@ function MemberButton({ member, setDisplayProfile, muted}: MemberButtonProps) {
 			<button disabled={disabled} onClick={() => setDisplayProfile(member)} className={`w-full flex flex-row flex-nowrap items-center member-button py-2 px-1 ${disabled && "user-member-disabled"}`}>
 				<div className="relative mx-2">
 					<div className=""><Avatar src={avatar} alt={member.username}/></div>
-					<div className="absolute top-5 left-7"><UserStatus login={member.login} /></div>
+					<div className="absolute top-5 left-7"><UserStatus userId={member.id} /></div>
 				</div>
 				{
 					disabled ?

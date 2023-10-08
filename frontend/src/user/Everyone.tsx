@@ -50,7 +50,7 @@ function ProfileElement({ user }: ProfileElementProps) {
 	return (
 		<>
 		<Paper key={render} className="profile_element">
-			<div className="status"><UserStatus login={user.login} /></div>
+			<div className="status"><UserStatus userId={user.id} /></div>
 			<div className="py-2"><Avatar src={avatar} alt={user.username}/></div>
 			<div className="px-4">
 				<NavLink to={'/profile/' + user.username}>

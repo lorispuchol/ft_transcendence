@@ -3,6 +3,7 @@ import { JwtService } from "@nestjs/jwt";
 import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 import { client_url } from "src/auth/constants";
+import { UserService } from "src/user/user.service";
 
 @WebSocketGateway({
 	namespace: "game",
@@ -11,42 +12,45 @@ import { client_url } from "src/auth/constants";
 export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 	constructor(
 		private jwtService: JwtService,
+		private userService: UserService,
 		) {}
 		
-	private users: Map<Socket, string> = new Map();
+	private users: Map<Socket, number> = new Map();
 	private queue: Socket[] = [];
-	private defyQueue: string[] = [];
+	private defyQueue: number[] = [];
 
 	afterInit(server: Server) {}
 
 	async handleConnection(client: Socket, ...args: any[]) {
 		const decoded: any = this.jwtService.decode(<string>client.handshake.headers.token);
-		const newLogin: string = decoded.login;;
-		this.users.set(client, newLogin);
+		const newId: number = decoded.id;;
+		this.users.set(client, newId);
 	}
 
 	handleDisconnect(client: Socket) {
-		const offLogin: string = this.users.get(client);
+		const offId: number = this.users.get(client);
 		this.queue = this.queue.filter((socket) => socket.id !== client.id);
-		this.defyQueue= this.defyQueue.filter((login) => login !== offLogin);
+		this.defyQueue= this.defyQueue.filter((id) => id !== offId);
 		this.users.delete(client);
 	}
 
 	@SubscribeMessage("search")
-	matchmaking(@MessageBody() defy: string | null, @ConnectedSocket() client: Socket) {
-		const login = this.users.get(client);
+	async matchmaking(@MessageBody() defy: number | null, @ConnectedSocket() client: Socket) {
+		const id = this.users.get(client);
+		const username = (await this.userService.findOneById(id)).username;
 
 		if (defy)
 		{
 			const i = this.defyQueue.indexOf(defy);
 			if (i < 0)
-				this.defyQueue.push(login);
+				this.defyQueue.push(id);
 			else
 			{
+				const defyName = (await this.userService.findOneById(defy)).username;
 				const openentSocket: Socket = [...this.users.entries()].filter(({ 1: value}) => defy === value).map(([key]) => key)[0];
 				this.defyQueue.splice(i, 1);
-				client.emit("matchmaking", {p1: {score:0, avatar: "", username: defy}, p2: {score:0, avatar: "", username: login}});
-				openentSocket.emit("matchmaking", {p1: {score:0, avatar: "", username: defy}, p2: {score:0, avatar: "", username: login}});
+				client.emit("matchmaking", {p1: {score:0, avatar: "", username: defyName}, p2: {score:0, avatar: "", username: username}});
+				openentSocket.emit("matchmaking", {p1: {score:0, avatar: "", username: defyName}, p2: {score:0, avatar: "", username: username}});
 				//need to create game with openent
 			}
 		}
@@ -58,8 +62,9 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		{
 			const openentSock = this.queue.shift();
 			const openent = this.users.get(openentSock);
-			client.emit("matchmaking", {p1: {score:0, avatar: "", username: openent}, p2: {score:0, avatar: "", username: login}});
-			openentSock.emit("matchmaking", {p1: {score:0, avatar: "", username: openent}, p2: {score:0, avatar: "", username: login}});
+			const openentName = (await this.userService.findOneById(openent)).username;
+			client.emit("matchmaking", {p1: {score:0, avatar: "", username: openentName}, p2: {score:0, avatar: "", username: username}});
+			openentSock.emit("matchmaking", {p1: {score:0, avatar: "", username: openentName}, p2: {score:0, avatar: "", username: username}});
 			//need to create game with openent
 		}
 	}

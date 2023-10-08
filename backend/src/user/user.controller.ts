@@ -76,8 +76,6 @@ export class UserController {
 			return await this.userService.getAvatar(username);
 		}
 
-	//dev
-	@Public()
 	@Get('all')
 	async getAllUsers() {
 		return await this.userService.getAllUsers();

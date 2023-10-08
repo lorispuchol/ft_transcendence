@@ -6,6 +6,7 @@ import handleBall, { Ball, drawBall, init_ball } from "./ball";
 import collision from "./collision";
 import { countDown } from "./countDown";
 import { Players } from "../Game";
+import { ArrowDownward } from "@mui/icons-material";
 
 let freezeFrame = 0;
 
@@ -118,7 +119,12 @@ export default function LocalGame( { setPlayers }: any ) {
 
 	return (
 			<div className="canvas_container">
-				<h1 className="get_ready left-[21vw] top-[20vw]">{winner}</h1>
+				{ winner &&
+				<>
+					<h1 className="get_ready left-[21vw] top-[20vw]">{winner}</h1>
+					<ArrowDownward className="get_ready left-[31vw] top-[30vw] text-[8vw]" />
+				</>
+				}
 				<div className={"prompt_wrapper" + (prompt ? "" : " fade")}>
 					<h1 className="get_ready left-[23vw] top-[5vw]">GET READY</h1>
 					<div className={"key kbd left-[10vw] top-[10vw] " + leftReady}>w</div>

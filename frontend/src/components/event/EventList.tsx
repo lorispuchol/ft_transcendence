@@ -9,6 +9,8 @@ import { useNavigate } from "react-router-dom";
 interface Event {
 	type: string,
 	sender: string,
+	senderId: number,
+	gameMode?: string,
 }
 
 interface RenderIconProps {
@@ -57,7 +59,7 @@ function Events({ socket }: SocketProps) {
 	useEffect(() => {
 		function eventListener(event: Event) {
 			setEvents((prevEvents: Event[]) => {
-				if (prevEvents.find((value) => value.sender + value.type === event.sender + event.type))
+				if (prevEvents.find((value) => value.senderId + value.type === event.senderId + event.type))
 					return [...prevEvents];
 				const newEvents: Event[] = [...prevEvents, event];
 				return newEvents;
@@ -65,9 +67,10 @@ function Events({ socket }: SocketProps) {
 		}
 		function eventDeleter(event: Event) {
 			setEvents((prevEvents: Event[]) => {
-				const index = prevEvents.indexOf(event);
-				prevEvents.splice(index, 1);
-				return [...prevEvents];
+				const newEvents = prevEvents.filter((value) => (
+					!(value.type === event.type && value.senderId === event.senderId)
+					));
+				return newEvents;
 			});
 		}
 

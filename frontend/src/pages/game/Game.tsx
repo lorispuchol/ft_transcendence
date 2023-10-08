@@ -5,7 +5,7 @@ import GameMenu from "./GameMenu";
 import bird from "./bird.png";
 import MatchMaking from "./online/MatchMaking";
 import LocalGame from './local/LocalGame';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 interface Player {
 	score: number,
@@ -44,9 +44,8 @@ function PlayerCard( { player }: any ) {
 
 export default function Game() {
 	const location = useLocation();
-	const navigate = useNavigate();
 	const [players, setPlayers]: [Players, Function] = useState({p1: null, p2: null});
-	const [defy, setDefy]: [string | null, Function] = useState(location.state ? location.state.to : null);
+	const [defy, setDefy]: [number | null, Function] = useState(location.state ? location.state.to : null);
 	const [setting, setSetting]: [Setting, Function] = useState(location.state ? {type: "online", mode: location.state.mode} : {type: "menu", mode: "classic"});
 
 	useEffect(() => {
