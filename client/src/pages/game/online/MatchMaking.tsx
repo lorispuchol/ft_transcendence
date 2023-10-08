@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { server_url } from "../../../utils/Request";
 import { Players, Setting } from "../Game";
 import { CircularProgress } from "@mui/material";
+import OnlineGame from "./OnlineGame";
 
 interface Props {
 	setting: Setting,
@@ -58,8 +59,7 @@ export default function MatchMaking({ setting, setPlayers, setSetting, defy }: P
 	
 	return (
 		<div>
-			<div>online</div>
-			<div>defy: {defy}</div>
+			<OnlineGame socket={socket} side={null} />
 		</div>
 	)
 }
