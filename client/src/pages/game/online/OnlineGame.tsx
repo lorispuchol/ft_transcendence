@@ -1,10 +1,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import "../Game.scss";
-import handlePaddle, { Pad, handleKey, handlePaddleGetReady, init_paddle } from "./paddle";
-import handleBall, { Ball, drawBall, init_ball } from "./ball";
-import collision from "./collision";
-import { countDown } from "./countDown";
+import handlePaddle, { Pad, handleKey, handlePaddleGetReady, init_paddle } from "../local/paddle";
+import handleBall, { Ball, drawBall, init_ball } from "../local/ball";
+import collision from "../local/collision";
+import { countDown } from "../local/countDown";
 import { Players } from "../Game";
 
 let freezeFrame = 0;
@@ -36,7 +36,7 @@ function checkPoint(changeScores: Function, score: any, ctx: CanvasRenderingCont
 	return false;
 }
 
-export default function LocalGame( { setPlayers }: any ) {
+export default function OnlineGame( { socket, setPlayers }: any ) {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const [prompt, setPrompt]: [boolean, Function] = useState(true);
 	const [winner, setWinner]: [string, Function] = useState("");

@@ -14,13 +14,13 @@ enum padSide {
 	Right = -1
 }
 
-function bounce(side: padSide, ball: Ball, ph: number, px: number, py:number) {
+function bounce(side: padSide, ball: Ball, ph: number, py:number) {
 	let angle = -Math.PI * 0.5;
 	let collidePoint = (ball.y - py) / ph;
 	collidePoint = clamp(collidePoint, 0, 1);
 	angle += (collidePoint * (Math.PI * -0.2) + Math.PI * 0.1);
 
-	if (ball.speed < 100)
+	if (ball.speed < 70)
 		ball.speed += ball.acc;
 	ball.dx =  Math.abs(Math.sin(angle)) * side;
 	ball.dy = -Math.cos(angle);
@@ -43,9 +43,9 @@ function paddleHit(pad: Pad, ball: Ball) {
 		return (dx*dx + dy*dy <= ball.rad ** 2);
 	}
 	if (hit(pad.rx, pad.ry))
-		bounce(padSide.Right, ball, pad.h, pad.rx, pad.ry);	
+		bounce(padSide.Right, ball, pad.h, pad.ry);	
 	else if (hit(pad.lx, pad.ly))
-		bounce(padSide.Left, ball, pad.h, pad.lx, pad.ly);
+		bounce(padSide.Left, ball, pad.h, pad.ly);
 }
 
 export default function collision(screen: ScreenSize, pad: Pad, ball: Ball) {

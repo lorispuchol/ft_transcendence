@@ -12,6 +12,7 @@ import { ChatModule } from 'src/chat/chat.module';
 import { EventModule } from 'src/event/event.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { GameModule } from 'src/game/game.module';
 
 @Module({
 	imports: [
@@ -21,6 +22,7 @@ import { join } from 'path';
 		ChatModule,
 		RelationshipModule,
 		EventModule,
+		GameModule,
 		ServeStaticModule.forRoot({
 			rootPath: join(__dirname, '..', '../../public'),
 			serveRoot: '/public/'
