@@ -199,7 +199,6 @@ export class RelationshipService{
 	}
 
 	async getRelationship(user1: User, user2: User) {
-
 		const relation: Relationship = await this.relationshipRepository.findOne({
 			relations: ["requester", "recipient"],
 			where: {

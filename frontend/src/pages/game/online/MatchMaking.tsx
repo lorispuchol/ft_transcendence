@@ -1,10 +1,11 @@
 import { Socket, io } from "socket.io-client";
 import Loading from "../../../utils/Loading";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { server_url } from "../../../utils/Request";
 import { Players, Setting } from "../Game";
 import { CircularProgress } from "@mui/material";
 import OnlineGame from "./OnlineGame";
+import { UserContext } from "../../../utils/Context";
 
 interface Props {
 	setting: Setting,
@@ -16,7 +17,9 @@ interface Props {
 export default function MatchMaking({ setting, setPlayers, setSetting, defy }: Props) {
 	const [socket, setSocket]: [Socket | null, Function] = useState(null);
 	const [openent, setOpenent]: [boolean, Function] = useState(false);
+	const [side, setSide]: [number, Function] = useState(1);
 	const currentMode: string = setting.mode;
+	const username = useContext(UserContext);
 
 	useEffect(() => {
 		const token = localStorage.getItem("token");
@@ -31,6 +34,10 @@ export default function MatchMaking({ setting, setPlayers, setSetting, defy }: P
 			{
 				setPlayers(players);
 				setOpenent(true);
+				if (players.p1?.username === username)
+					setSide(1);
+				else
+					setSide(2);
 			}
 		}
 
@@ -40,7 +47,7 @@ export default function MatchMaking({ setting, setPlayers, setSetting, defy }: P
 		return () => {
 			newSocket.close();
 		};
-	}, [setSocket, defy, setPlayers, setSetting, currentMode])
+	}, [setSocket, defy, setPlayers, setSetting, setSide, username, currentMode])
 	if (!socket)
 		return (<Loading />);
 	
@@ -54,7 +61,7 @@ export default function MatchMaking({ setting, setPlayers, setSetting, defy }: P
 	
 	return (
 		<div>
-			<OnlineGame socket={socket} side={null} />
+			<OnlineGame socket={socket} side={side} />
 		</div>
 	)
 }

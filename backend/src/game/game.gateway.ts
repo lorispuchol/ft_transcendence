@@ -4,6 +4,7 @@ import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect,
 import { Server, Socket } from "socket.io";
 import { client_url } from "src/auth/constants";
 import { UserService } from "src/user/user.service";
+import { PongGame } from "./game.service";
 
 @WebSocketGateway({
 	namespace: "game",
@@ -16,6 +17,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		) {}
 		
 	private users: Map<Socket, number> = new Map();
+	private lobby: Map<number, PongGame> = new Map();
 	private queue: Socket[] = [];
 	private defyQueue: number[] = [];
 
@@ -32,6 +34,12 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		this.queue = this.queue.filter((socket) => socket.id !== client.id);
 		this.defyQueue= this.defyQueue.filter((id) => id !== offId);
 		this.users.delete(client);
+		const instance: PongGame = this.lobby.get(offId);
+		if (instance) {
+			const otherPlayer = instance.handleDisconnect(offId);
+			this.lobby.delete(offId);
+			this.lobby.delete(otherPlayer);
+		}
 	}
 
 	@SubscribeMessage("search")
@@ -61,11 +69,23 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		else
 		{
 			const openentSock = this.queue.shift();
-			const openent = this.users.get(openentSock);
-			const openentName = (await this.userService.findOneById(openent)).username;
+			const openent: number = this.users.get(openentSock);
+			const openentName: string = (await this.userService.findOneById(openent)).username;
 			client.emit("matchmaking", {p1: {score:0, avatar: "", username: openentName}, p2: {score:0, avatar: "", username: username}});
 			openentSock.emit("matchmaking", {p1: {score:0, avatar: "", username: openentName}, p2: {score:0, avatar: "", username: username}});
 			//need to create game with openent
+			const instance: PongGame = new PongGame(openent, openentSock, id, client);
+			this.lobby.set(id, instance);
+			this.lobby.set(openent, instance);
+			instance.start();
 		}
+	}
+
+	@SubscribeMessage("input")
+	handleGameInput(@MessageBody() input: string, @ConnectedSocket() client: Socket) {
+		const userId = this.users.get(client);
+		const instance = this.lobby.get(userId);
+
+		instance.input(userId, input);
 	}
 }

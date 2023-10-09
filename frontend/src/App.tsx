@@ -76,7 +76,7 @@ export default function App() {
 		return (<ErrorHandling status={response.status} message={response.error} />);
 	return (
 		<WebSocket>
-			<UserContext.Provider value={response.data?.username}>
+			<UserContext.Provider value={response.data?.username!}>
 				<div className='background_primary w-screen px-5 py-5'>
 					<NavBar />
 					<Routes>

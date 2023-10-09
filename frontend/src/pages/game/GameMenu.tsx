@@ -106,7 +106,7 @@ export default function GameMenu({ setSetting, setDefy }: MenuProps) {
 									))
 								}
 								</div>
-							<Button key="defy" onClick={send_defy}>defy</Button>
+							<Button key="defy" className="text-[1.5vw]" onClick={send_defy}>defy</Button>
 							</div>
 					</div>
 					}

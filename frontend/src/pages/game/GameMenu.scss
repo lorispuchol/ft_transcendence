@@ -36,7 +36,13 @@
 	height: 4.965vw;
 	border: 0px !important;
 	justify-content: space-between;
+	font-size: 2vw;
 }
+
+.menu_select > Button > * {
+	font-size: 2vw;
+}
+
 
 .menu_select > Button:hover{
 	background-color: c.$primary;
