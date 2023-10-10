@@ -73,6 +73,9 @@ hr {
 	background-color: #323C58;
 	box-shadow: inset 0 0 5px #000000;
 	order: 1;
+	::-webkit-scrollbar {
+		display: none;
+	}
 }
 
 .chan-nav {
@@ -126,6 +129,10 @@ hr {
 	display: flex;
 	flex-direction: column;
 	padding: 10px;
+}
+
+.list-member::-webkit-scrollbar {
+	display: none;
 }
 
 .member-button {

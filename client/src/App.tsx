@@ -12,7 +12,7 @@ import Chat from './chat/Chat';
 import Game from './pages/game/Game';
 import Loader from './components/Loading/Loader'
 import { NavBar } from './components/NavBar/NavBar';
-import { EventContext, SocketChatContext, UserContext } from './utils/Context';
+import { EventContext, UserContext } from './utils/Context';
 import { Socket, io } from 'socket.io-client';
 
 interface UserData {
@@ -57,19 +57,9 @@ function WebSocket({ children }: WebSocketProps) {
 export default function App() {
 	const [response, setResponse]: [Response, Function] = useState({status: "loading"});
 
-	const [socketChat, setSocketChat]: [Socket | null, Function] = useState(null);
-
 	useEffect(() => {
 			GetRequest("/user/me").then((response) => setResponse(response));
 	}, []);
-
-	useEffect(() => {
-		const token = localStorage.getItem("token");
-		const option = { transportOptions: { polling: { extraHeaders: { token: token }}}};
-		const newSocket = io(server_url + "/chat", option);
-		setSocketChat(newSocket);
-		return () => {newSocket.close()};
-	}, [setSocketChat]);
 
 	if (response.status === "loading")
 		return (<Loading />);
@@ -89,7 +79,6 @@ export default function App() {
 	return (
 		<WebSocket>
 			<UserContext.Provider value={response.data?.username}>
-			<SocketChatContext.Provider value={socketChat}>
 				<div className='background_primary w-screen px-5 py-5'>
 					<NavBar />
 					<Routes>
@@ -102,7 +91,6 @@ export default function App() {
 						<Route path='/loader' element={<Loader />} />
 					</Routes>
 				</div>
-			</SocketChatContext.Provider>
 			</UserContext.Provider>
 		</WebSocket>
 	);

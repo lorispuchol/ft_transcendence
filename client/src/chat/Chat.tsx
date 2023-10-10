@@ -205,7 +205,15 @@ export default function Chat() {
 	const [focusConv, setFocusConv]: [string, Function] = useState(location.state?.to);
 	const [displayProfile, setDisplayProfile]: [UserData | null, Function] = useState(null);
 
-	const socket = useContext(SocketChatContext);
+	const [socket, setSocket]: [Socket | null, Function] = useState(null);
+
+	useEffect(() => {
+		const token = localStorage.getItem("token");
+		const option = { transportOptions: { polling: { extraHeaders: { token: token }}}};
+		const newSocket = io(server_url + "/chat", option);
+		setSocket(newSocket);
+		return () => {newSocket.close()};
+	}, [setSocket]);
 
 	useEffect(() => {
 		setFocusConv(location.state?.to);
@@ -215,6 +223,7 @@ export default function Chat() {
 		return (<Loading />)
 
 	return (
+		<SocketChatContext.Provider value={socket}>
 		<SetDisplayMemberContext.Provider value={setDisplayProfile}>
 		<DisplayMemberContext.Provider value={displayProfile}>
 
@@ -232,5 +241,6 @@ export default function Chat() {
 			<ToastContainer />
 		</DisplayMemberContext.Provider>
 		</SetDisplayMemberContext.Provider>
+		</SocketChatContext.Provider>
 	);
 }
