@@ -9,6 +9,7 @@ interface ScreenSize {
 interface Pad {
 	w: number,
 	h: number,
+	speed: number,
 	p1x: number,
 	p1y: number,
 	p2x: number,
@@ -42,21 +43,25 @@ export class PongGame {
 		private socketP2,
 	) {}
 
+	private intervalId: NodeJS.Timer;
+
 	private inputP1: string  = "";
 	private inputP2: string = "";
-
+	
 	static screen: ScreenSize = {w: 3200, h:1800};
+	static borderGap: number = PongGame.screen.h * 0.006;
 	private paddles: Pad = this.init_paddle();
 	private ball: Ball = this.init_ball(PongGame.screen);
 
 	public start() {
 		performance.now();
-		const perSec = 6000 / 60;
-		setInterval(this.update, perSec)
+		const perSec = 1000 / 60;
+		this.intervalId = setInterval(() => this.update(this), perSec);
 	}
 
-	private update() {
-		this.sendState();
+	private update(self: this) {
+		self.movement(self.paddles);
+		self.sendState();
 	}
 
 	private sendState() {
@@ -86,9 +91,11 @@ export class PongGame {
 	public handleDisconnect(id: number) {
 		switch(id) {
 			case this.p1:
+				clearInterval(this.intervalId);
 				this.socketP2.emit("end", "player1");
 				return this.p2;
 			case this.p2:
+				clearInterval(this.intervalId);
 				this.socketP1.emit("end", "player2");
 				return this.p1;
 			default:
@@ -96,9 +103,22 @@ export class PongGame {
 		}
 	}
 
+	private movement(pad: Pad) {	
+		if (this.inputP1 === "ArrowUp" && pad.p1y >= PongGame.borderGap)
+			pad.p1y -= pad.speed;
+		else if (this.inputP1 === "ArrowDown" && pad.p1y <= PongGame.screen.h - pad.h - PongGame.borderGap)
+			pad.p1y += pad.speed;
+		
+		if (this.inputP2 === "ArrowUp" && pad.p2y >= PongGame.borderGap)
+			pad.p2y -= pad.speed;
+		else if (this.inputP2 === "ArrowDown" && pad.p2y <= PongGame.screen.h - pad.h - PongGame.borderGap)
+			pad.p2y += pad.speed;
+	}
+
 	private init_paddle() {
 		const w = PongGame.screen.w * 0.01;
 		const h = PongGame.screen.h * 0.15;
+		const speed: number = PongGame.screen.h * 0.02;
 	
 		const p1x = PongGame.screen.w * 0.9 - w * 0.5;
 		const p1y = PongGame.screen.h * 0.5 - h * 0.5;
@@ -106,7 +126,7 @@ export class PongGame {
 		const p2x = PongGame.screen.w * 0.1 - w * 0.5;
 		const p2y = PongGame.screen.h * 0.5 - h * 0.5;
 	
-		return {w, h, p1x, p1y, p2x, p2y};
+		return {w, h, speed, p1x, p1y, p2x, p2y};
 	}
 
 	private rng(min: number, max: number) {

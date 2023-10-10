@@ -88,12 +88,11 @@ export default function Everyone() {
 
 			function everyoneListener(newUser: UserData) {
 				setUsers((prev: UserData[]) => {
-						if (!prev.some((user: UserData) => (user.login === newUser.login)))
+						if (!prev.some((user: UserData) => (user.id === newUser.id)))
 							return [...prev, newUser];
 						return ([...prev]);
 					});
 			}
-
 			socket.on('everyone', everyoneListener);
 
 			return () => {socket.off('everyone', everyoneListener)};

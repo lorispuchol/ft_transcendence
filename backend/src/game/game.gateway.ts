@@ -83,9 +83,31 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	@SubscribeMessage("input")
 	handleGameInput(@MessageBody() input: string, @ConnectedSocket() client: Socket) {
+		if (!input)
+			return ;
 		const userId = this.users.get(client);
 		const instance = this.lobby.get(userId);
 
 		instance.input(userId, input);
+	}
+
+	//dev
+	@SubscribeMessage("getState")
+	getState(client: Socket) {
+		console.log(
+			"users->", this.users.values(),
+			"lobby->", this.lobby.keys(), 
+			"queue->", this.queue.length, 
+			"defy->", this.defyQueue
+		);
+	}
+
+	//dev
+	@SubscribeMessage("flush")
+	flush(client: Socket) {
+		this.users = new Map();
+		this.lobby = new Map();
+		this.queue = [];
+		this.defyQueue = []
 	}
 }

@@ -3,7 +3,7 @@ import Loading from "../../../utils/Loading";
 import { useContext, useEffect, useState } from "react";
 import { server_url } from "../../../utils/Request";
 import { Players, Setting } from "../Game";
-import { CircularProgress } from "@mui/material";
+import { Button, CircularProgress } from "@mui/material";
 import OnlineGame from "./OnlineGame";
 import { UserContext } from "../../../utils/Context";
 
@@ -24,7 +24,7 @@ export default function MatchMaking({ setting, setPlayers, setSetting, defy }: P
 	useEffect(() => {
 		const token = localStorage.getItem("token");
 		const option = { transportOptions: { polling: { extraHeaders: { token: token }}}};
-		const newSocket = io(server_url + "/game", option);
+		const newSocket: Socket = io(server_url + "/game", option);
 		setSocket(newSocket);
 		
 		function handleSearch(players: Players | null) {
@@ -48,6 +48,12 @@ export default function MatchMaking({ setting, setPlayers, setSetting, defy }: P
 			newSocket.close();
 		};
 	}, [setSocket, defy, setPlayers, setSetting, setSide, username, currentMode])
+	function getState() {
+		socket?.emit("getState");
+	}
+	function flush() {
+		socket?.emit("flush");
+	}
 	if (!socket)
 		return (<Loading />);
 	
@@ -56,12 +62,15 @@ export default function MatchMaking({ setting, setPlayers, setSetting, defy }: P
 			<div>
 				<CircularProgress />
 				<div>waiting for openent</div>
+				<Button color="error" onClick={getState}>get State</Button>
+				<Button color="error" onClick={flush}>flush</Button>
 			</div>
 		);
 	
 	return (
 		<div>
 			<OnlineGame socket={socket} side={side} />
+			<Button className="get_ready" onClick={getState}>get State</Button>
 		</div>
 	)
 }

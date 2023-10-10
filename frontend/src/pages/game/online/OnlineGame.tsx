@@ -6,6 +6,7 @@ import handleBall, { Ball, drawBall, init_ball } from "../local/ball";
 import collision from "../local/collision";
 import { countDown } from "../local/countDown";
 import { Players } from "../Game";
+import { Button } from "@mui/material";
 
 let freezeFrame = 0;
 
@@ -59,6 +60,7 @@ export default function OnlineGame( { socket, setPlayers, side }: any ) {
 		const score = {p1:0, p2:0};
 
 		function updateState(state: any) {
+			// console.log(state);
 			openentKey = state.openentKey;
 			paddle.opY = state.openentPos;
 			ball.x = state.ballX;
@@ -69,6 +71,7 @@ export default function OnlineGame( { socket, setPlayers, side }: any ) {
 		socket.on("GameState", updateState);
 		
 		function gameEnd(winner: string) {
+			window.cancelAnimationFrame(animationFrameId);
 			setWinner(winner);
 		}
 		socket.on("end", gameEnd);
@@ -87,13 +90,6 @@ export default function OnlineGame( { socket, setPlayers, side }: any ) {
 		// 	}
 		// 	animationFrameId = window.requestAnimationFrame(renderReady);
 		// }
-
-		function renderEnd() {
-			if (score.p1 === 3)
-				setWinner("player 1 win");
-			if (score.p2 === 3)
-				setWinner("player 2 win");
-		}
 
 		function render() {
 			// if (freezeFrame)
@@ -128,6 +124,7 @@ export default function OnlineGame( { socket, setPlayers, side }: any ) {
 	
 		return (() => {
 			socket.off("GameState", updateState);
+			socket.off("end", gameEnd);
 			window.cancelAnimationFrame(animationFrameId);
 			document.removeEventListener("keydown", idKey[0]);
 			document.removeEventListener("keyup", idKey[1]);

@@ -41,14 +41,14 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 
 	async handleConnection(client: Socket, ...args: any[]) {
 		const decoded: any = this.jwtService.decode(<string>client.handshake.headers.token);
-		const newId: number = decoded.id;
+		const newId: number = decoded?.id;
 		const user: User = await this.eventService.getUserData(newId);
 		if (!user)
 		{
 			client.disconnect();
 			return ;
 		}
-		const newUser = {avatar: user.avatar, id: user.id, username: user.username};
+		const newUser = {avatar: user.avatar, id: user.id, username: user.username, login: user.login};
 		this.users.set(client, newId);
 		
 		this.users.forEach(async (id, socket) => {
