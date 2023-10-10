@@ -34,10 +34,11 @@ export default function MatchMaking({ setting, setPlayers, setSetting, defy }: P
 			{
 				setPlayers(players);
 				setOpenent(true);
+				//left=1  right=-1
 				if (players.p1?.username === username)
 					setSide(1);
 				else
-					setSide(2);
+					setSide(-1);
 			}
 		}
 
@@ -69,7 +70,7 @@ export default function MatchMaking({ setting, setPlayers, setSetting, defy }: P
 	
 	return (
 		<div>
-			<OnlineGame socket={socket} side={side} />
+			<OnlineGame socket={socket} setPlayers={setPlayers} side={side} />
 			<Button className="get_ready" onClick={getState}>get State</Button>
 		</div>
 	)

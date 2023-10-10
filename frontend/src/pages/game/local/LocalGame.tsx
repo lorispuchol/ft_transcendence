@@ -1,7 +1,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import "../Game.scss";
-import handlePaddle, { Pad, handleKey, handlePaddleGetReady, init_paddle } from "./paddle";
+import handlePaddle, { Pad, clearBehind, handleKey, handlePaddleGetReady, init_paddle } from "./paddle";
 import handleBall, { Ball, drawBall, init_ball } from "./ball";
 import collision from "./collision";
 import { countDown } from "./countDown";
@@ -104,6 +104,7 @@ export default function LocalGame( { setPlayers }: any ) {
 				handlePaddle(ctx, paddle);
 				collision(screen, paddle, ball);
 				handleBall(ctx, ball);
+				clearBehind(ctx, paddle);
 				roundStart = checkPoint(setPlayers, score, ctx, paddle, ball);
 			}
 			animationFrameId = window.requestAnimationFrame(render);

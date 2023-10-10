@@ -37,6 +37,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		const instance: PongGame = this.lobby.get(offId);
 		if (instance) {
 			const otherPlayer = instance.handleDisconnect(offId);
+			instance.clear();
 			this.lobby.delete(offId);
 			this.lobby.delete(otherPlayer);
 		}
@@ -69,14 +70,14 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		else
 		{
 			const openentSock = this.queue.shift();
-			const openent: number = this.users.get(openentSock);
-			const openentName: string = (await this.userService.findOneById(openent)).username;
+			const openentId: number = this.users.get(openentSock);
+			const openentName: string = (await this.userService.findOneById(openentId)).username;
 			client.emit("matchmaking", {p1: {score:0, avatar: "", username: openentName}, p2: {score:0, avatar: "", username: username}});
 			openentSock.emit("matchmaking", {p1: {score:0, avatar: "", username: openentName}, p2: {score:0, avatar: "", username: username}});
 			//need to create game with openent
-			const instance: PongGame = new PongGame(openent, openentSock, id, client);
+			const instance: PongGame = new PongGame(openentId, openentSock, id, client);
 			this.lobby.set(id, instance);
-			this.lobby.set(openent, instance);
+			this.lobby.set(openentId, instance);
 			instance.start();
 		}
 	}

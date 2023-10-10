@@ -23,13 +23,13 @@ export function init_paddle(screen: ScreenSize, side: number) {
 
 	if (side === 1)
 	{
-		ownX = screen.w * 0.9 - w * 0.5;
-		opX = screen.w * 0.1 - w * 0.5;
+		ownX = screen.w * 0.1 - w * 0.5;
+		opX = screen.w * 0.9 - w * 0.5;
 	}
 	else
 	{
-		ownX = screen.w * 0.1 - w * 0.5;
-		opX = screen.w * 0.9 - w * 0.5;
+		ownX = screen.w * 0.9 - w * 0.5;
+		opX = screen.w * 0.1 - w * 0.5;
 	}
 
 	return {w, h, ownX, ownY, opX, opY};
@@ -42,6 +42,19 @@ export function drawPaddle (ctx: CanvasRenderingContext2D, pad: Pad) {
 	ctx.rect(pad.ownX, pad.ownY, pad.w , pad.h);
 	ctx.rect(pad.opX, pad.opY, pad.w , pad.h);
 	ctx.fill();
+}
+
+export function clearBehind(ctx: CanvasRenderingContext2D, pad: Pad, side: number) {
+	if (side === 1)
+	{
+		ctx.clearRect(pad.ownX - pad.w , pad.ownY, pad.w, pad.h);
+		ctx.clearRect(pad.opX + 2 * pad.w , pad.opY, pad.w, pad.h);
+	}
+	else
+	{
+		ctx.clearRect(pad.ownX + 2 * pad.w , pad.ownY, pad.w, pad.h);
+		ctx.clearRect(pad.opX - pad.w , pad.opY, pad.w, pad.h);
+	}
 }
 
 const allowedKey = ['ArrowUp', 'ArrowDown'];

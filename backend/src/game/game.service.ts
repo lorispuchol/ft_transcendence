@@ -26,6 +26,11 @@ interface Ball {
 	acc: number,
 }
 
+enum padSide {
+	P1 = 1,
+	P2 = -1
+}
+
 interface State {
 	openentKey: string,
 	openentPos: number,
@@ -40,13 +45,17 @@ export class PongGame {
 		private p1: number,
 		private socketP1: Socket,
 		private p2: number,
-		private socketP2,
+		private socketP2: Socket,
 	) {}
 
 	private intervalId: NodeJS.Timer;
+	private timeoutId: NodeJS.Timeout;
+	private startTime: number = 0;
 
 	private inputP1: string  = "";
 	private inputP2: string = "";
+	private scoreP1: number = 0;
+	private scoreP2: number = 0;
 	
 	static screen: ScreenSize = {w: 3200, h:1800};
 	static borderGap: number = PongGame.screen.h * 0.006;
@@ -54,15 +63,34 @@ export class PongGame {
 	private ball: Ball = this.init_ball(PongGame.screen);
 
 	public start() {
-		performance.now();
+		this.clear();
 		const perSec = 1000 / 60;
-		this.intervalId = setInterval(() => this.update(this), perSec);
+		const startDelay = 2000;
+		const startTime: number = Date.now() + startDelay;
+		this.sendState();
+		this.socketP1.emit("roundReset", {scoreP1: this.scoreP1, scoreP2: this.scoreP2, nextRound: startTime});
+		this.socketP2.emit("roundReset", {scoreP1: this.scoreP1, scoreP2: this.scoreP2, nextRound: startTime});
+		this.timeoutId = setTimeout(() => {
+			console.log("lets go")
+			this.intervalId = setInterval(() => this.update(this), perSec);
+		}, startDelay);
 	}
 
 	private update(self: this) {
 		self.movement(self.paddles);
+		self.collision();
+		self.handleBall(self.ball);
+		if (self.checkPoint())
+			return ;
 		self.sendState();
 	}
+
+	public clear() {
+		clearInterval(this.intervalId);
+		clearTimeout(this.timeoutId);
+	}
+
+	//////////////SOCKET//////////////
 
 	private sendState() {
 		const state = {
@@ -91,18 +119,33 @@ export class PongGame {
 	public handleDisconnect(id: number) {
 		switch(id) {
 			case this.p1:
-				clearInterval(this.intervalId);
 				this.socketP2.emit("end", "player1");
 				return this.p2;
 			case this.p2:
-				clearInterval(this.intervalId);
 				this.socketP1.emit("end", "player2");
 				return this.p1;
 			default:
-				return 1;
+				return 0;
 		}
 	}
 
+	//////////////GAME LOGIC//////////////
+	
+	private checkPoint() {
+		const hitLeft = this.ball.x <= this.ball.rad;
+		const hitRight = this.ball.x >= (PongGame.screen.w - this.ball.rad);
+	
+		if (!hitLeft && !hitRight)
+			return 0;
+		this.scoreP1 += +hitRight; 
+		this.scoreP2 += +hitLeft;
+		Object.assign(this.paddles, this.init_paddle());
+		Object.assign(this.ball, this.init_ball(PongGame.screen));
+		this.start();
+		return 1;
+	}
+
+	//PADDLE
 	private movement(pad: Pad) {	
 		if (this.inputP1 === "ArrowUp" && pad.p1y >= PongGame.borderGap)
 			pad.p1y -= pad.speed;
@@ -120,15 +163,16 @@ export class PongGame {
 		const h = PongGame.screen.h * 0.15;
 		const speed: number = PongGame.screen.h * 0.02;
 	
-		const p1x = PongGame.screen.w * 0.9 - w * 0.5;
+		const p1x = PongGame.screen.w * 0.1 - w * 0.5;
 		const p1y = PongGame.screen.h * 0.5 - h * 0.5;
 	
-		const p2x = PongGame.screen.w * 0.1 - w * 0.5;
+		const p2x = PongGame.screen.w * 0.9 - w * 0.5;
 		const p2y = PongGame.screen.h * 0.5 - h * 0.5;
 	
 		return {w, h, speed, p1x, p1y, p2x, p2y};
 	}
 
+	//BALL
 	private rng(min: number, max: number) {
 		return Math.floor(Math.random() * (max - min + 1) ) + min;
 	}
@@ -147,6 +191,56 @@ export class PongGame {
 		const acc = 4;
 	
 		return {x, y, rad, dx, dy, speed, acc};
+	}
+
+	handleBall (ball: Ball) {
+		ball.x += ball.dx * ball.speed;
+		ball.y += ball.dy * ball.speed;
+	}
+
+	//COLLISION
+	private clamp = (num: number, min: number, max: number) => Math.min(Math.max(num, min), max);
+
+	private bounce(side: padSide, ball: Ball, ph: number, py:number) {
+		let angle = -Math.PI * 0.5;
+		let collidePoint = (ball.y - py) / ph;
+		collidePoint = this.clamp(collidePoint, 0, 1);
+		angle += (collidePoint * (Math.PI * -0.2) + Math.PI * 0.1);
+
+		if (ball.speed < 70)
+			ball.speed += ball.acc;
+		ball.dx =  Math.abs(Math.sin(angle)) * side;
+		ball.dy = -Math.cos(angle);
+	}
+
+	private paddleHit(pad: Pad, ball: Ball) {
+
+		function hit(px: number, py: number) {
+			const distX = Math.abs(ball.x - px - pad.w * 0.5);
+			const distY = Math.abs(ball.y - py - pad.h * 0.5);	
+
+			if (distX > (pad.w * 0.5 + ball.rad)) { return false; }
+			if (distY > (pad.h * 0.5 + ball.rad)) { return false; }
+		
+			if (distX <= (pad.w * 0.5)) { return true; } 
+			if (distY <= (pad.h * 0.5)) { return true; }
+		
+			const dx = distX - pad.w * 0.5;
+			const dy = distY - pad.h * 0.5;
+			return (dx*dx + dy*dy <= ball.rad ** 2);
+		}
+		if (hit(pad.p1x, pad.p1y))
+			this.bounce(padSide.P1, ball, pad.h, pad.p1y);	
+		else if (hit(pad.p2x, pad.p2y))
+			this.bounce(padSide.P2, ball, pad.h, pad.p2y);
+	}
+
+	private collision() {
+		this.paddleHit(this.paddles, this.ball);
+		if (this.ball.y >= (PongGame.screen.h - this.ball.rad) || this.ball.y <= this.ball.rad)
+			this.ball.dy *= -1;
+		if (this.ball.x >= (PongGame.screen.w - this.ball.rad) || this.ball.x <= this.ball.rad)
+			this.ball.dx *= -1;
 	}
 }
 

@@ -12,7 +12,7 @@ export function countDown(ctx: CanvasRenderingContext2D, dteStart: number, timer
 	const width = ctx.canvas.width;
 	const height = ctx.canvas.height;
 
-	let d = performance.now();
+	let d = Date.now();
 	let offset = timer - (d - dteStart);
 	if(offset <= 0) // If time is up
 		return false;
