@@ -182,7 +182,6 @@ function Explore() {
 	function changeMap(chanName: string, pw: string) {
 		let temp: Map<string, string> = new Map(inputPw);
 		temp.set(chanName, pw);
-		console.log(temp)
 		setInputPw(temp);
 	}
 	
