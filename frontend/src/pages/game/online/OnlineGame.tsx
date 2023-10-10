@@ -49,7 +49,6 @@ export default function OnlineGame( { socket, setPlayers, side }: any ) {
 					{p1: {...prev.p1, score: data.scoreP1},
 					p2: {...prev.p2, score: data.scoreP2}});
 				});
-			drawBall(ctx, ball);
 			Object.assign(paddle, init_paddle(screen, side));
 			Object.assign(ball, init_ball(screen));
 			now = Date.now();
@@ -86,6 +85,7 @@ export default function OnlineGame( { socket, setPlayers, side }: any ) {
 	
 		return (() => {
 			socket.off("GameState", updateState);
+			socket.off("roundReset", roundReset);
 			socket.off("end", gameEnd);
 			window.cancelAnimationFrame(animationFrameId);
 			document.removeEventListener("keydown", idKey[0]);

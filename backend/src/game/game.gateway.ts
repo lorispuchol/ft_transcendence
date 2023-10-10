@@ -44,23 +44,27 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 	@SubscribeMessage("search")
-	async matchmaking(@MessageBody() defy: number | null, @ConnectedSocket() client: Socket) {
+	async matchmaking(@MessageBody() defyId: number | null, @ConnectedSocket() client: Socket) {
 		const id = this.users.get(client);
 		const username = (await this.userService.findOneById(id)).username;
 
-		if (defy)
+		if (defyId)
 		{
-			const i = this.defyQueue.indexOf(defy);
+			const i = this.defyQueue.indexOf(defyId);
 			if (i < 0)
 				this.defyQueue.push(id);
 			else
 			{
-				const defyName = (await this.userService.findOneById(defy)).username;
-				const openentSocket: Socket = [...this.users.entries()].filter(({ 1: value}) => defy === value).map(([key]) => key)[0];
+				const defyName = (await this.userService.findOneById(defyId)).username;
+				const defySocket: Socket = [...this.users.entries()].filter(({ 1: value}) => value === defyId).map(([key]) => key)[0];
 				this.defyQueue.splice(i, 1);
 				client.emit("matchmaking", {p1: {score:0, avatar: "", username: defyName}, p2: {score:0, avatar: "", username: username}});
-				openentSocket.emit("matchmaking", {p1: {score:0, avatar: "", username: defyName}, p2: {score:0, avatar: "", username: username}});
-				//need to create game with openent
+				defySocket.emit("matchmaking", {p1: {score:0, avatar: "", username: defyName}, p2: {score:0, avatar: "", username: username}});
+				//create game with defy
+				const instance: PongGame = new PongGame(defyId, defySocket, id, client);
+				this.lobby.set(id, instance);
+				this.lobby.set(defyId, instance);
+				setTimeout(() => instance.start(), 100);
 			}
 		}
 		else if (!this.queue.length)
@@ -74,11 +78,11 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			const openentName: string = (await this.userService.findOneById(openentId)).username;
 			client.emit("matchmaking", {p1: {score:0, avatar: "", username: openentName}, p2: {score:0, avatar: "", username: username}});
 			openentSock.emit("matchmaking", {p1: {score:0, avatar: "", username: openentName}, p2: {score:0, avatar: "", username: username}});
-			//need to create game with openent
+			//create game with openent
 			const instance: PongGame = new PongGame(openentId, openentSock, id, client);
 			this.lobby.set(id, instance);
 			this.lobby.set(openentId, instance);
-			instance.start();
+			setTimeout(() => instance.start(), 100);
 		}
 	}
 

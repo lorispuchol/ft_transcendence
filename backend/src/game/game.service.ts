@@ -59,19 +59,21 @@ export class PongGame {
 	
 	static screen: ScreenSize = {w: 3200, h:1800};
 	static borderGap: number = PongGame.screen.h * 0.006;
+	static winningScore: number = 3;
+
 	private paddles: Pad = this.init_paddle();
 	private ball: Ball = this.init_ball(PongGame.screen);
 
 	public start() {
 		this.clear();
 		const perSec = 1000 / 60;
-		const startDelay = 2000;
+		const startDelay = 1000;
 		const startTime: number = Date.now() + startDelay;
-		this.sendState();
 		this.socketP1.emit("roundReset", {scoreP1: this.scoreP1, scoreP2: this.scoreP2, nextRound: startTime});
 		this.socketP2.emit("roundReset", {scoreP1: this.scoreP1, scoreP2: this.scoreP2, nextRound: startTime});
+		if (this.checkWinner())
+			return ;
 		this.timeoutId = setTimeout(() => {
-			console.log("lets go")
 			this.intervalId = setInterval(() => this.update(this), perSec);
 		}, startDelay);
 	}
@@ -131,6 +133,22 @@ export class PongGame {
 
 	//////////////GAME LOGIC//////////////
 	
+	private checkWinner() {
+		if (this.scoreP1 != PongGame.winningScore && this.scoreP2 != PongGame.winningScore)
+			return 0;
+		if (this.scoreP1 === PongGame.winningScore)
+		{
+			this.socketP1.emit("end", "player1");
+			this.socketP2.emit("end", "player1");
+		}
+		else
+		{
+			this.socketP1.emit("end", "player2");
+			this.socketP2.emit("end", "player2");
+		}
+		return 1;
+	}
+
 	private checkPoint() {
 		const hitLeft = this.ball.x <= this.ball.rad;
 		const hitRight = this.ball.x >= (PongGame.screen.w - this.ball.rad);
