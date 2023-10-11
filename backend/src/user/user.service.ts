@@ -27,7 +27,6 @@ export class UserService {
 	}
 
 	async findOneById(id: number): Promise<User | undefined> {
-
 		return this.userRepository.findOneBy({id: id});
 	}
 
@@ -57,7 +56,23 @@ export class UserService {
 	}
 
 	async getAllUsers() {
-		return this.userRepository.find();
+		const users: User[] = await this.userRepository.find();
+		const parsedUsers: any[] = [];
+
+		users.forEach((user: User) => {
+			parsedUsers.push(this.parseUser(user));
+		});
+		return (parsedUsers);
+	}
+
+	parseUser(user: User) {
+		return ({
+			id: user.id,
+			login: user.login,
+			username: user.username,
+			avatar: user.avatar,
+			nb_victory: user.nb_victory,
+			nb_defeat: user.nb_defeat
+		})
 	}
 }
-

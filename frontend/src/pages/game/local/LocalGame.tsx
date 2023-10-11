@@ -45,7 +45,7 @@ export default function LocalGame( { setPlayers }: any ) {
 	const [rightReady, setRightReady]: [string, Function] = useState("blinking");
 	
 	useEffect(() => {
-		setPlayers({p1: {score:0, avatar: "", username: "player 1"}, p2: {score:0, avatar: "", username: "player 2"}});
+		setPlayers({p1: {score: 0, id: 0, username: "Player 1"}, p2: {score: 0, id: 0, username: "Player 2"}});
 		const ctx = canvasRef!.current!.getContext('2d')!;
 		const screen = {w: 3200, h: 1800}
 		ctx.canvas.width = screen.w;

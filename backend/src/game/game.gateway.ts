@@ -3,7 +3,6 @@ import { JwtService } from "@nestjs/jwt";
 import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 import { client_url } from "src/auth/constants";
-import { UserService } from "src/user/user.service";
 import { PongGame } from "./game.service";
 
 @WebSocketGateway({
@@ -13,7 +12,6 @@ import { PongGame } from "./game.service";
 export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 	constructor(
 		private jwtService: JwtService,
-		private userService: UserService,
 		) {}
 		
 	private users: Map<Socket, number> = new Map();
@@ -44,46 +42,49 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 	@SubscribeMessage("search")
-	async matchmaking(@MessageBody() defyId: number | null, @ConnectedSocket() client: Socket) {
-		const id = this.users.get(client);
-		const username = (await this.userService.findOneById(id)).username;
+	async matchmaking(@MessageBody() mode: string, @ConnectedSocket() client: Socket) {
+		const userId = this.users.get(client);
 
-		if (defyId)
-		{
-			const i = this.defyQueue.indexOf(defyId);
-			if (i < 0)
-				this.defyQueue.push(id);
-			else
-			{
-				const defyName = (await this.userService.findOneById(defyId)).username;
-				const defySocket: Socket = [...this.users.entries()].filter(({ 1: value}) => value === defyId).map(([key]) => key)[0];
-				this.defyQueue.splice(i, 1);
-				client.emit("matchmaking", {p1: {score:0, avatar: "", username: defyName}, p2: {score:0, avatar: "", username: username}});
-				defySocket.emit("matchmaking", {p1: {score:0, avatar: "", username: defyName}, p2: {score:0, avatar: "", username: username}});
-				//create game with defy
-				const instance: PongGame = new PongGame(defyId, defySocket, id, client);
-				this.lobby.set(id, instance);
-				this.lobby.set(defyId, instance);
-				setTimeout(() => instance.start(), 100);
-			}
-		}
-		else if (!this.queue.length)
+		 if (!this.queue.length)
 		{
 			this.queue.push(client);
+			return ;
 		}
-		else
+
+		const openentSock = this.queue.shift();
+		const openentId: number = this.users.get(openentSock);
+
+		client.emit("matchmaking", {side: -1, p1: {score:0, id: openentId, username: null}, p2: {score:0, id: userId, username: null}});
+		openentSock.emit("matchmaking", {side: 1, p1: {score:0, id: openentId, username: null}, p2: {score:0, id: userId, username: null}});
+
+		//create game with openent
+		const instance: PongGame = new PongGame(openentId, openentSock, userId, client);
+		this.lobby.set(userId, instance);
+		this.lobby.set(openentId, instance);
+		setTimeout(() => instance.start(), 100);
+	}
+
+	@SubscribeMessage("defy")
+	async defy(@MessageBody() defyId: number, @ConnectedSocket() client: Socket) {
+		const userId = this.users.get(client);
+		const i = this.defyQueue.indexOf(defyId);
+		if (i < 0)
 		{
-			const openentSock = this.queue.shift();
-			const openentId: number = this.users.get(openentSock);
-			const openentName: string = (await this.userService.findOneById(openentId)).username;
-			client.emit("matchmaking", {p1: {score:0, avatar: "", username: openentName}, p2: {score:0, avatar: "", username: username}});
-			openentSock.emit("matchmaking", {p1: {score:0, avatar: "", username: openentName}, p2: {score:0, avatar: "", username: username}});
-			//create game with openent
-			const instance: PongGame = new PongGame(openentId, openentSock, id, client);
-			this.lobby.set(id, instance);
-			this.lobby.set(openentId, instance);
-			setTimeout(() => instance.start(), 100);
+			this.defyQueue.push(userId);
+			return ;
 		}
+
+		this.defyQueue.splice(i, 1);
+		const defySocket: Socket = [...this.users.entries()].filter(({ 1: value}) => value === defyId).map(([key]) => key)[0];
+
+		client.emit("matchmaking", {side: -1, p1: {score:0, id: defyId, username: null}, p2: {score:0, id: userId, username: null}});
+		defySocket.emit("matchmaking", {side: 1, p1: {score:0, id: defyId, username: null}, p2: {score:0, id: userId, username: null}});
+
+		//create game with defy
+		const instance: PongGame = new PongGame(defyId, defySocket, userId, client);
+		this.lobby.set(userId, instance);
+		this.lobby.set(defyId, instance);
+		setTimeout(() => instance.start(), 100);
 	}
 
 	@SubscribeMessage("input")

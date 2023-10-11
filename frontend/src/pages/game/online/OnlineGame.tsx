@@ -17,6 +17,7 @@ export default function OnlineGame( { socket, setPlayers, side }: any ) {
 	const [winner, setWinner]: [string, Function] = useState("");
 	
 	useEffect(() => {
+		setWinner("");
 		const ctx = canvasRef!.current!.getContext('2d')!;
 		const screen = {w: 3200, h: 1800}
 		ctx.canvas.width = screen.w;

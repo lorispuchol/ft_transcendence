@@ -144,13 +144,14 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 	}
 
 	@SubscribeMessage('acceptGame')
-	async acceptGame(@MessageBody() senderId: number, @ConnectedSocket() client: Socket) {
+	async acceptGame(@MessageBody() defyInfo: any, @ConnectedSocket() client: Socket) {
 		const userId: number = this.users.get(client);
 		
-		client.emit("deleteEvent", {type: "gameRequest", senderId: senderId, sender: ""});
+		client.emit("deleteEvent", {type: "gameRequest", senderId: defyInfo.senderId, sender: ""});
 
-		const userSocket: Socket = [...this.users.entries()].filter(({ 1: value}) => value === senderId).map(([key]) => key)[0];
+		const userSocket: Socket = [...this.users.entries()].filter(({ 1: value}) => value === defyInfo.senderId).map(([key]) => key)[0];
 		userSocket.emit("defy", {id: userId, response: "OK"});
+		setTimeout(() => {client.emit("goDefy", defyInfo)}, 200)
 	}
 
 	@SubscribeMessage('refuseGame')

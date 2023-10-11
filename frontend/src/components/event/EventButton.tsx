@@ -69,8 +69,8 @@ function AcceptGame({ senderId, mode }: GameProps) {
 	const navigate = useNavigate();
 
 	function handleClick() {
-		socket.emit("acceptGame", senderId);
-		navigate("/game", {replace: true, state: {to: senderId, mode: mode}})
+		socket.emit("acceptGame", {senderId, mode});
+		navigate("/game");
 	}
 
 	return (

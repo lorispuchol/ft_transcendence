@@ -50,7 +50,6 @@ export class PongGame {
 
 	private intervalId: NodeJS.Timer;
 	private timeoutId: NodeJS.Timeout;
-	private startTime: number = 0;
 
 	private inputP1: string  = "";
 	private inputP2: string = "";
