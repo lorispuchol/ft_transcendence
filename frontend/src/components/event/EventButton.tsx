@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 interface Event {
 	type: string,
 	sender: string,
+	senderId: number,
 	gameMode?: string,
 }
 
@@ -20,8 +21,12 @@ interface EventButtonProps {
 interface ButtonChannelProps {
 	channel: string
 }
-interface ButtonProps {
-	login: string,
+interface FriendProps {
+	login: string
+}
+
+interface GameProps {
+	senderId: number,
 	mode?: string
 }
 
@@ -69,7 +74,45 @@ function AcceptChannel({ channel }: ButtonChannelProps) {
 	)
 }
 
-function RefuseFriend({ login }: ButtonProps) {
+function RefuseChannel({ channel }: ButtonChannelProps) {
+	const [response, setResponse]: [Response, Function] = useState({status: "inactive"});
+
+	function handleClick() {
+		DeleteRequest("/chat/refuseChannel/" + channel).then((response) => {setResponse(response)});
+	}
+	if (response.status === "KO")
+		return (<ErrorHandling status={response.status} message={response.error} />);
+	if (response.data?.status === "KO")
+		return (<strong>{response.data.description}</strong>);
+
+	return (
+		<Button onClick={handleClick} color="error"><Close/></Button>
+	)
+}
+
+function AcceptChannel({ channel }: ButtonChannelProps) {
+	const [response, setResponse]: [Response, Function] = useState({status: "inactive"});
+
+	const socket = useContext(SocketChatContext);
+
+	function handleClick() {
+		PatchRequest("/chat/acceptChannel/" + channel, {}).then((response) => {
+			setResponse(response)
+			if (response.status === "OK")
+				socket!.emit('message', channel, "Hello Everybody!");
+		});
+}
+	if (response.status === "KO")
+			return (<ErrorHandling status={response.status} message={response.error} />);
+	if (response.data?.status === "KO")
+		return (<strong>{response.data.description}</strong>);
+
+	return (
+		<Button onClick={handleClick} color="success"><Done/></Button>
+	)
+}
+
+function RefuseFriend({ login }: FriendProps) {
 	const [response, setResponse]: [Response, Function] = useState({status: "inactive"});
 
 	function handleClick() {
@@ -85,7 +128,7 @@ function RefuseFriend({ login }: ButtonProps) {
 	)
 }
 
-function AcceptFriend({ login }: ButtonProps) {
+function AcceptFriend({ login }: FriendProps) {
 	const [response, setResponse]: [Response, Function] = useState({status: "inactive"});
 
 	function handleClick() {
@@ -101,13 +144,13 @@ function AcceptFriend({ login }: ButtonProps) {
 	)
 }
 
-function AcceptGame({ login, mode }: ButtonProps) {
+function AcceptGame({ senderId, mode }: GameProps) {
 	const socket = useContext(EventContext)!;
 	const navigate = useNavigate();
 
 	function handleClick() {
-		navigate("/game", {replace: true, state: {to: login, mode: mode}})
-		socket.emit("acceptGame", login);
+		socket.emit("acceptGame", {senderId, mode});
+		navigate("/game");
 	}
 
 	return (
@@ -115,11 +158,11 @@ function AcceptGame({ login, mode }: ButtonProps) {
 	)
 }
 
-function RefuseGame({ login }: ButtonProps) {
+function RefuseGame({ senderId }: GameProps) {
 	const socket = useContext(EventContext)!;
 
 	function handleClick() {
-		socket.emit("refuseGame", login);
+		socket.emit("refuseGame", senderId);
 	}
 
 	return (
@@ -147,8 +190,8 @@ export default function EventButton ({ event }: EventButtonProps) {
 	if (event.type === "gameRequest")
 		return (
 			<div className="grid grid-cols-2">
-				<AcceptGame login={event.sender} mode={event.gameMode}/>
-				<RefuseGame login={event.sender} />
+				<AcceptGame senderId={event.senderId} mode={event.gameMode}/>
+				<RefuseGame senderId={event.senderId} />
 			</div>
 		)
 	if (event.type !== "message")

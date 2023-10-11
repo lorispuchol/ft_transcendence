@@ -10,6 +10,12 @@ import { MemberDistinc, Participant } from "src/chat/entities/participant_chan_x
 interface Event {
 	type: string,
 	sender: string,
+	senderId: number,
+}
+
+interface Sender {
+	id: number,
+	username: string,
 }
 
 @Injectable()
@@ -23,21 +29,21 @@ export class EventService {
 		private userService: UserService,
 	) {}
 
-	newEvent(login: string, event: Event) {
-		this.eventGateway.newEvent(login, event);
+	newEvent(userId: number, event: Event) {
+		this.eventGateway.newEvent(userId, event);
 	}
 
-	deleteEvent(login: string, event: Event) {
-		this.eventGateway.deleteEvent(login, event);
+	deleteEvent(userId: number, event: Event) {
+		this.eventGateway.deleteEvent(userId, event);
 	}
 
-	async getUserData(login: string) {
-		return await this.userService.findOneByLogin(login);
+	async getUserData(id: number) {
+		return await this.userService.findOneById(id);
 	}
 
-	async getPendingInvitations(login: string): Promise<string[]> {
+	async getPendingInvitations(userId: number): Promise<Sender[]> {
 		
-		const user: User = await this.userService.findOneByLogin(login);
+		const user: User = await this.userService.findOneById(userId);
 		const pendingInvitations: Relationship[] = await this.relationshipRepository.find({
 			where: {
 				recipient: user.id,
@@ -45,14 +51,14 @@ export class EventService {
 			} as FindOptionsWhere<User>
 		});
 
-		const logins: string[] = [];
-		pendingInvitations.forEach((invitation) => logins.push(invitation.requester.username)) // pourquoi username et pas login ?
-		return logins;
+		const senders: Sender[] = [];
+		pendingInvitations.forEach((invitation) => senders.push({id: invitation.requester.id, username: invitation.requester.username}))
+		return senders;
 	}
 
-	async getPendingInvitationsChannel(login: string): Promise<string[]> {
+	async getPendingInvitationsChannel(userId: number): Promise<Sender[]> {
 		
-		const user: User = await this.userService.findOneByLogin(login);
+		const user: User = await this.userService.findOneById(userId);
 		const pendingInvitationsChannel: Participant[] = await this.participantRepository.find({
 			where: {
 				user: user.id,
@@ -60,8 +66,8 @@ export class EventService {
 			} as FindOptionsWhere<User>
 		});
 
-		const channels: string[] = [];
-		pendingInvitationsChannel.forEach((invitationChan) => channels.push(invitationChan.channel.name))
+		const channels: Sender[] = [];
+		pendingInvitationsChannel.forEach((invitationChan) => channels.push({username: invitationChan.channel.name, id: invitationChan.channel.id}))
 		return channels;
 	}
 
@@ -78,9 +84,9 @@ export class EventService {
 		return blockeds;
 	}
 
-	async isBlocked(login: string, blocker: string) {
-		const requester: User = await this.userService.findOneByLogin(blocker);
-		const recipient: User = await this.userService.findOneByLogin(login);
+	async isBlocked(userId: number, blockerId: number) {
+		const requester: User = await this.userService.findOneById(blockerId);
+		const recipient: User = await this.userService.findOneById(userId);
 
 		if (!requester || !recipient)
 			return (false);

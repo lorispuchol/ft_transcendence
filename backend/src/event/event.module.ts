@@ -13,6 +13,6 @@ import { Participant } from "src/chat/entities/participant_chan_x_user.entity";
 		UserModule,
 	],
 	providers: [EventService, EventGateway],
-	exports: [EventService, EventGateway],
+	exports: [EventService],
 })
 export class EventModule {}

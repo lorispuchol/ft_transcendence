@@ -9,7 +9,7 @@ import { User } from "src/user/user.entity";
 import { MemberDistinc, Participant } from "./entities/participant_chan_x_user.entity";
 import { Message } from "./entities/message.entity";
 import { RelationshipService } from "src/relationship/relationship.service";
-import { EventGateway } from "src/event/event.gateway";
+import { EventService } from "src/event/event.service";
 
 @WebSocketGateway({
 	namespace: "chat",
@@ -21,7 +21,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		private chatService: ChatService,
 		private userService: UserService,
 		private relationshipService: RelationshipService,
-		private eventGateaway: EventGateway,
+		private eventService: EventService,
 	) {}
 
 	private users: Map<string, Socket> = new Map();
@@ -58,23 +58,24 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		const msg: Message = await this.chatService.saveNewMsg(sender, channel, value[1])
 
 		const toEmits: Socket[] = []
-		const loginsToEvent: string[] = [];
+		const loginsToEvent: number[] = [];
 
 		const promises = members.map( async (member) => {
 			const socket: Socket = this.users.get(member.user.login)
 			if (socket && await this.relationshipService.ReqIsBlocked(sender, member.user) === false) {
 				toEmits.push(socket)
 			}
-			loginsToEvent.push(member.user.login);
+			loginsToEvent.push(member.user.id);
 		})
 		Promise.all(promises).then(() => {
 			toEmits.map((socket) => socket.emit('message', {chan: value[0], msg: msg}));
-			loginsToEvent.map((login) => {
-				if(login !== sender.login)
+			loginsToEvent.map((id) => {
+				if(id !== sender.id) {
 					if (channel.name.includes("+"))
-						this.eventGateaway.newEvent(login, {type: "message", sender: channel.name})
+						this.eventService.newEvent(id, {type: "message", sender: channel.name, senderId: channel.id})
 					else
-						this.eventGateaway.newEvent(login, {type: "message", sender: "#" + channel.name})
+						this.eventService.newEvent(id, {type: "message", sender: "#" + channel.name, senderId: channel.id})
+				}
 			})
 		})
 	}
@@ -88,12 +89,13 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		const decoded: any = this.jwtService.decode(<string>client.handshake.headers.token)
 		const reqUser: User = await this.userService.findOneByLogin(decoded.login);
 		const Guest: User = await this.userService.findOneByUsername(value[1]);
+		const channel: Channel = await this.chatService.findChanByName(value[0])
 		
 		if (!Guest)
 			return client.emit('inviteRes', {status: "KO", description: "User not found"});
 		const result: any = await this.chatService.setDistinction(reqUser, value[0], Guest.login, MemberDistinc.INVITED);
 		if (result.status === "OK") {
-			this.eventGateaway.newEvent(Guest.login, {type: "channelInvitation", sender: value[0]}); // ici le sender est le channel
+			this.eventService.newEvent(Guest.id, {type: "channelInvitation", sender: channel.name, senderId: channel.id}); // ici le sender est le channel
 		}
 		return client.emit('inviteRes', {status: result.status, description: result.description});
 	}

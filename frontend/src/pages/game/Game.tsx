@@ -1,21 +1,38 @@
 import './Game.scss';
 import { Chip, Paper } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import GameMenu from "./GameMenu";
 import bird from "./bird.png";
 import MatchMaking from "./online/MatchMaking";
 import LocalGame from './local/LocalGame';
-import { useLocation } from 'react-router-dom';
+import { GetRequest } from '../../utils/Request';
+import { EventContext } from '../../utils/Context';
+
+interface UserData {
+	id: number,
+	avatar: string,
+	login: string,
+	username: string,
+	nb_victory: number,
+	nb_defeat: number,
+}
+
+interface Response {
+	status: string,
+	data?: UserData,
+	error?: string,
+}
 
 interface Player {
 	score: number,
-	avatar: string,
-	username: string,
+	id: number,
+	username: string | null,
 }
 
 export interface Players {
 	p1: Player | null,
 	p2: Player | null,
+	side?: number,
 }
 
 export interface Setting {
@@ -24,34 +41,54 @@ export interface Setting {
 }
 
 function PlayerCard( { player }: any ) {
+	const [user, setUser]: [any, Function] = useState({
+		avatar: bird,
+		id: player.id,
+		username: player.username
+	});
 
-	if (player)
-	{
-		const avatar = player.avatar === "" ? bird : player.avatar;
-		return (
-			<Paper className="player_card in_game_card">
-				<img src={avatar} alt="avatar" />
-				<div className="score">{player.score}</div>
-				<Chip label={player.username}/>
-				<div/>
-			</Paper>
-		);
-	}
+	useEffect(() => {
+		if (!user.id)
+			return ;
+		GetRequest("/user/profile/id/" + user.id).then((response: Response) => {
+			if (response.status === "OK")
+				setUser({
+					avatar : response.data!.avatar ? response.data!.avatar : bird,
+					id: user.id,
+					username: response.data!.username
+				})
+		});
+
+	}, [user]);
+
 	return (
-		<Paper className="player_card"><div className="el_pongo">PONGO</div></Paper>
-	)
+		<Paper className="player_card in_game_card">
+			<img src={user.avatar} alt="avatar" />
+			<div className="score">{player.score}</div>
+			<Chip label={user.username}/>
+			<div/>
+		</Paper>
+	);
 }
 
 export default function Game() {
-	const location = useLocation();
+	const socket = useContext(EventContext)!;
 	const [players, setPlayers]: [Players, Function] = useState({p1: null, p2: null});
-	const [defy, setDefy]: [string | null, Function] = useState(location.state ? location.state.to : null);
-	const [setting, setSetting]: [Setting, Function] = useState(location.state ? {type: "online", mode: location.state.mode} : {type: "menu", mode: "classic"});
+	const [defy, setDefy]: [number | null, Function] = useState(null);
+	const [setting, setSetting]: [Setting, Function] = useState({type: "menu", mode: "classic"});
 
 	useEffect(() => {
-		setDefy(location.state ? location.state.to : null);
-		setSetting(location.state ? {type: "online", mode: location.state.mode} : {type: "menu", mode: "classic"});
-	}, [location])
+
+		function goToDefy(defyInfo: any) {
+			setDefy(defyInfo.senderId);
+			setSetting({type: "online", mode: defyInfo.mode});
+		}
+		socket.on("goDefy", goToDefy)
+
+		return (() => {
+			socket.off("goDefy", goToDefy)
+		})
+	}, [socket, setDefy, setSetting])
 
 	function returnToMenu() {
 		setSetting({type: "menu", mode: setting.mode});
@@ -65,16 +102,18 @@ export default function Game() {
 			case "local":
 				return (<LocalGame setPlayers={setPlayers}/>)
 			case "online":
-				return (<MatchMaking setting={setting} setSetting={setSetting} setPlayers={setPlayers} defy={defy}/>);
+				return (<MatchMaking mode={setting.mode} setSetting={setSetting} setPlayers={setPlayers} defy={defy} setDefy={setDefy}/>);
 		}
 	}
 
 	return (
 		<>
 			<div className="canvas_wrap">
-				<PlayerCard player={players.p1}/>
+				{players.p1? <PlayerCard player={players.p1}/> 
+					: <Paper className="player_card"><div className="el_pongo">PONGO</div></Paper>}
 				{modeSelect()}
-				<PlayerCard player={players.p2}/>
+				{players.p2? <PlayerCard player={players.p2}/>
+					: <Paper className="player_card"><div className="el_pongo">PONGO</div></Paper>}
 			</div>
 			{setting.type !== "menu" &&
 				<div className="flex justify-center"><button onClick={returnToMenu}>

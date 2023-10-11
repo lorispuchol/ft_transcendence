@@ -32,6 +32,10 @@ export function drawPaddle (ctx: CanvasRenderingContext2D, pad: Pad) {
 	ctx.fill();
 }
 
+export function clearBehind(ctx: CanvasRenderingContext2D, pad: Pad) {
+	ctx.clearRect(pad.lx - pad.w , pad.ly, pad.w, pad.h);
+	ctx.clearRect(pad.rx + 2 * pad.w , pad.ry, pad.w, pad.h);
+}
 
 const allowedLeftKey = ['w', 's'];
 let leftKey: string[] = [];

@@ -1,59 +1,75 @@
 import { Socket, io } from "socket.io-client";
 import Loading from "../../../utils/Loading";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { server_url } from "../../../utils/Request";
-import { Players, Setting } from "../Game";
-import { CircularProgress } from "@mui/material";
+import { Players } from "../Game";
+import { Button, CircularProgress, Paper } from "@mui/material";
+import OnlineGame from "./OnlineGame";
+import { UserContext } from "../../../utils/Context";
 
 interface Props {
-	setting: Setting,
+	mode: string,
 	setSetting: Function,
 	setPlayers: Function,
-	defy: string | null,
+	defy: number | null,
+	setDefy: Function
 }
 
-export default function MatchMaking({ setting, setPlayers, setSetting, defy }: Props) {
+export default function MatchMaking({ mode, setPlayers, setSetting, defy, setDefy }: Props) {
 	const [socket, setSocket]: [Socket | null, Function] = useState(null);
 	const [openent, setOpenent]: [boolean, Function] = useState(false);
+	const [side, setSide]: [number, Function] = useState(1);
+	const username = useContext(UserContext);
 
 	useEffect(() => {
 		const token = localStorage.getItem("token");
 		const option = { transportOptions: { polling: { extraHeaders: { token: token }}}};
-		const newSocket = io(server_url + "/game", option);
+		const newSocket: Socket = io(server_url + "/game", option);
 		setSocket(newSocket);
 		
-		function handleSearch(players: Players | null) {
-			if (!players)
-				setSetting({type: "menu", mode: setting.mode});
-			else
-			{
-				setPlayers(players);
-				setOpenent(true);
-			}
+		function handleSearch(players: Players) {
+			setPlayers(players);
+			setOpenent(true);
+			//left=1  right=-1
+			setSide(players.side);
 		}
-
 		newSocket.on("matchmaking", handleSearch);
-		newSocket.emit("search", defy);
+		if (defy)
+		{
+			newSocket.emit("defy", defy);
+			setDefy(null);
+		}
+		else
+			newSocket.emit("search", mode);
 
 		return () => {
+			newSocket.off("matchmaking", handleSearch);
 			newSocket.close();
 		};
-	}, [setSocket, defy, setPlayers, setSetting, setting.mode])
+	}, [setSocket, defy, setPlayers, setSetting, setSide, username, mode, setDefy]);
+	function getState() {
+		socket?.emit("getState");
+	}
+	function flush() {
+		socket?.emit("flush");
+	}
 	if (!socket)
 		return (<Loading />);
 	
 	if (!openent)
 		return (
-			<div>
+			<Paper>
 				<CircularProgress />
 				<div>waiting for openent</div>
-			</div>
+				<Button color="error" onClick={getState}>get State</Button>
+				<Button color="error" onClick={flush}>flush</Button>
+			</Paper>
 		);
 	
 	return (
 		<div>
-			<div>online</div>
-			<div>defy: {defy}</div>
+			<OnlineGame socket={socket} setPlayers={setPlayers} side={side} />
+			<Button className="get_ready" onClick={getState}>get State</Button>
 		</div>
 	)
 }

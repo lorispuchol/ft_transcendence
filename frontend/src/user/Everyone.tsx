@@ -50,7 +50,7 @@ function ProfileElement({ user }: ProfileElementProps) {
 	return (
 		<>
 		<Paper key={render} className="profile_element">
-			<div className="status"><UserStatus login={user.login} /></div>
+			<div className="status"><UserStatus userId={user.id} /></div>
 			<div className="py-2"><Avatar src={avatar} alt={user.username}/></div>
 			<div className="px-4">
 				<NavLink to={'/profile/' + user.username}>
@@ -88,12 +88,11 @@ export default function Everyone() {
 
 			function everyoneListener(newUser: UserData) {
 				setUsers((prev: UserData[]) => {
-						if (!prev.some((user: UserData) => (user.login === newUser.login)))
+						if (!prev.some((user: UserData) => (user.id === newUser.id)))
 							return [...prev, newUser];
 						return ([...prev]);
 					});
 			}
-
 			socket.on('everyone', everyoneListener);
 
 			return () => {socket.off('everyone', everyoneListener)};

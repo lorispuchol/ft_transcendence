@@ -14,5 +14,9 @@ WORKDIR '/app'
 #RUN npm install .
 #RUN npm audit fix
 
+ENV TZ=Europe/Paris
+RUN apk add tzdata
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 #CMD ["npm", "run", "build"]
 ENTRYPOINT ["sh", "entrypoint_dev.sh"]

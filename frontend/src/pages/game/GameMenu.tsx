@@ -12,7 +12,7 @@ interface MenuProps {
 
 interface UserData {
 	avatar: string | null,
-	login: string,
+	id: number,
 	username: string,
 }
 
@@ -21,7 +21,7 @@ export default function GameMenu({ setSetting, setDefy }: MenuProps) {
 	const [mode, setMode]: [string, Function] = useState("classic");
 	const [users, setUsers]: [UserData[], Function] = useState([]);
 	const [waitResponse, setWaitResponse]: [boolean, Function] = useState(false);
-	const [select, setSelect]: [string | null, Function] = useState(null);
+	const [select, setSelect]: [number | null, Function] = useState(null);
 	const socket = useContext(EventContext)!;
 
 	useEffect(() => {
@@ -29,13 +29,12 @@ export default function GameMenu({ setSetting, setDefy }: MenuProps) {
 			setUsers((prev: UserData[]) => [...prev, newUser])
 		}
 		function delUser(oldUser: UserData) {
-			setUsers((prev: UserData[]) => prev.filter((user) => user.login !== oldUser.login));
-			if (select === oldUser.login)
+			setUsers((prev: UserData[]) => prev.filter((user) => user.id !== oldUser.id));
+			if (select === oldUser.id)
 				setSelect(null);
 		}
 		function handleDefy(data: any) {
-			console.log(select);
-			if (data.login !== select)
+			if (data.id !== select)
 				return ;
 			if (data.response === "OK")
 			{
@@ -103,11 +102,11 @@ export default function GameMenu({ setSetting, setDefy }: MenuProps) {
 								<div className="defy_list">
 								{
 									users.map((user: UserData) => (
-										<div id="user" key={user.login} className={select === user.login? "defy_focus": ""} onClick={() => setSelect(user.login)}>{user.username}</div>
+										<div id="user" key={user.id} className={select === user.id ? "defy_focus": ""} onClick={() => setSelect(user.id)}>{user.username}</div>
 									))
 								}
 								</div>
-							<Button key="defy" onClick={send_defy}>defy</Button>
+							<Button key="defy" className="text-[1.5vw]" onClick={send_defy}>defy</Button>
 							</div>
 					</div>
 					}
