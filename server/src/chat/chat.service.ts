@@ -53,6 +53,22 @@ export class ChatService {
 			channel: {id: channel.id}
 		});
 	}
+
+	async setAnotherOwner(channel: Channel) {
+		const parts: Participant[] = await this.participantRepository.find({
+			where: {
+				channel: channel.id
+			} as FindOptionsWhere<Channel>
+		})
+		if (!parts)
+			return ;
+		let newOwner: Participant = parts.find((part) => part.distinction === MemberDistinc.ADMIN)
+		if (!newOwner)
+			newOwner = parts.find((part) => part.distinction === MemberDistinc.MEMBER)
+		if (!newOwner)
+			return ;
+		await this.saveNewMember(newOwner.user, channel, MemberDistinc.OWNER, new Date())
+	}
 	
 	async getConvs(user: User): Promise<Channel[]> {
 		const chans: Channel[] = [];
@@ -89,6 +105,26 @@ export class ChatService {
 		return parts.find((part) => part.user.id === user.id)
 	}
 
+	async leaveChan(requester: User, chanName: string) {
+
+		const channel: Channel = await this.findChanByName(chanName)
+		if (!channel)
+			throw new HttpException("Channel not found", HttpStatus.FORBIDDEN);
+		if (channel.mode === ChanMode.DM)
+			throw new HttpException("Channel is a Dm", HttpStatus.FORBIDDEN);
+		
+		const reqPart: Participant = await this.findOneParticipant(channel, requester)
+
+		if (!reqPart || reqPart.distinction < MemberDistinc.MEMBER)
+			throw new HttpException("You are not part of " + channel.name, HttpStatus.FORBIDDEN);
+
+		this.deleteMember(requester, channel)
+		if (reqPart.distinction === MemberDistinc.OWNER)
+			await this.setAnotherOwner(channel)
+
+		return ({status: "OK", description: "You well leave " + channel.name})
+	}
+
 	async mute(requester: User, chanName: string, login: string) {		
 		var muteDate: Date = new Date();
 		muteDate.setMinutes(muteDate.getMinutes() + 1)
@@ -120,13 +156,13 @@ export class ChatService {
 			throw new HttpException(member.username + " is not part of " + channel.name + ": " + this.getDistStr(memberPart.distinction), HttpStatus.FORBIDDEN);
 		if (memberPart.muteDate > new Date()){
 			let displayDate: Date = new Date(memberPart.muteDate)
-			displayDate.setHours(displayDate.getHours() + 2)
+			displayDate.setHours(displayDate.getHours() + 2) //////////// a changer pour le fuseau horaire
 			return ({status: "KO", description: memberPart.user.username + " is already mute until " +  new Date(displayDate).toLocaleTimeString()})
 		}
 		this.saveNewMember(member, channel, memberPart.distinction, muteDate)
 
 		let displayDate: Date = new Date(muteDate)
-		displayDate.setHours(displayDate.getHours() + 2)
+		displayDate.setHours(displayDate.getHours() + 2) //////////// a changer pour le fuseau horaire
 		return ({status: "OK", description: memberPart.user.username + " is now mute until " +  new Date(displayDate).toLocaleTimeString()})
 	}
 

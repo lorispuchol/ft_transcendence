@@ -19,6 +19,7 @@ import { ArrowForward, VolumeOff } from "@mui/icons-material";
 import { ControlButton } from "../components/ChatButton/ControlButtons";
 import { MuteButton } from "../components/ChatButton/MuteButton";
 import { InviteModule } from "../components/ChatButton/InviteModule";
+import { LeaveButton } from "../components/ChatButton/LeaveButton";
 
 
 interface MemberProps {
@@ -198,6 +199,7 @@ export default function ListMembers({chan}: ListMembersProps) {
 			}
 			<div>
 				<InviteModule chan={chan} />
+				<LeaveButton chanName={chan}/>
 			</div>
 		</div>
 	)

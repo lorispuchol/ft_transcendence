@@ -24,6 +24,17 @@ export class ChatController {
 		)
 	}
 
+	@Get('leaveChan/:chan')
+	async leaveChan(
+		@Request() req: any,
+		@Param('chan') chan: string
+	) {
+		return this.chatService.leaveChan(
+			await this.userService.findOneByLogin(req.user.login),
+			chan
+		)
+	}
+
 	@Post('mute/:chan')
 	async mute (
 		@Request() req: any,

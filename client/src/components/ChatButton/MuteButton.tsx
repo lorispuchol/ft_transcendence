@@ -36,7 +36,7 @@ export function MuteButton({ memberPart }: MuteButtonProps) {
 	}
 	return (
 		<button className="btn" disabled={disable} onClick={mute}>
-			<p>MUTE</p>
+			<p>MUTE FOR 1MIN</p>
 		</button>
 	);
 }

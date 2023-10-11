@@ -213,7 +213,7 @@ export default function Chat() {
 		const newSocket = io(server_url + "/chat", option);
 		setSocket(newSocket);
 		return () => {newSocket.close()};
-	}, [setSocket]);
+	}, [setSocket, focusConv]);
 
 	useEffect(() => {
 		setFocusConv(location.state?.to);
