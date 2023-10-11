@@ -12,12 +12,6 @@ interface Props {
 	defy: string | null,
 }
 
-interface Player {
-	score: number,
-	avatar: string,
-	username: string,
-}
-
 export default function MatchMaking({ setting, setPlayers, setSetting, defy }: Props) {
 	const [socket, setSocket]: [Socket | null, Function] = useState(null);
 	const [openent, setOpenent]: [boolean, Function] = useState(false);
@@ -44,7 +38,7 @@ export default function MatchMaking({ setting, setPlayers, setSetting, defy }: P
 		return () => {
 			newSocket.close();
 		};
-	}, [setSocket])
+	}, [setSocket, defy, setPlayers, setSetting, setting.mode])
 	if (!socket)
 		return (<Loading />);
 	

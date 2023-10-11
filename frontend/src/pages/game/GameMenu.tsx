@@ -4,7 +4,6 @@ import './GameMenu.scss';
 import { Public, RocketLaunch, SportsTennis, Weekend } from "@mui/icons-material";
 import { useContext, useEffect, useState } from "react";
 import { EventContext } from "../../utils/Context";
-import Loader from "../../components/Loading/Loader";
 
 interface MenuProps {
 	setSetting: Function,
@@ -55,11 +54,11 @@ export default function GameMenu({ setSetting, setDefy }: MenuProps) {
 			socket.off('userDisconnect', delUser);
 			socket.off("defy", handleDefy);
 		};
-	}, [socket, select])
+	}, [socket, select, mode, setDefy, setSetting])
 	
 	useEffect(() => {
 		socket.emit("getConnected");
-	}, [])
+	}, [socket])
 
 	function focus(value: string) {
 		if (type === value || mode === value)

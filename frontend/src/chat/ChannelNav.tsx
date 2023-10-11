@@ -3,7 +3,6 @@ import { FormControl, FormControlLabel, FormGroup, FormLabel, Paper, Radio, Radi
 import { useContext, useEffect, useState } from "react";
 import './chat.scss'
 import { GetRequest, PostRequest } from "../utils/Request";
-import { ToastContainer } from "react-toastify";
 import { SocketChatContext } from "../utils/Context";
 import { ChanMode, ChannelData } from "./interfaceData";
 import Loading from "../utils/Loading";
