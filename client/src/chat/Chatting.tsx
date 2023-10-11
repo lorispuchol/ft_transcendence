@@ -65,7 +65,7 @@ function Messages({chan}: MessagesProps) {
 	return (
 		<div className="w-full flex flex-col overflow-hidden overflow-scroll px-5 mb-3">
 			{messages.map((message: MessageData) => (
-			<div key={message.id} className={`chat ${message.sender.username === userName ? 'chat-start' : 'chat-end'}`}>
+			<div key={message.id} className={`chat ${message.sender.username === userName ? 'chat-end' : 'chat-start'}`}>
 				<div className="chat-image avatar">
 					<div className="w-10 rounded-full">
 						<img src={message.sender.avatar ? message.sender.avatar : defaultAvatar} alt={message.sender.username} />

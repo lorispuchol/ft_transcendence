@@ -6,8 +6,8 @@ import ErrorHandling from "../utils/Error";
 import { useLocation } from "react-router-dom";
 import { Socket, io } from "socket.io-client";
 import './chat.scss'
-import { ChanMode, ChannelData, MemberDistinc, MessageData, ParticipantData } from "./interfaceData";
-import { SocketChatContext, UserContext } from "../utils/Context";
+import { ChanMode, ChannelData, MemberDistinc, MessageData, ParticipantData, UserData } from "./interfaceData";
+import { DisplayMemberContext, SetDisplayMemberContext, SocketChatContext, UserContext } from "../utils/Context";
 import ChannelNav from "./ChannelNav";
 import { Avatar } from "@mui/material";
 import { Tag } from "@mui/icons-material";
@@ -81,6 +81,7 @@ function ChanButtonConv({chan, focusConv, setFocusConv}: ButtonConvProps) {
 
 	const [resMembers, setResMembers]: [ResMembers, Function] = useState({status: "loading"});
 	const user = useContext(UserContext);
+	const setDisplayMemberContext = useContext(SetDisplayMemberContext);
 
 	useEffect(() => {
 		GetRequest("/chat/getMembers/" + chan.name).then((res) => setResMembers(res))
@@ -96,11 +97,16 @@ function ChanButtonConv({chan, focusConv, setFocusConv}: ButtonConvProps) {
 		&& resMembers.data!.find((member) => member.user.username === user)!.distinction <= MemberDistinc.INVITED)
 		return null;
 	
+	function handleOnClick() {
+		setFocusConv(chan.name);
+		setDisplayMemberContext(null)
+	}
+
 	return (
 		<button
 			className={`button-conv ${chan.name === focusConv && 'focused'}`}
 			key={chan.name}
-			onClick={()=> setFocusConv(chan.name)}
+			onClick={handleOnClick}
 		>
 			<Avatar>
 				<Tag />
@@ -113,6 +119,7 @@ function ChanButtonConv({chan, focusConv, setFocusConv}: ButtonConvProps) {
 function DmButtonConv({chan, focusConv, setFocusConv}: ButtonConvProps) {
 
 	const user = useContext(UserContext);
+	const setDisplayMemberContext = useContext(SetDisplayMemberContext);
 	const [resMembers, setResMembers]: [ResMembers, Function] = useState({status: "loading"});
 
 	useEffect(() => {
@@ -136,11 +143,17 @@ function DmButtonConv({chan, focusConv, setFocusConv}: ButtonConvProps) {
 	}
 	if (!displayAvatar)
 		displayAvatar = defaultAvatar;
+
+	function handleOnClick() {
+		setFocusConv(chan.name);
+		setDisplayMemberContext(null)
+	}
+
 	return (
 		<button
 			className={`button-conv ${chan.name === focusConv && 'focused'}`}
 			key={chan.name}
-			onClick={()=> setFocusConv(chan.name)}
+			onClick={handleOnClick}
 		>
 			<Avatar src={displayAvatar} alt="avatar"></Avatar>
 			<p>{displayUsername}</p>
@@ -188,7 +201,9 @@ function ListConv({focusConv, setFocusConv}: focusConvProps) {
 
 export default function Chat() {
 	const location = useLocation();
+
 	const [focusConv, setFocusConv]: [string, Function] = useState(location.state?.to);
+	const [displayProfile, setDisplayProfile]: [UserData | null, Function] = useState(null);
 
 	const [socket, setSocket]: [Socket | null, Function] = useState(null);
 
@@ -198,7 +213,7 @@ export default function Chat() {
 		const newSocket = io(server_url + "/chat", option);
 		setSocket(newSocket);
 		return () => {newSocket.close()};
-	}, [setSocket]);
+	}, [setSocket, focusConv]);
 
 	useEffect(() => {
 		setFocusConv(location.state?.to);
@@ -209,6 +224,9 @@ export default function Chat() {
 
 	return (
 		<SocketChatContext.Provider value={socket}>
+		<SetDisplayMemberContext.Provider value={setDisplayProfile}>
+		<DisplayMemberContext.Provider value={displayProfile}>
+
 			<div className="chat-page">
 				<div className="list-conv">
 					<ListConv focusConv={focusConv} setFocusConv={setFocusConv}/>
@@ -218,10 +236,11 @@ export default function Chat() {
 				</div>
 				<div className="list-member">
 					{focusConv ? <ListMembers chan={focusConv} /> : null}
-					<ToastContainer />
 				</div>
 			</div>
 			<ToastContainer />
+		</DisplayMemberContext.Provider>
+		</SetDisplayMemberContext.Provider>
 		</SocketChatContext.Provider>
 	);
 }

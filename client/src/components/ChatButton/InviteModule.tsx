@@ -33,7 +33,7 @@ export function InviteModule({chan}: InviteButtonProps) {
 	return (
 		<div>
 			<form onSubmit={invite}>
-				<input value={guestUsername} placeholder="Username" onChange={(e) => {setGuest(e.currentTarget.value);}} />
+				<input className="w-full" value={guestUsername} placeholder="Username" onChange={(e) => {setGuest(e.currentTarget.value);}} />
 				<button className="btn" type="submit">INVITE</button>
 			</form>
 		</div>

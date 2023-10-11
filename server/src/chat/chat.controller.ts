@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Request } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Request } from "@nestjs/common";
 import { ChatService } from "./chat.service";
 import { UserService } from "src/user/user.service";
 import { Distinction, JoinChannelWithPassword, Mute, NewChannelWithPassword, NewChannelWithoutPassword } from "./channel.dto";
@@ -21,6 +21,17 @@ export class ChatController {
 	async getNoConvs( @Request() req: any ) {
 		return await this.chatService.getNoConvs(
 			await this.userService.findOneByLogin(req.user.login)
+		)
+	}
+
+	@Get('leaveChan/:chan')
+	async leaveChan(
+		@Request() req: any,
+		@Param('chan') chan: string
+	) {
+		return this.chatService.leaveChan(
+			await this.userService.findOneByLogin(req.user.login),
+			chan
 		)
 	}
 
@@ -68,6 +79,26 @@ export class ChatController {
 			await this.userService.findOneByLogin(req.user.login),
 			chan,
 			null
+		)
+	}
+
+	@Patch('acceptChannel/:chan')
+	async acceptChannel (
+		@Request() req: any,
+		@Param('chan') chan: string ) {
+		return await this.chatService.acceptChan(
+			await this.userService.findOneByLogin(req.user.login),
+			chan
+		)
+	}
+
+	@Delete('refuseChannel/:chan')
+	async refuseChannel (
+		@Request() req: any,
+		@Param('chan') chan: string ) {
+		return await this.chatService.refuseChan(
+			await this.userService.findOneByLogin(req.user.login),
+			chan
 		)
 	}
 	
