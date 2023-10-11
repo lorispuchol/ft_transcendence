@@ -175,7 +175,7 @@ export class ChatService {
 		if (!memberPart || memberPart.distinction !== MemberDistinc.INVITED)
 			return ({status: "KO", description: "You are not invited in " + channel.name})
 		this.saveNewMember(invited, channel, MemberDistinc.MEMBER, new Date())
-		this.eventService.deleteEvent(invited.login, {type: "channelInvitation", sender: channel.name});
+		this.eventService.deleteEvent(invited.id, {type: "channelInvitation", sender: channel.name, senderId: channel.id});
 		return ({status: "OK", description: "You are now member of " + channel.name})
 	}
 
@@ -188,7 +188,7 @@ export class ChatService {
 		if (!memberPart || memberPart.distinction !== MemberDistinc.INVITED)
 			return ({status: "KO", description: "You are not invited in " + channel.name})
 		this.deleteMember(invited, channel)
-		this.eventService.deleteEvent(invited.login, {type: "channelInvitation", sender: channel.name});
+		this.eventService.deleteEvent(invited.id, {type: "channelInvitation", sender: channel.name, senderId: channel.id});
 		return ({status: "OK", description: "You well decline this invitation"})
 	}
 

@@ -19,6 +19,11 @@ interface Response {
 export function ChangeAccessibility({chanName}: ChangeAccessibilityProps) {
 	
 	const [response, setResponse]: [Response, Function] = useState({status: "loading"});
+	const [datasAccess, setDatasAccess] = useState({
+		mode: ChanMode.PUBLIC,
+		currentPw: "",
+		newPw: "",
+	});
 
 	useEffect(() => {
 		GetRequest("/chat/getConvs").then((response) => setResponse(response));
@@ -30,11 +35,6 @@ export function ChangeAccessibility({chanName}: ChangeAccessibilityProps) {
 
 	const channel: ChannelData | undefined = response.data!.find((conv) => conv.name === chanName);
 
-	const [datasAccess, setDatasAccess] = useState({
-		mode: ChanMode.PUBLIC,
-		currentPw: "",
-		newPw: "",
-	});
 
 	if (!channel)
 		return null;
