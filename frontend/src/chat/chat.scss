@@ -65,7 +65,7 @@ hr {
 /* ////////////////////////////////  Chatting and ChanNav //////////////////////////// */
 
 .chatting {
-	//border-radius: 0.25rem;
+	border-radius: 0 0 0 0;
 	display: flex;
 	flex-basis: 60%;
 	flex-grow: 0;
@@ -73,6 +73,9 @@ hr {
 	background-color: #323C58;
 	//box-shadow: inset 0 0 5px #000000;
 	order: 1;
+	::-webkit-scrollbar {
+		display: none;
+	}
 }
 
 .chan-nav {
@@ -115,7 +118,7 @@ hr {
 
 /* ////////////////////////////////  ListMember  //////////////////////////// */
 .list-member {
-	//border-radius: 0.25rem;
+	border-radius: 0 0.25rem 0.25rem 0;
 	background-color: #46506c;
 	flex-basis: 20%;
 	flex-grow: 0;
@@ -126,6 +129,10 @@ hr {
 	display: flex;
 	flex-direction: column;
 	padding: 10px;
+}
+
+.list-member::-webkit-scrollbar {
+	display: none;
 }
 
 .member-button {

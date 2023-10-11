@@ -11,10 +11,6 @@ import { Message } from "./entities/message.entity";
 import { RelationshipService } from "src/relationship/relationship.service";
 import { EventService } from "src/event/event.service";
 
-interface Event {
-	type: string,
-	sender: string,
-}
 @WebSocketGateway({
 	namespace: "chat",
 	cors: { origin: [client_url] },

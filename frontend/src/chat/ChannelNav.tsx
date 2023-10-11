@@ -3,7 +3,6 @@ import { FormControl, FormControlLabel, FormGroup, FormLabel, Paper, Radio, Radi
 import { useContext, useEffect, useState } from "react";
 import './chat.scss'
 import { GetRequest, PostRequest } from "../utils/Request";
-import { ToastContainer } from "react-toastify";
 import { SocketChatContext } from "../utils/Context";
 import { ChanMode, ChannelData } from "./interfaceData";
 import Loading from "../utils/Loading";
@@ -182,7 +181,6 @@ function Explore() {
 	function changeMap(chanName: string, pw: string) {
 		let temp: Map<string, string> = new Map(inputPw);
 		temp.set(chanName, pw);
-		console.log(temp)
 		setInputPw(temp);
 	}
 	
@@ -240,8 +238,6 @@ export default function ChannelNav() {
 						</PopUp>
 				}
 			</div>
-			<ToastContainer />
 		</>
-		
 	)
 }

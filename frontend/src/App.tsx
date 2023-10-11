@@ -56,9 +56,11 @@ function WebSocket({ children }: WebSocketProps) {
 
 export default function App() {
 	const [response, setResponse]: [Response, Function] = useState({status: "loading"});
+
 	useEffect(() => {
 			GetRequest("/user/me").then((response) => setResponse(response));
 	}, []);
+
 	if (response.status === "loading")
 		return (<Loading />);
 	if (response.status === 401)
@@ -89,7 +91,6 @@ export default function App() {
 						<Route path='/loader' element={<Loader />} />
 					</Routes>
 				</div>
-				<></>
 			</UserContext.Provider>
 		</WebSocket>
 	);

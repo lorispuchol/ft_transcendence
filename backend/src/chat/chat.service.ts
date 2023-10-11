@@ -8,6 +8,7 @@ import { Message } from "./entities/message.entity";
 import { RelationshipService } from "src/relationship/relationship.service";
 import { UserService } from "src/user/user.service";
 import * as bcrypt from 'bcrypt';
+import { EventService } from "src/event/event.service";
 
 @Injectable()
 export class ChatService {
@@ -22,7 +23,8 @@ export class ChatService {
 		private messagesRepository: Repository<Message>,
 
 		private relationshipService: RelationshipService,
-		private userService: UserService
+		private userService: UserService,
+		private eventService: EventService,
 	) {}
 
 	getDistStr(dist: MemberDistinc): string {
@@ -50,6 +52,22 @@ export class ChatService {
 			user: {id: user.id},
 			channel: {id: channel.id}
 		});
+	}
+
+	async setAnotherOwner(channel: Channel) {
+		const parts: Participant[] = await this.participantRepository.find({
+			where: {
+				channel: channel.id
+			} as FindOptionsWhere<Channel>
+		})
+		if (!parts)
+			return ;
+		let newOwner: Participant = parts.find((part) => part.distinction === MemberDistinc.ADMIN)
+		if (!newOwner)
+			newOwner = parts.find((part) => part.distinction === MemberDistinc.MEMBER)
+		if (!newOwner)
+			return ;
+		await this.saveNewMember(newOwner.user, channel, MemberDistinc.OWNER, new Date())
 	}
 	
 	async getConvs(user: User): Promise<Channel[]> {
@@ -87,6 +105,26 @@ export class ChatService {
 		return parts.find((part) => part.user.id === user.id)
 	}
 
+	async leaveChan(requester: User, chanName: string) {
+
+		const channel: Channel = await this.findChanByName(chanName)
+		if (!channel)
+			throw new HttpException("Channel not found", HttpStatus.FORBIDDEN);
+		if (channel.mode === ChanMode.DM)
+			throw new HttpException("Channel is a Dm", HttpStatus.FORBIDDEN);
+		
+		const reqPart: Participant = await this.findOneParticipant(channel, requester)
+
+		if (!reqPart || reqPart.distinction < MemberDistinc.MEMBER)
+			throw new HttpException("You are not part of " + channel.name, HttpStatus.FORBIDDEN);
+
+		this.deleteMember(requester, channel)
+		if (reqPart.distinction === MemberDistinc.OWNER)
+			await this.setAnotherOwner(channel)
+
+		return ({status: "OK", description: "You well leave " + channel.name})
+	}
+
 	async mute(requester: User, chanName: string, login: string) {		
 		var muteDate: Date = new Date();
 		muteDate.setMinutes(muteDate.getMinutes() + 1)
@@ -118,14 +156,40 @@ export class ChatService {
 			throw new HttpException(member.username + " is not part of " + channel.name + ": " + this.getDistStr(memberPart.distinction), HttpStatus.FORBIDDEN);
 		if (memberPart.muteDate > new Date()){
 			let displayDate: Date = new Date(memberPart.muteDate)
-			displayDate.setHours(displayDate.getHours() + 2)
+			displayDate.setHours(displayDate.getHours() + 2) //////////// a changer pour le fuseau horaire
 			return ({status: "KO", description: memberPart.user.username + " is already mute until " +  new Date(displayDate).toLocaleTimeString()})
 		}
 		this.saveNewMember(member, channel, memberPart.distinction, muteDate)
 
 		let displayDate: Date = new Date(muteDate)
-		displayDate.setHours(displayDate.getHours() + 2)
+		displayDate.setHours(displayDate.getHours() + 2) //////////// a changer pour le fuseau horaire
 		return ({status: "OK", description: memberPart.user.username + " is now mute until " +  new Date(displayDate).toLocaleTimeString()})
+	}
+
+	async acceptChan(invited: User, chanName: string) {
+		const channel: Channel = await this.findChanByName(chanName)
+		if (!channel)
+			return ({status: "KO", description: "Channel not found"})
+
+		const memberPart: Participant = await this.findOneParticipant(channel, invited)
+		if (!memberPart || memberPart.distinction !== MemberDistinc.INVITED)
+			return ({status: "KO", description: "You are not invited in " + channel.name})
+		this.saveNewMember(invited, channel, MemberDistinc.MEMBER, new Date())
+		this.eventService.deleteEvent(invited.login, {type: "channelInvitation", sender: channel.name});
+		return ({status: "OK", description: "You are now member of " + channel.name})
+	}
+
+	async refuseChan(invited: User, chanName: string) {
+		const channel: Channel = await this.findChanByName(chanName)
+		if (!channel)
+			return ({status: "KO", description: "Channel not found"})
+
+		const memberPart: Participant = await this.findOneParticipant(channel, invited)
+		if (!memberPart || memberPart.distinction !== MemberDistinc.INVITED)
+			return ({status: "KO", description: "You are not invited in " + channel.name})
+		this.deleteMember(invited, channel)
+		this.eventService.deleteEvent(invited.login, {type: "channelInvitation", sender: channel.name});
+		return ({status: "OK", description: "You well decline this invitation"})
 	}
 
 	async setDistinction(requester: User, chanName: string, login: string, distinction: MemberDistinc) {
@@ -154,10 +218,10 @@ export class ChatService {
 				return ({status: "OK", description: "Invitation for " + channel.name + " send to " + member.username})
 			}
 			else
-				return ({status: "OK", description: member.username + " is not part of " + channel.name})
+				return ({status: "KO", description: member.username + " is not part of " + channel.name})
 		}		
 		if (memberPart.user.id === reqPart.user.id)
-				return ({status: "OK", description: "Impossible to change your own accessiblity"})
+				return ({status: "KO", description: "Impossible to change your own accessiblity"})
 
 		if (distinction === MemberDistinc.INVITED) {
 			if (memberPart.distinction === MemberDistinc.INVITED)

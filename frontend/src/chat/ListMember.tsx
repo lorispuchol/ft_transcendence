@@ -12,13 +12,15 @@ import MessageButton from "./MessageButton";
 import Friendbutton from "../components/Relationship/Friendbutton";
 import BlockButton from "../components/Relationship/BlockButton";
 import { logInfo } from "./Chat";
-import { RerenderListContext, SetDisplayMemberContext, SetRerenderListContext, UserContext } from "../utils/Context";
+import { DisplayMemberContext, RerenderListContext, SetDisplayMemberContext, SetRerenderListContext, UserContext } from "../utils/Context";
 import './chat.scss'
 import '../user/user.scss'
 import { ArrowForward, VolumeOff } from "@mui/icons-material";
 import { ControlButton } from "../components/ChatButton/ControlButtons";
 import { MuteButton } from "../components/ChatButton/MuteButton";
 import { InviteModule } from "../components/ChatButton/InviteModule";
+import { LeaveButton } from "../components/ChatButton/LeaveButton";
+import { ChangeAccessibility } from "../components/ChatButton/ChangeAccessibility";
 
 
 interface MemberProps {
@@ -139,7 +141,8 @@ export default function ListMembers({chan}: ListMembersProps) {
 	const user = useContext(UserContext);
 	const isDm: boolean = chan.includes("+");
 
-	const [displayProfile, setDisplayProfile]: [UserData | null, Function] = useState(null);
+	const setDisplayProfile = useContext(SetDisplayMemberContext);
+	const displayProfile: UserData | null = useContext(DisplayMemberContext);
 	const [reRenderList, setRerenderList]: [number, Function] = useState(0);
 
 	const [response, setResponse]: [ResponseMembers, Function] = useState({status: "loading"});
@@ -161,7 +164,6 @@ export default function ListMembers({chan}: ListMembersProps) {
 		return <Profile member={response.data[0].user} isDm={true} />
 	if (displayProfile) {
 		return (
-			<SetDisplayMemberContext.Provider value={setDisplayProfile}>
 			<SetRerenderListContext.Provider value={setRerenderList}>
 			<RerenderListContext.Provider value={reRenderList}>
 				<Member
@@ -171,7 +173,6 @@ export default function ListMembers({chan}: ListMembersProps) {
 				/>
 			</RerenderListContext.Provider>
 			</SetRerenderListContext.Provider>
-			</SetDisplayMemberContext.Provider>		
 		)
 	}
 
@@ -194,11 +195,15 @@ export default function ListMembers({chan}: ListMembersProps) {
 			{
 				members.map((member) => {
 					return <MemberButton member={member.user} setDisplayProfile={setDisplayProfile} muted={(new Date(member.muteDate) as any).getTime() > new Date().getTime()} key={member.user.login} />
-				}
-				)
+				})
 			}
 			<div>
+				<hr className="my-5"/>
 				<InviteModule chan={chan} />
+				<hr className="my-5"/>
+				<ChangeAccessibility chanName={chan}/>
+				<hr className="my-5"/>
+				<LeaveButton chanName={chan}/>
 			</div>
 		</div>
 	)

@@ -1,7 +1,7 @@
 import { ReactElement, useContext, useEffect, useState } from "react";
 import { Socket } from "socket.io-client";
 import { Badge, Button, ClickAwayListener, Divider, IconButton, List, ListItem, ListItemAvatar, Paper, Popper } from "@mui/material";
-import { EmojiPeople, MarkChatUnread, Notifications, VideogameAsset } from "@mui/icons-material";
+import { EmojiPeople, GroupAdd, MarkChatUnread, Notifications, VideogameAsset } from "@mui/icons-material";
 import EventButton from "./EventButton";
 import { EventContext, UserContext } from "../../utils/Context";
 import { useNavigate } from "react-router-dom";
@@ -47,6 +47,8 @@ function RenderIcon({e, setEvents}: RenderIconProps) {
 			return (<VideogameAsset />);
 		case 'message':
 			return (<Button onClick={goToMsg}><MarkChatUnread /></Button>)
+		case 'channelInvitation':
+			return (<GroupAdd />)
 		default:
 			return (<strong>error: type not found</strong>)
 	}
@@ -91,7 +93,7 @@ function Events({ socket }: SocketProps) {
 					<div key={event.type + event.sender}>
 						<ListItem>
 							<ListItemAvatar><RenderIcon e={event} setEvents={setEvents}/></ListItemAvatar>
-							{event.sender.replace("+", "").replace(user!, "")}
+							{event.type === 'channelInvitation' && '#'}{event.sender.replace("+", "").replace(user!, "")}
 						</ListItem>
 						<EventButton event={event}/>
 						{index + 1 !== events.length? <Divider /> : null}
