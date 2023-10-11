@@ -74,44 +74,6 @@ function AcceptChannel({ channel }: ButtonChannelProps) {
 	)
 }
 
-function RefuseChannel({ channel }: ButtonChannelProps) {
-	const [response, setResponse]: [Response, Function] = useState({status: "inactive"});
-
-	function handleClick() {
-		DeleteRequest("/chat/refuseChannel/" + channel).then((response) => {setResponse(response)});
-	}
-	if (response.status === "KO")
-		return (<ErrorHandling status={response.status} message={response.error} />);
-	if (response.data?.status === "KO")
-		return (<strong>{response.data.description}</strong>);
-
-	return (
-		<Button onClick={handleClick} color="error"><Close/></Button>
-	)
-}
-
-function AcceptChannel({ channel }: ButtonChannelProps) {
-	const [response, setResponse]: [Response, Function] = useState({status: "inactive"});
-
-	const socket = useContext(SocketChatContext);
-
-	function handleClick() {
-		PatchRequest("/chat/acceptChannel/" + channel, {}).then((response) => {
-			setResponse(response)
-			if (response.status === "OK")
-				socket!.emit('message', channel, "Hello Everybody!");
-		});
-}
-	if (response.status === "KO")
-			return (<ErrorHandling status={response.status} message={response.error} />);
-	if (response.data?.status === "KO")
-		return (<strong>{response.data.description}</strong>);
-
-	return (
-		<Button onClick={handleClick} color="success"><Done/></Button>
-	)
-}
-
 function RefuseFriend({ login }: FriendProps) {
 	const [response, setResponse]: [Response, Function] = useState({status: "inactive"});
 

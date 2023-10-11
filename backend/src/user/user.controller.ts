@@ -33,6 +33,8 @@ export class UserController {
 		@Request() req: any
 	) {
 		const user: User = await this.userService.findOneByLogin(req.user.login);
+		if (!user)
+			return ;
 		return (this.userService.parseUser(user));
 	}
 
@@ -87,6 +89,8 @@ export class UserController {
 		@Param('username') username: string
 	) {
 		const user: User = await this.userService.findOneByUsername(username);
+		if (!user)
+			return ;
 		return (this.userService.parseUser(user));
 	}
 
@@ -95,6 +99,8 @@ export class UserController {
 		@Param('id') userId: number
 	) {
 		const user: User = await this.userService.findOneById(userId);
+		if (!user)
+			return ;
 		return (this.userService.parseUser(user));
 	}
 }
