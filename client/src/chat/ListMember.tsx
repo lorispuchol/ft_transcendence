@@ -20,6 +20,7 @@ import { ControlButton } from "../components/ChatButton/ControlButtons";
 import { MuteButton } from "../components/ChatButton/MuteButton";
 import { InviteModule } from "../components/ChatButton/InviteModule";
 import { LeaveButton } from "../components/ChatButton/LeaveButton";
+import { ChangeAccessibility } from "../components/ChatButton/ChangeAccessibility";
 
 
 interface MemberProps {
@@ -194,11 +195,14 @@ export default function ListMembers({chan}: ListMembersProps) {
 			{
 				members.map((member) => {
 					return <MemberButton member={member.user} setDisplayProfile={setDisplayProfile} muted={(new Date(member.muteDate) as any).getTime() > new Date().getTime()} key={member.user.login} />
-				}
-				)
+				})
 			}
 			<div>
+				<hr className="my-5"/>
 				<InviteModule chan={chan} />
+				<hr className="my-5"/>
+				<ChangeAccessibility chanName={chan}/>
+				<hr className="my-5"/>
 				<LeaveButton chanName={chan}/>
 			</div>
 		</div>
