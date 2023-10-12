@@ -65,7 +65,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			if (socket && await this.relationshipService.ReqIsBlocked(sender, member.user) === false) {
 				toEmits.push(socket)
 			}
-			if (await this.relationshipService.ReqIsBlocked(sender, member.user) === false) {
+			if (await this.relationshipService.ReqIsBlocked(sender, member.user) === false && member.distinction > MemberDistinc.INVITED) {
 				loginsToEvent.push(member.user.id);
 			}
 		})

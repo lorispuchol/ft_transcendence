@@ -45,7 +45,6 @@ export class ChatService {
 			} as FindOptionsWhere<Channel>
 		})
 		const owner: Participant = parts.find((part) => part.distinction === MemberDistinc.OWNER)
-		console.log(owner)
 		if (!owner)
 			newMember.distinction = MemberDistinc.OWNER;
 		else
