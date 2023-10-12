@@ -89,7 +89,6 @@ export default function App() {
 						<Route path='/loader' element={<Loader />} />
 					</Routes>
 				</div>
-				<></>
 			</UserContext.Provider>
 		</WebSocket>
 	);
