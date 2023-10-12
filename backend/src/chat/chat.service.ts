@@ -39,8 +39,18 @@ export class ChatService {
 		
 		const newMember: Participant = new Participant();
 
+		const parts: Participant[] = await this.participantRepository.find({
+			where: {
+				channel: channel.id
+			} as FindOptionsWhere<Channel>
+		})
+		const owner: Participant = parts.find((part) => part.distinction === MemberDistinc.OWNER)
+		console.log(owner)
+		if (!owner)
+			newMember.distinction = MemberDistinc.OWNER;
+		else
+			newMember.distinction = dist;
 		newMember.channel = channel;
-		newMember.distinction = dist;
 		newMember.user = user;
 		newMember.muteDate = muteDate
 
@@ -69,7 +79,7 @@ export class ChatService {
 			return ;
 		await this.saveNewMember(newOwner.user, channel, MemberDistinc.OWNER, new Date())
 	}
-	
+
 	async getConvs(user: User): Promise<Channel[]> {
 		const chans: Channel[] = [];
 		const parts: Participant[] = await this.participantRepository.find({
@@ -278,7 +288,7 @@ export class ChatService {
 			(password && (mode === ChanMode.PRIVATE || mode === ChanMode.PUBLIC))) {
 			throw new HttpException("forbidden", HttpStatus.FORBIDDEN);
 		}
-		const newChan: Channel = await this.channelRepository.create({
+		const newChan: Channel = this.channelRepository.create({
 			name: name,
 			mode: mode
 		})

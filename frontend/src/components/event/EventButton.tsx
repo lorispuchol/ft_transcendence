@@ -53,19 +53,19 @@ function RefuseChannel({ channel }: ButtonChannelProps) {
 }
 
 function AcceptChannel({ channel }: ButtonChannelProps) {
-	const [response, setResponse]: [Response, Function] = useState({status: "inactive"});
 
-	const socket = useContext(SocketChatContext);
+	const [response, setResponse]: [Response, Function] = useState({status: "inactive"});
+	const navigate = useNavigate()
 
 	function handleClick() {
 		PatchRequest("/chat/acceptChannel/" + channel, {}).then((response) => {
 			setResponse(response)
 			if (response.status === "OK")
-				socket!.emit('message', channel, "Hello Everybody!");
+				navigate("/chat", {replace: true, state: {to: channel}})
 		});
-}
+	}
 	if (response.status === "KO")
-			return (<ErrorHandling status={response.status} message={response.error} />);
+		return (<ErrorHandling status={response.status} message={response.error} />);
 	if (response.data?.status === "KO")
 		return (<strong>{response.data.description}</strong>);
 

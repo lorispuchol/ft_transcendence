@@ -226,7 +226,6 @@ export default function Chat() {
 		<SocketChatContext.Provider value={socket}>
 		<SetDisplayMemberContext.Provider value={setDisplayProfile}>
 		<DisplayMemberContext.Provider value={displayProfile}>
-
 			<div className="chat-page">
 				<div className="list-conv">
 					<ListConv focusConv={focusConv} setFocusConv={setFocusConv}/>

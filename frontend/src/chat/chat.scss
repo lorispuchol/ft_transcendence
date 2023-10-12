@@ -21,7 +21,7 @@ hr {
 	order: 0;
 	overflow: scroll;
 	background-color: #282f4a;
-	//box-shadow: inset 0 0 5px #000000;
+	box-shadow: inset 0 0 5px #000000;
 	display: flex;
 	flex-direction: column;
 	padding: 10px;
@@ -71,7 +71,7 @@ hr {
 	flex-grow: 0;
 	flex-shrink: 0;
 	background-color: #323C58;
-	//box-shadow: inset 0 0 5px #000000;
+	box-shadow: inset 0 0 5px #000000;
 	order: 1;
 	::-webkit-scrollbar {
 		display: none;
@@ -123,7 +123,7 @@ hr {
 	flex-basis: 20%;
 	flex-grow: 0;
 	flex-shrink: 0;
-	//box-shadow: inset 0 0 5px #000000;
+	box-shadow: inset 0 0 5px #000000;
 	order: 2;
 	overflow: scroll;
 	display: flex;

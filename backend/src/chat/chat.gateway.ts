@@ -65,7 +65,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			if (socket && await this.relationshipService.ReqIsBlocked(sender, member.user) === false) {
 				toEmits.push(socket)
 			}
-			loginsToEvent.push(member.user.id);
+			if (await this.relationshipService.ReqIsBlocked(sender, member.user) === false) {
+				loginsToEvent.push(member.user.id);
+			}
 		})
 		Promise.all(promises).then(() => {
 			toEmits.map((socket) => socket.emit('message', {chan: value[0], msg: msg}));

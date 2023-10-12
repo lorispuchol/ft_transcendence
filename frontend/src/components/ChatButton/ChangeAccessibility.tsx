@@ -1,43 +1,23 @@
 import { useEffect, useState } from "react";
 import { ChanMode, ChannelData } from "../../chat/interfaceData";
-import { GetRequest } from "../../utils/Request";
-import Loading from "../../utils/Loading";
-import ErrorHandling from "../../utils/Error";
 import { FormControl, FormControlLabel, FormGroup, FormLabel, Radio, RadioGroup } from "@mui/material";
-import { Add } from "@mui/icons-material";
 
 interface ChangeAccessibilityProps {
-	chanName: string,
+	channel: ChannelData,
+	newMode: ChanMode,
 }
 
-interface Response {
-	status: string | number,
-	data?: ChannelData[],
-	error?: string,
-}
-
-export function ChangeAccessibility({chanName}: ChangeAccessibilityProps) {
+export function ChangeAccessibility({channel, newMode}: ChangeAccessibilityProps) {
 	
-	const [response, setResponse]: [Response, Function] = useState({status: "loading"});
 	const [datasAccess, setDatasAccess] = useState({
-		mode: ChanMode.PUBLIC,
+		mode: newMode,
 		currentPw: "",
 		newPw: "",
 	});
 
 	useEffect(() => {
-		GetRequest("/chat/getConvs").then((response) => setResponse(response));
-	}, []);
-	if (response.status === "loading")
-		return (<Loading />);
-	if (response.status !== "OK")
-		return (<ErrorHandling status={response.status} message={response.error} />);
-
-	const channel: ChannelData | undefined = response.data!.find((conv) => conv.name === chanName);
-
-
-	if (!channel)
-		return null;
+		setDatasAccess({mode: newMode, currentPw: "", newPw: ""});
+	}, [newMode])
 
 	const changeMode = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setDatasAccess({
@@ -96,12 +76,8 @@ export function ChangeAccessibility({chanName}: ChangeAccessibilityProps) {
 	return (
 		<div>
 			<FormControl className="flex flex-col items-center">
-				<FormLabel className=" text-inherit mb-3 text-base font-semibold">CREATE YOUR OWN CHANNEL</FormLabel>
+				<FormLabel className="text-inherit mb-3 text-base">Change Accessiblity</FormLabel>
 				<form onSubmit={submitAccess}>
-					<FormGroup>
-						<input className="input w-full max-w-xs bg-white mb-3 text-inherit text-black" value={datasAccess.currentPw} onChange={changeCurrentPw} name="name" placeholder="Channel Name" />	
-						<input className="input w-full max-w-xs bg-white mb-3 text-inherit text-black" disabled={datasAccess.mode !== ChanMode.PROTECTED} type="password" placeholder="Password" value={datasAccess.newPw} onChange={changeNewPw} name="password" />	
-					</FormGroup>
 					<RadioGroup
 						className="mb-3"
 						onChange={changeMode}
@@ -110,11 +86,15 @@ export function ChangeAccessibility({chanName}: ChangeAccessibilityProps) {
 						defaultValue="public"
 						name="radio-buttons-group"
 					>
-						<FormControlLabel value={ChanMode.PUBLIC} control={<Radio color="default"/>} label="Public" />
-						<FormControlLabel value={ChanMode.PRIVATE} control={<Radio color="default"/>} label="Private" />
-						<FormControlLabel value={ChanMode.PROTECTED} control={<Radio color="default"/>} label="Protected by a password" />
+						{channel.mode !== ChanMode.PUBLIC && <FormControlLabel value={ChanMode.PUBLIC} control={<Radio color="default"/>} label="Public" />}
+						{channel.mode !== ChanMode.PRIVATE && <FormControlLabel value={ChanMode.PRIVATE} control={<Radio color="default"/>} label="Private" />}
+						<FormControlLabel value={ChanMode.PROTECTED} control={<Radio color="default"/>} label={channel.mode === ChanMode.PROTECTED ? "Change Password" : "Protected"} />
 					</RadioGroup>
-					<button className="w-full btn btn-active bg-white btn-neutral hover:bg-purple-900" type="submit" ><Add/></button>
+					<FormGroup>
+						{channel.mode === ChanMode.PROTECTED && <input className="input w-full h-10 max-w-xs bg-white mb-3 text-inherit text-black" value={datasAccess.currentPw} type="password" onChange={changeCurrentPw} name="name" placeholder="Current Password" />}
+						{datasAccess.mode === ChanMode.PROTECTED && <input className="input w-full h-10 max-w-xs bg-white mb-3 text-inherit text-black" value={datasAccess.newPw} type="password" onChange={changeNewPw} name="password" placeholder="New Password" disabled={datasAccess.mode !== ChanMode.PROTECTED} />}
+					</FormGroup>
+					<button className="w-full btn btn-active h-14 text-slate-200 bg-purple-700 btn-neutral hover:bg-purple-900" type="submit" >CHANGE ACCESSIBILITY</button>
 				</form>
 			</FormControl>
 		</div>

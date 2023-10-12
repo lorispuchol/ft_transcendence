@@ -9,7 +9,7 @@ interface ControlButtonProps {
 	distinction: MemberDistinc,
 }
 
-// Invite is different than other Button
+// Invite, Mute and Leave are different than other Button
 /// Upgrade Degrade Kick and Ban are identique
 export function ControlButton({ memberPart, distinction }: ControlButtonProps) {
 	
