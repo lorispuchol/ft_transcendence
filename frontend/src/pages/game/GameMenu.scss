@@ -1,0 +1,143 @@
+@use '/app/src/style/color' as c;
+
+.menu_container {
+	position: relative;
+}
+
+.menu_wrapper {
+	position: absolute;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 100%;
+	z-index: 2;
+}
+
+.main_menu{
+	background-color: rgb(196, 187, 212) !important;
+	outline: 4px solid c.$primary;
+	border-color: c.$primary;
+	width:35vw;
+	height: 20vw;
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.menu_select {
+	display: flex;
+	width: 100%;
+	outline: 2px solid c.$primary;
+}
+
+.menu_select > Button {
+	color: c.$secondary;
+	background-color: inherit;
+	height: 4.965vw;
+	border: 0px !important;
+	justify-content: space-between;
+	font-size: 2vw;
+}
+
+.menu_select > Button > * {
+	font-size: 2vw;
+}
+
+
+.menu_select > Button:hover{
+	background-color: c.$primary;
+	filter: brightness(1.1);
+}
+
+.button_focus {
+	background-color: c.$primary !important;
+	filter: brightness(1.2);
+}
+
+.menu_buttons {
+	grid-column: 2/3;
+	grid-row: 1 / span 2;
+	border-left: 4px solid;
+	border-color: inherit;
+	display: flex;
+	flex-direction: column;
+}
+
+.menu_buttons > button {
+	margin: auto;
+	font-size: 3vw;
+	height: min-content;
+	width: min-content;
+	color: c.$secondary;
+	background-color: c.$primary;
+	filter: brightness(1.2);
+}
+
+.menu_buttons > Button:hover {
+	background-color: c.$primary;
+	filter: brightness(1.1);
+}
+
+.defy {
+	margin: auto;
+	background-color: c.$primary;
+	width: 15vw;
+	height: 11vw;
+	display: flex;
+	flex-direction: column;
+}
+
+.wait > * {
+	margin: auto;
+	color: c.$secondary !important;
+}
+
+.defy_list {
+	overflow: scroll;
+	margin: auto;
+	margin-top: 0.5vw;
+	margin-bottom: 0;
+	width: 13.8vw;
+	height: 8.5vw;
+	background-color: c.$secondary;
+}
+
+.defy_list::-webkit-scrollbar {
+	display: none !important;
+  }
+
+.defy_list > #user {
+	width: 100%;
+	color: c.$primary;
+	font-size: 1.5vw;
+	display: flex;
+	justify-content: center;
+}
+
+.defy_list > #user:hover {
+	background-color: c.$primary;
+	color: c.$secondary;
+	cursor: pointer;
+}
+
+.defy_focus {
+	background-color: c.$primary;
+	color: c.$secondary !important;
+}
+
+.defy > button {
+	border-radius: 0;
+	margin: auto;
+	margin-top: 0;
+	margin-bottom: 0;
+	height: 2vw;
+	width: 100%;
+	color: c.$secondary;
+	background-color: c.$primary;
+	filter: brightness(1.2);
+}
+
+.defy > Button:hover {
+	background-color: c.$primary;
+	filter: brightness(1.1);
+}
