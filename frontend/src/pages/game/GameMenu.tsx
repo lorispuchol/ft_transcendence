@@ -16,6 +16,12 @@ interface UserData {
 	username: string,
 }
 
+interface DefyInfo {
+	openentId: number,
+	mode: string,
+	response: string,
+}
+
 export default function GameMenu({ setSetting, setDefy }: MenuProps) {
 	const [type, setType]: [string, Function] = useState("local");
 	const [mode, setMode]: [string, Function] = useState("classic");
@@ -28,32 +34,42 @@ export default function GameMenu({ setSetting, setDefy }: MenuProps) {
 		function addUser(newUser: UserData) {
 			setUsers((prev: UserData[]) => [...prev, newUser])
 		}
+		socket.on('everyone', addUser);
 		function delUser(oldUser: UserData) {
 			setUsers((prev: UserData[]) => prev.filter((user) => user.id !== oldUser.id));
 			if (select === oldUser.id)
 				setSelect(null);
 		}
-		function handleDefy(data: any) {
-			if (data.id !== select)
+		socket.on('userDisconnect', delUser);
+		function handleDefy(data: DefyInfo) {
+			if (data.openentId !== select || !waitResponse)
 				return ;
 			if (data.response === "OK")
 			{
 				setDefy(select);
-				setSetting({type: "online", mode: mode})
+				setSetting({type: "online", mode: data.mode})
 			}
 			else
 				setWaitResponse(false);
 		}
-		socket.on('everyone', addUser);
-		socket.on('userDisconnect', delUser);
 		socket.on("defy", handleDefy);
-		
+		function waitDefy(defyId: number) {
+			socket.emit("clear");
+			setSelect(defyId);
+			setWaitResponse(true);
+			socket.emit("challenge", {to: defyId, mode: "classique"});
+		}
+		socket.on("waitDefy", waitDefy);
+
 		return () => {
+			if (waitResponse)
+				socket.emit("cancelChallenge");
 			socket.off('everyone', addUser);
 			socket.off('userDisconnect', delUser);
 			socket.off("defy", handleDefy);
+			socket.off("waitDefy", waitDefy);
 		};
-	}, [socket, select, mode, setDefy, setSetting])
+	})
 	
 	useEffect(() => {
 		socket.emit("getConnected");
@@ -70,6 +86,11 @@ export default function GameMenu({ setSetting, setDefy }: MenuProps) {
 			return ;
 		socket.emit("challenge", {to: select, mode: mode});
 		setWaitResponse(true);
+	}
+
+	function cancel_defy() {
+		socket.emit("cancelChallenge");
+		setWaitResponse(false);
 	}
 
 	return (
@@ -93,7 +114,7 @@ export default function GameMenu({ setSetting, setDefy }: MenuProps) {
 							<div />
 							<CircularProgress />
 							<strong>waiting for response</strong>
-							<div />
+							<Button className="text-[1vw]" onClick={cancel_defy}>cancel</Button>
 						</div>
 					:
 					<div className="menu_buttons">

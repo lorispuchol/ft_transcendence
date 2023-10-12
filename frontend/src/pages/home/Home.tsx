@@ -1,7 +1,7 @@
 import { Logout } from "@mui/icons-material";
 import { IconButton, Paper } from "@mui/material";
-import { client_url } from "../utils/Request";
-import Everyone from "../user/Everyone";
+import { client_url } from "../../utils/Request";
+import Everyone from "../../components/user/Everyone";
 import './Home.scss';
 
 export default function Home() {

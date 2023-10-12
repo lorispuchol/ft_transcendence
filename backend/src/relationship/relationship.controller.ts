@@ -90,7 +90,7 @@ export class RelationshipController {
 			)
 	}
 
-	@Get(':recipient')
+	@Get('user/:recipient')
 	async getRelation(
 		@Request() req: any,
 		@Param('recipient') recipient: string ) {

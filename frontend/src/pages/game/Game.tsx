@@ -80,6 +80,7 @@ export default function Game() {
 	useEffect(() => {
 
 		function goToDefy(defyInfo: any) {
+			socket.emit("clear");
 			setDefy(defyInfo.senderId);
 			setSetting({type: "online", mode: defyInfo.mode});
 		}

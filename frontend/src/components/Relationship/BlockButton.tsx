@@ -26,7 +26,7 @@ export default function BlockButton({ login, render }: BlockProps) {
 	const [update, setUpdate]: [number, Function] = useState(0);
 
 	useEffect(() => {
-		GetRequest("/relationship/" + login).then((response) => setResponse(response));
+		GetRequest("/relationship/user/" + login).then((response) => setResponse(response));
 	}, [update, login]);
 	if (response.status === "loading")
 		return (<IconButton><DoDisturbOn /></IconButton>);
