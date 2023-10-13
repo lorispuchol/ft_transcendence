@@ -49,13 +49,25 @@ export class UserController {
 		@Request() req: any,
 		@Body() newUsername: newUsername
 	) {
+		console.log(newUsername)
 		const user: User = await this.userService.findOneById(req.user.id);
 		if (!user)
 			return ;
 		this.userService.changeUsername(req.user.id, newUsername.username);
 		return {username: newUsername.username};
 	}
-	
+
+	@Patch('usernameToLogin')
+	async changeUsernameToLogin(
+		@Request() req: any
+	) {
+		const user: User = await this.userService.findOneById(req.user.id);
+		if (!user)
+			return ;
+		this.userService.changeUsername(user.id, user.login);
+		return {username: user.login};
+	}
+
 	@Patch('avatar')
 	@UseInterceptors(FileInterceptor('file', storage))
 	async changeAvatar(

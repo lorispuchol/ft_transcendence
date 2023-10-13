@@ -29,11 +29,16 @@ export class IsUsernameAvailable {
 			client_secret: ftConstants.secret,
 			redirect_uri: ftConstants.redirect_uri,
 		};
-		const getToken = await axios.post("https://api.intra.42.fr/oauth/token", data);
-		const userData = await axios.get("https://api.intra.42.fr/v2/users?filter[login]=" + value, {
-			headers: { Authorization:'Bearer ' + getToken.data.access_token }})
-		const ftUser: any[] = userData.data;
-		return (ftUser.length === 0);
+		try {
+			const getToken = await axios.post("https://api.intra.42.fr/oauth/token", data);
+			const userData = await axios.get("https://api.intra.42.fr/v2/users?filter[login]=" + value, {
+				headers: { Authorization:'Bearer ' + getToken.data.access_token }})
+			const ftUser: any[] = userData.data;
+			return (ftUser.length === 0);
+		}
+		catch (error) {
+			return (false);
+		}
 	}
 
 	defaultMessage(args: ValidationArguments) {

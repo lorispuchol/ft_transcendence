@@ -27,24 +27,16 @@ interface Response {
 	error?: string,
 }
 
-export default function SettingsPopup({ close }: any) {
-	const [username, setUsername] = useState('')
+export default function SettingsPopup({ close, login }: {close: any, login: string}) {
+	const [newUsername, setNewUsername]: [string, Function] = useState('')
 	const [pp, setPp] = useState<any>()
-	const user = useContext(UserContext);
+	const username = useContext(UserContext);
 
-	const [response, setResponse]: [Response, Function] = useState({status: "loading"});
 	useEffect(() => {
-		GetRequest("/user/avatar/" + user).then((response) => setResponse(response));
-	}, [user]);
-	if (response.status === "loading")
-		return (<Loading />);
-	if (response.status !== "OK")
-		return (<ErrorHandling status={response.status} message={response.error} />);
-	
-	// const avatar = response.data ? response.data : (defaultAvatar as string);
+	}, []);
 
 	function usernameChange(event: ChangeEvent<HTMLInputElement>) {
-		setUsername(event.target.value);
+		setNewUsername(event.target.value);
 	}
 
 	function ppChange(event: ChangeEvent<HTMLInputElement>) {
@@ -55,10 +47,14 @@ export default function SettingsPopup({ close }: any) {
 
 	function updateUsername(e: FormEvent) {
 		e.preventDefault();
-		PatchRequest("/user/username", {username})
+		let toLogin = "";
+		if (newUsername === login)
+			toLogin = "ToLogin";
+		console.log(newUsername)
+		PatchRequest("/user/username" + toLogin, {username: newUsername})
 		.then ((response:any) => {
 			if (response.status === "OK")
-				window.location.href = client_url + "/profile/" + username;
+				window.location.href = client_url + "/profile/" + newUsername;
 			else
 				updateError(response.error);
 		})
@@ -80,7 +76,7 @@ export default function SettingsPopup({ close }: any) {
 		PatchRequest("/user/avatar", formData)
 		.then ((response:any) => {
 			if (response.status === "OK")
-				window.location.href = client_url + "/profile/" + user;
+				window.location.href = client_url + "/profile/" + username;
 			else
 				updateError(response.error);
 		})
@@ -89,22 +85,20 @@ export default function SettingsPopup({ close }: any) {
 	return (
 		<div className='flex justify-center items-center'>
 			<div className="settings_bg justify-center">
-				<div>
-					<ClickAwayListener onClickAway={close}>
-						<Paper className='settings_box'>
-							<button className='close_button' onClick={close}>X</button>
-							<form className='settings_option mt-5' onSubmit={updateUsername}>
-								Username: <input type='text' className="username_input" value={username} onChange={usernameChange} />
-								<button className='update_button' onClick={updateUsername}>UPDATE</button> 
-							</form>
-							<form className='settings_option' onSubmit={updatePp}>
-								Modifier photo de profile: <input type='file' accept='/image/*' onChange={ppChange} />
-								<button className='update_button' onClick={updatePp}>UPDATE</button>
-							</form>
-						</Paper>
-					</ClickAwayListener>
-					<ToastContainer />
-				</div>
+				<ClickAwayListener onClickAway={close}>
+					<Paper className='settings_box'>
+						<button className='close_button' onClick={close}>X</button>
+						<form className='settings_option mt-5' onSubmit={updateUsername}>
+							Username: <input type='text' className="username_input" value={newUsername} onChange={usernameChange} />
+							<button className='update_button' onClick={updateUsername}>UPDATE</button> 
+						</form>
+						<form className='settings_option' onSubmit={updatePp}>
+							Modifier photo de profile: <input type='file' accept='/image/*' onChange={ppChange} />
+							<button className='update_button' onClick={updatePp}>UPDATE</button>
+						</form>
+					</Paper>
+				</ClickAwayListener>
+				<ToastContainer />
 			</div>
 		</div>
 	  );
