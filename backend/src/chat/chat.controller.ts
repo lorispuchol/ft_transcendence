@@ -87,7 +87,6 @@ export class ChatController {
 		@Request() req: any,
 		@Param('chan') chan: string,
 		@Body() dataChan: SetPasswordChannel ) {
-		console.log(req.user.login, chan, dataChan)
 		return await this.chatService.setPwChan(
 			await this.userService.findOneByLogin(req.user.login),
 			chan,
@@ -100,7 +99,6 @@ export class ChatController {
 		@Request() req: any,
 		@Param('chan') chan: string,
 		@Body() dataChan: AddPwChan ) {
-		console.log(req.user.login, chan, dataChan)
 		return await this.chatService.setPwChan(
 			await this.userService.findOneByLogin(req.user.login),
 			chan,
@@ -113,7 +111,6 @@ export class ChatController {
 		@Request() req: any,
 		@Param('chan') chan: string,
 		@Body() dataChan: RemovePwChannel ) {
-		console.log(req.user.login, chan, dataChan)
 		return await this.chatService.changeModeChan(
 			await this.userService.findOneByLogin(req.user.login),
 			chan,
@@ -126,7 +123,6 @@ export class ChatController {
 		@Request() req: any,
 		@Param('chan') chan: string,
 		@Body() dataChan: ChangeModeChan) {
-		console.log(req.user.login, chan, dataChan)
 		return await this.chatService.changeModeChan(
 			await this.userService.findOneByLogin(req.user.login),
 			chan,
