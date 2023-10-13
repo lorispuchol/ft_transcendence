@@ -212,6 +212,11 @@ export class RelationshipService{
 
 	async getRelation(user1: User, user2: User) {
 
+		if (!user1)
+			return ({status: "KO", description: "Request impossible"})
+		if (!user2)
+			return ({status: "KO", description: "User not found"})
+
 		const relation1: Relationship = await this.getRelationship(user1, user2);
 		if (relation1 && relation1.status === RelationshipStatus.BLOCKED)
 			return ({status: "blocked"});

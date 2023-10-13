@@ -203,7 +203,14 @@ export default function ListMembers({chan}: ListMembersProps) {
 				<hr className="my-5"/>
 				<InviteModule chan={chan} />
 				<hr className="my-5"/>
-				<ChangeAccessibility channel={owner[0].channel} newMode={owner[0].channel.mode === ChanMode.PUBLIC ? ChanMode.PRIVATE : ChanMode.PUBLIC}/>
+				{userParticipant.distinction === MemberDistinc.OWNER
+					&& <ChangeAccessibility 
+							channel={owner[0].channel} 
+							newMode={owner[0].channel.mode === ChanMode.PUBLIC ? ChanMode.PRIVATE : ChanMode.PUBLIC}
+							reRenderList={reRenderList}
+							setRerenderList={setRerenderList}
+						/>
+				}
 				<hr className="my-5"/>
 				<LeaveButton chanName={chan}/>
 			</div>

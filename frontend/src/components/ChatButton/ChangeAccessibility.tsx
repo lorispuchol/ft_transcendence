@@ -1,13 +1,17 @@
 import { useEffect, useState } from "react";
 import { ChanMode, ChannelData } from "../../chat/interfaceData";
 import { FormControl, FormControlLabel, FormGroup, FormLabel, Radio, RadioGroup } from "@mui/material";
+import { PostRequest } from "../../utils/Request";
+import { logError, logSuccess, logWarn } from "../../chat/Chat";
 
 interface ChangeAccessibilityProps {
 	channel: ChannelData,
 	newMode: ChanMode,
+	reRenderList: number,
+	setRerenderList: Function
 }
 
-export function ChangeAccessibility({channel, newMode}: ChangeAccessibilityProps) {
+export function ChangeAccessibility({channel, newMode, reRenderList, setRerenderList}: ChangeAccessibilityProps) {
 	
 	const [datasAccess, setDatasAccess] = useState({
 		mode: newMode,
@@ -42,35 +46,82 @@ export function ChangeAccessibility({channel, newMode}: ChangeAccessibilityProps
 
 	function submitAccess(e: React.FormEvent<HTMLFormElement>) {
 		e.preventDefault();
-		/*
-		const channelName = datasChan.channelName;
-		const mode: ChanMode = datasChan.mode;
-		const password = datasChan.password;
 
-		if (mode === ChanMode.PROTECTED) {
-			PostRequest("/chat/createChanWithPw", {channelName, password, mode}).then((response: any) => {
-				if (response.status === "OK"){
-					socket!.emit('message',channelName, "Welcome To Everybody!");
-					close();
-					logSuccess(`Channel ${channelName} created successfully`)
-				}
-				else
-					logError(response.error);
-			});
+		const channelName = channel.name;
+		const mode = datasAccess.mode;
+		const password = datasAccess.currentPw;
+		const newPw = datasAccess.newPw;
+
+		if (datasAccess.mode === ChanMode.PROTECTED) {
+			if (channel.mode === ChanMode.PROTECTED) {
+				PostRequest("/chat/changePwChan/" + channel.name, {channelName, password, newPw}).then((response: any) => {
+					if (response.status === "OK"){
+						if (response.data.status === "KO")
+							logWarn(response.data.description)
+						else {
+							logSuccess(response.data.description)
+							setDatasAccess({mode: ChanMode.PUBLIC, currentPw: "", newPw: ""});
+							setRerenderList(reRenderList + 1);
+						}
+					}
+					else
+						logError(response.error);
+				});
+			}
+			else {
+				PostRequest("/chat/addPwChan/" + channel.name, { newPw }).then((response: any) => {
+					if (response.status === "OK"){
+						if (response.data.status === "KO")
+							logWarn(response.data.description)
+						else {
+							logSuccess(response.data.description)
+							setDatasAccess({mode: ChanMode.PUBLIC, currentPw: "", newPw: ""});
+							setRerenderList(reRenderList + 1);
+						}
+					}
+					else
+						logError(response.error);
+				});
+			}
 		}
 		else {
-			PostRequest("/chat/createChanWithoutPw", {channelName, mode}).then((response: any) => {
-				if (response.status === "OK"){
-					socket!.emit('message',channelName, "Welcome To Everybody!");
-					close();
-					logSuccess(`Channel ${channelName} created successfully`)
-				}
-				else
-					logError(response.error);
-			});
+			if (channel.mode === ChanMode.PROTECTED) {
+				PostRequest("/chat/removePwChan/" + channel.name, {channelName, password, mode}).then((response: any) => {
+					if (response.status === "OK"){
+						if (response.data.status === "KO")
+							logWarn(response.data.description)
+						else {
+							logSuccess(response.data.description)
+							if (mode === ChanMode.PUBLIC)
+								setDatasAccess({mode: ChanMode.PRIVATE, currentPw: "", newPw: ""});
+							else if (mode === ChanMode.PRIVATE)
+								setDatasAccess({mode: ChanMode.PUBLIC, currentPw: "", newPw: ""});
+							setRerenderList(reRenderList + 1);
+						}
+					}
+					else
+						logError(response.error);
+				});
+			}
+			else {
+				PostRequest("/chat/changeModeChan/" + channel.name, { mode }).then((response: any) => {
+					if (response.status === "OK"){
+						if (response.data.status === "KO")
+							logWarn(response.data.description)
+						else {
+							logSuccess(response.data.description)
+							if (mode === ChanMode.PUBLIC)
+								setDatasAccess({mode: ChanMode.PRIVATE, currentPw: "", newPw: ""});
+							else if (mode === ChanMode.PRIVATE)
+								setDatasAccess({mode: ChanMode.PUBLIC, currentPw: "", newPw: ""});
+							setRerenderList(reRenderList + 1);
+						}
+					}
+					else
+						logError(response.error);
+				});
+			}
 		}
-		*/
-		console.log(datasAccess.currentPw, datasAccess.newPw, datasAccess.mode)
 	}
 
 	return (
