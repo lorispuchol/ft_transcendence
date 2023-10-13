@@ -54,8 +54,10 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 	async handleConnection(client: Socket, ...args: any[]) {
 		const decoded: any = this.jwtService.decode(<string>client.handshake.headers.token);
 		const newId: number = decoded?.id;
+
 		const user: User = await this.eventService.getUserData(newId);
-		if (!user)
+		const checkMultiAccount: Socket = [...this.users.entries()].filter(({ 1: value}) => value === newId).map(([key]) => key)[0];
+		if (!user || checkMultiAccount)
 		{
 			client.disconnect();
 			return ;
@@ -86,6 +88,13 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 			socket.emit("userDisconnect", offUser);
 		})
 		this.users.delete(client);
+	}
+
+	isAlreadyConnected(userId: number): boolean {
+		const socket: Socket = [...this.users.entries()].filter(({ 1: value}) => value === userId).map(([key]) => key)[0];
+		if (socket)
+			return true;
+		return false;
 	}
 
 	@SubscribeMessage('getConnected')

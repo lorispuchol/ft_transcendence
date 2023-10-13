@@ -18,14 +18,6 @@ export class UserService {
 		return await this.userRepository.save(newUser);
 	}
 
-	async deleteOne(login: string) {
-		if (! await this.findOneByLogin(login)) {
-			return `Error: User ${login} doesn't exist`
-		}
-		this.userRepository.delete({login});
-		return `User ${login} deleted`;
-	}
-
 	async findOneById(id: number): Promise<User | undefined> {
 		return this.userRepository.findOneBy({id: id});
 	}

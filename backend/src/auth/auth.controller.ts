@@ -1,7 +1,8 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, Redirect, Response } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpException, HttpStatus, Param, Post, Query, Redirect, Response } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { Public, client_url, ftConstants } from "./constants";
 import { NewUserWithPassword, UserWithPassword } from "./auth.dto";
+import { HttpStatusCode } from "axios";
 
 @Controller('auth')
 export class AuthController {
@@ -33,6 +34,11 @@ export class AuthController {
 		try {
 			const userData = await this.authService.getDataFtApi(code);
 			const token: string = await this.authService.logIn(userData.data.login);
+			if (!token)
+			{
+				res.redirect(client_url + "/login?alreadyHere=" + userData.data.login);
+				return ;
+			}
 			res.redirect(client_url + "/login?token=" + token);
 		}
 		catch (error) {

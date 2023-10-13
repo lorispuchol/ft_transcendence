@@ -5,6 +5,7 @@ import { UserService } from "src/user/user.service";
 import { ftConstants } from "./constants";
 import axios from "axios";
 import * as bcrypt from 'bcrypt';
+import { EventService } from "src/event/event.service";
 
 @ValidatorConstraint({ async: true })
 @Injectable()
@@ -60,6 +61,26 @@ export class PasswordMatch {
 	}
 
 	defaultMessage(args: ValidationArguments) {
-		return "unknow username or wrong password";
+		return ("unknow username or wrong password");
+	}
+}
+
+@ValidatorConstraint({ async: true })
+@Injectable()
+export class AlreadyHere {
+	constructor(
+		private userService: UserService,
+		private eventService: EventService,
+	) {}
+
+	async validate(value: string) {
+		const user: User = await this.userService.findOneByUsername(value);
+		if (!user || this.eventService.isAlreadyConnected(user.id))
+			return false;
+		return true;
+	}
+
+	defaultMessage(args: ValidationArguments) {
+		return (args.value + " is already connected on another instance");
 	}
 }
