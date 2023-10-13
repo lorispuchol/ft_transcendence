@@ -4,6 +4,7 @@ import { User } from "src/user/user.entity";
 import { UserService } from "src/user/user.service";
 import { ftConstants } from "./constants";
 import axios from "axios";
+// @ts-ignore
 import * as bcrypt from 'bcrypt';
 import { EventService } from "src/event/event.service";
 
@@ -59,13 +60,13 @@ export class PasswordMatch {
 		if (!user)
 			return false;
 
-		const isMatch = await bcrypt.compare(log.password, user.password);
+		const isMatch = await bcrypt.compare(value, user.password);
 		if (!isMatch)
 			return false;
 		return true;
 	}
 
-	defaultMessage(args: ValidationArguments) {
+	defaultMessage() {
 		return ("unknow username or wrong password");
 	}
 }
