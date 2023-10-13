@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Request } from "@nestjs/common";
 import { ChatService } from "./chat.service";
 import { UserService } from "src/user/user.service";
-import { Distinction, JoinChannelWithPassword, Mute, NewChannelWithPassword, NewChannelWithoutPassword } from "./channel.dto";
+import { AddPwChan, ChangeModeChan, Distinction, JoinChannelWithPassword, Mute, NewChannelWithPassword, NewChannelWithoutPassword, RemovePwChannel, SetPasswordChannel } from "./channel.dto";
 
 @Controller('chat')
 export class ChatController {
@@ -79,6 +79,54 @@ export class ChatController {
 			await this.userService.findOneByLogin(req.user.login),
 			chan,
 			null
+		)
+	}
+
+	@Post('changePwChan/:chan')
+	async changePwChan (
+		@Request() req: any,
+		@Param('chan') chan: string,
+		@Body() dataChan: SetPasswordChannel ) {
+		return await this.chatService.setPwChan(
+			await this.userService.findOneByLogin(req.user.login),
+			chan,
+			dataChan.newPw
+		)
+	}
+
+	@Post('addPwChan/:chan')
+	async setPwChan (
+		@Request() req: any,
+		@Param('chan') chan: string,
+		@Body() dataChan: AddPwChan ) {
+		return await this.chatService.setPwChan(
+			await this.userService.findOneByLogin(req.user.login),
+			chan,
+			dataChan.newPw
+		)
+	}
+
+	@Post('removePwChan/:chan')
+	async removePwChan (
+		@Request() req: any,
+		@Param('chan') chan: string,
+		@Body() dataChan: RemovePwChannel ) {
+		return await this.chatService.changeModeChan(
+			await this.userService.findOneByLogin(req.user.login),
+			chan,
+			dataChan.mode
+		)
+	}
+	
+	@Post('changeModeChan/:chan')
+	async changeModeChan (
+		@Request() req: any,
+		@Param('chan') chan: string,
+		@Body() dataChan: ChangeModeChan) {
+		return await this.chatService.changeModeChan(
+			await this.userService.findOneByLogin(req.user.login),
+			chan,
+			dataChan.mode
 		)
 	}
 

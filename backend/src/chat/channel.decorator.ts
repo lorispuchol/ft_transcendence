@@ -34,9 +34,8 @@ export class PasswordChannelMatch {
 	async validate(value: string, args: ValidationArguments) {
 		const log: any = args.object;
 		const channel: Channel = await this.chatService.findChanByName(log.channelName);
-		if (!channel)
+		if (!channel || channel && channel.mode !== ChanMode.PROTECTED)
 			return false;
-
 		const isMatch = await bcrypt.compare(log.password, channel.password);
 		if (!isMatch)
 			return false;

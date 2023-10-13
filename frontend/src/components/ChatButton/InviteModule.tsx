@@ -6,6 +6,8 @@ interface InviteButtonProps {
 	chan: string,
 }
 
+// Invite is different than other Button
+/// Upgrade Degrade Kick and Ban are identique
 export function InviteModule({chan}: InviteButtonProps) {
 	
 	const [guestUsername, setGuest]: [string, Function] = useState("")

@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { GetRequest } from "../utils/Request";
 import ErrorHandling from "../utils/Error";
 import Loading from "../utils/Loading";
-import { MemberDistinc, ParticipantData, UserData } from "./interfaceData";
+import { ChanMode, MemberDistinc, ParticipantData, UserData } from "./interfaceData";
 import { defaultAvatar } from "../pages/Profile/Profile";
 import { Avatar, Paper } from "@mui/material";
 import UserStatus from "../components/user/UserStatus";
@@ -21,7 +21,6 @@ import { MuteButton } from "../components/ChatButton/MuteButton";
 import { InviteModule } from "../components/ChatButton/InviteModule";
 import { LeaveButton } from "../components/ChatButton/LeaveButton";
 import { ChangeAccessibility } from "../components/ChatButton/ChangeAccessibility";
-
 
 interface MemberProps {
 	member: UserData,
@@ -161,7 +160,10 @@ export default function ListMembers({chan}: ListMembersProps) {
 	const members: ParticipantData[] = response.data.filter((member) => member.distinction === 1)!;
 	
 	if (isDm)
-		return <Profile member={response.data[0].user} isDm={true} />
+		if (response.data[0].user.id !== userParticipant.user.id)
+			return <Profile member={response.data[0].user} isDm={true} />
+		else
+			return <Profile member={response.data[1].user} isDm={true} />
 	if (displayProfile) {
 		return (
 			<SetRerenderListContext.Provider value={setRerenderList}>
@@ -201,7 +203,14 @@ export default function ListMembers({chan}: ListMembersProps) {
 				<hr className="my-5"/>
 				<InviteModule chan={chan} />
 				<hr className="my-5"/>
-				<ChangeAccessibility chanName={chan}/>
+				{userParticipant.distinction === MemberDistinc.OWNER
+					&& <ChangeAccessibility 
+							channel={owner[0].channel} 
+							newMode={owner[0].channel.mode === ChanMode.PUBLIC ? ChanMode.PRIVATE : ChanMode.PUBLIC}
+							reRenderList={reRenderList}
+							setRerenderList={setRerenderList}
+						/>
+				}
 				<hr className="my-5"/>
 				<LeaveButton chanName={chan}/>
 			</div>

@@ -180,6 +180,9 @@ function ListConv({focusConv, setFocusConv}: focusConvProps) {
 	if (response.status !== "OK")
 		return (<ErrorHandling status={response.status} message={response.error} />);
 
+	if (!response.data)
+		return null;
+
 	const dms: ChannelData[]  = response.data!.filter((conv) => conv.mode === ChanMode.DM)
 	const chans: ChannelData[]  = response.data!.filter((conv) => conv.mode !== ChanMode.DM)
 	return (
@@ -226,7 +229,6 @@ export default function Chat() {
 		<SocketChatContext.Provider value={socket}>
 		<SetDisplayMemberContext.Provider value={setDisplayProfile}>
 		<DisplayMemberContext.Provider value={displayProfile}>
-
 			<div className="chat-page">
 				<div className="list-conv">
 					<ListConv focusConv={focusConv} setFocusConv={setFocusConv}/>

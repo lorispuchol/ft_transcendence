@@ -52,7 +52,39 @@ export class SetPasswordChannel {
 	@IsNotEmpty()
 	@IsString()
 	@IsStrongPassword({minLength: 8, minLowercase: 1, minNumbers: 1, minUppercase: 1, minSymbols: 0})
-	NewPassword: string;
+	newPw: string;
+}
+
+export class AddPwChan {
+
+	@IsNotEmpty()
+	@IsString()
+	@IsStrongPassword({minLength: 8, minLowercase: 1, minNumbers: 1, minUppercase: 1, minSymbols: 0})
+	newPw: string;
+}
+
+export class RemovePwChannel {
+
+	@IsNotEmpty()
+	@IsString()
+	@MaxLength(33)
+	@MinLength(2)
+	@NotContains("+")
+	channelName: string;
+
+	@IsNotEmpty()
+	@IsString()
+	@Validate(PasswordChannelMatch)
+	password: string;
+
+	@IsEnum(ChanMode)
+	mode: ChanMode;
+}
+
+export class ChangeModeChan {
+
+	@IsEnum(ChanMode)
+	mode: ChanMode;
 }
 
 export class JoinChannelWithPassword {

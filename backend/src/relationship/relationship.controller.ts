@@ -91,5 +91,4 @@ export class RelationshipController {
 			await this.userService.findOneByLogin(recipient)
 		);
 	}
-
 }
