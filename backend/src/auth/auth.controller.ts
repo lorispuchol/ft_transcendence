@@ -1,8 +1,7 @@
-import { Body, Controller, Get, HttpCode, HttpException, HttpStatus, Param, Post, Query, Redirect, Response } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query, Redirect, Response } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { Public, client_url, ftConstants } from "./constants";
 import { NewUserWithPassword, UserWithPassword } from "./auth.dto";
-import { HttpStatusCode } from "axios";
 
 @Controller('auth')
 export class AuthController {
@@ -42,7 +41,6 @@ export class AuthController {
 			res.redirect(client_url + "/login?token=" + token);
 		}
 		catch (error) {
-			console.log(error);
 			res.send("something went wrong with 42 api");
 		}
 	}

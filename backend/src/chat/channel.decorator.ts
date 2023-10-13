@@ -1,8 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import { ValidationArguments, ValidatorConstraint } from "class-validator";
+// @ts-ignore
 import * as bcrypt from 'bcrypt';
 import { ChatService } from "./chat.service";
-import { ChanMode, Channel } from "./entities/channel.entity";
+import { Channel } from "./entities/channel.entity";
 
 @ValidatorConstraint({ async: true })
 @Injectable()

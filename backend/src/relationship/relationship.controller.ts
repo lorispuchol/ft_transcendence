@@ -1,7 +1,6 @@
-import { Body, Controller, Delete, Get, Param, Patch, Request } from "@nestjs/common";
+import { Controller, Delete, Get, Param, Patch, Request } from "@nestjs/common";
 import { UserService } from "src/user/user.service";
 import { RelationshipService } from "./relationship.service";
-import { Public } from "src/auth/constants";
 
 @Controller('relationship')
 export class RelationshipController {

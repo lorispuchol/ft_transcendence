@@ -6,7 +6,6 @@ import { client_url } from "src/auth/constants";
 import { EventService } from "./event.service";
 import { Inject, forwardRef } from "@nestjs/common";
 import { User } from "src/user/user.entity";
-import { subscribe } from "diagnostics_channel";
 
 interface Event {
 	type: string,
@@ -51,7 +50,7 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 
 	afterInit(server: Server) {}
 
-	async handleConnection(client: Socket, ...args: any[]) {
+	async handleConnection(client: Socket) {
 		const decoded: any = this.jwtService.decode(<string>client.handshake.headers.token);
 		const newId: number = decoded?.id;
 

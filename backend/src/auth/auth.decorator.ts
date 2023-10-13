@@ -4,6 +4,7 @@ import { User } from "src/user/user.entity";
 import { UserService } from "src/user/user.service";
 import { ftConstants } from "./constants";
 import axios from "axios";
+// @ts-ignore
 import * as bcrypt from 'bcrypt';
 import { EventService } from "src/event/event.service";
 
@@ -29,11 +30,16 @@ export class IsUsernameAvailable {
 			client_secret: ftConstants.secret,
 			redirect_uri: ftConstants.redirect_uri,
 		};
-		const getToken = await axios.post("https://api.intra.42.fr/oauth/token", data);
-		const userData = await axios.get("https://api.intra.42.fr/v2/users?filter[login]=" + value, {
-			headers: { Authorization:'Bearer ' + getToken.data.access_token }})
-		const ftUser: any[] = userData.data;
-		return (ftUser.length === 0);
+		try {
+			const getToken = await axios.post("https://api.intra.42.fr/oauth/token", data);
+			const userData = await axios.get("https://api.intra.42.fr/v2/users?filter[login]=" + value, {
+				headers: { Authorization:'Bearer ' + getToken.data.access_token }})
+			const ftUser: any[] = userData.data;
+			return (ftUser.length === 0);
+		}
+		catch (error) {
+			return (false);
+		}
 	}
 
 	defaultMessage(args: ValidationArguments) {
@@ -54,13 +60,13 @@ export class PasswordMatch {
 		if (!user)
 			return false;
 
-		const isMatch = await bcrypt.compare(log.password, user.password);
+		const isMatch = await bcrypt.compare(value, user.password);
 		if (!isMatch)
 			return false;
 		return true;
 	}
 
-	defaultMessage(args: ValidationArguments) {
+	defaultMessage() {
 		return ("unknow username or wrong password");
 	}
 }
