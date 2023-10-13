@@ -2,15 +2,9 @@ import { ChangeEvent, FormEvent, useContext, useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { ClickAwayListener, Paper } from '@mui/material'
-
-import { GetRequest, PatchRequest, client_url } from "../../utils/Request";
-
+import { PatchRequest, client_url } from "../../utils/Request";
 import './SettingsPopup.scss'
 import { UserContext } from "../../utils/Context";
-import Loading from "../../utils/Loading";
-import ErrorHandling from "../../utils/Error";
-
-// import { defaultAvatar } from "./Profile";
 
 
 function updateError(error: string[]) {
@@ -19,12 +13,6 @@ function updateError(error: string[]) {
 		autoClose: 2000,
 		hideProgressBar: true,
 	});
-}
-
-interface Response {
-	status: string,
-	data?: string,
-	error?: string,
 }
 
 export default function SettingsPopup({ close, login }: {close: any, login: string}) {
