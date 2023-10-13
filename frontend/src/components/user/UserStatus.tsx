@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { Socket } from "socket.io-client";
-import { EventContext } from "../utils/Context";
+import { EventContext } from "../../utils/Context";
 import { Circle } from "@mui/icons-material";
 
 interface UserStatusprops {

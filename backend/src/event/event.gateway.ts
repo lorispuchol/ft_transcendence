@@ -6,6 +6,7 @@ import { client_url } from "src/auth/constants";
 import { EventService } from "./event.service";
 import { Inject, forwardRef } from "@nestjs/common";
 import { User } from "src/user/user.entity";
+import { subscribe } from "diagnostics_channel";
 
 interface Event {
 	type: string,
@@ -19,8 +20,19 @@ interface Sender {
 	username: string,
 }
 
+interface UserInterval {
+	userId: number,
+	intervalId: NodeJS.Timer,
+}
+
 interface Challenge {
 	to: number,
+	mode: string
+}
+
+interface DefyReq {
+	reqId: number,
+	opId: number,
 	mode: string
 }
 
@@ -42,8 +54,10 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 	async handleConnection(client: Socket, ...args: any[]) {
 		const decoded: any = this.jwtService.decode(<string>client.handshake.headers.token);
 		const newId: number = decoded?.id;
+
 		const user: User = await this.eventService.getUserData(newId);
-		if (!user)
+		const checkMultiAccount: Socket = [...this.users.entries()].filter(({ 1: value}) => value === newId).map(([key]) => key)[0];
+		if (!user || checkMultiAccount)
 		{
 			client.disconnect();
 			return ;
@@ -74,6 +88,13 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 			socket.emit("userDisconnect", offUser);
 		})
 		this.users.delete(client);
+	}
+
+	isAlreadyConnected(userId: number): boolean {
+		const socket: Socket = [...this.users.entries()].filter(({ 1: value}) => value === userId).map(([key]) => key)[0];
+		if (socket)
+			return true;
+		return false;
 	}
 
 	@SubscribeMessage('getConnected')
@@ -130,17 +151,61 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 		client.emit("status/" + statuId, userStatus);
 	}
 
+	private defyReq: DefyReq[] = [];
 
 	@SubscribeMessage('challenge')
 	async challenge (@MessageBody() data: Challenge, @ConnectedSocket() client: Socket) {
 		const userId: number = this.users.get(client);
 		const user = await this.eventService.getUserData(userId);
 
-		if ( await this.eventService.isBlocked(userId, data.to))
+		if (await this.eventService.isBlocked(userId, data.to))
 			client.emit("defy", {id: data.to, response: "KO"});
 		
+		this.defyReq.push({reqId: userId, opId: data.to, mode: data.mode});
 		const event: Event = {type: "gameRequest", sender: user.username, senderId: user.id, gameMode: data.mode};
 		this.newEvent(data.to, event);
+	}
+
+	@SubscribeMessage('cancelChallenge')
+	async cancelChallenge (@ConnectedSocket() client: Socket) {
+		const userId: number = this.users.get(client);
+
+		let index: number = -1;
+		this.defyReq.forEach((defy: DefyReq, i: number) => {
+			if (defy.reqId === userId)
+				index = i;
+		})
+		if (index === -1)
+			return ;
+		const deletedDefyReq = this.defyReq.splice(index, 1)[0];
+		this.deleteEvent(deletedDefyReq.opId, {type: "gameRequest", sender: "", senderId: userId, gameMode: deletedDefyReq.mode});
+	}
+
+	private userInterval: UserInterval[] = []
+
+	clearUserInterval(userId: number) {
+		const index = this.userInterval.findIndex((elem: UserInterval) => {
+			if (elem.userId !== userId)
+			return 0;
+			clearInterval(elem.intervalId);
+			return 1;
+		})
+		this.userInterval.splice(index, 1);
+	}
+
+	@SubscribeMessage("clear")
+	clear(@ConnectedSocket() client: Socket) {
+		const userId = this.users.get(client);
+		this.clearUserInterval(userId);
+	}
+
+	@SubscribeMessage("defyButton")
+	waitDef(@MessageBody() defyId: number, @ConnectedSocket() client: Socket) {
+		const userId = this.users.get(client);
+
+		const intervalId = setInterval(() => {client.emit("waitDefy", defyId), console.log("interval button")}, 200);
+		this.userInterval.push({userId, intervalId});
+		setTimeout(() => {this.clearUserInterval(userId)}, 2000);
 	}
 
 	@SubscribeMessage('acceptGame')
@@ -148,19 +213,31 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 		const userId: number = this.users.get(client);
 		
 		client.emit("deleteEvent", {type: "gameRequest", senderId: defyInfo.senderId, sender: ""});
-
+	
+		const index: number  = this.defyReq.findIndex((elem: DefyReq) => (elem.reqId === defyInfo.senderId && elem.opId === userId))
+		if (index === -1)
+			return ;
+		const mode = this.defyReq.splice(index, 1)[0].mode;
+	
 		const userSocket: Socket = [...this.users.entries()].filter(({ 1: value}) => value === defyInfo.senderId).map(([key]) => key)[0];
-		userSocket.emit("defy", {id: userId, response: "OK"});
-		setTimeout(() => {client.emit("goDefy", defyInfo)}, 200)
+		userSocket.emit("defy", {openentId: userId, mode: mode,response: "OK"});
+		const intervalId = setInterval(() => {client.emit("goDefy", defyInfo), console.log("interval menu")}, 200);
+		this.userInterval.push({userId, intervalId});
+		setTimeout(() => {this.clearUserInterval(userId)}, 2000);
 	}
 
 	@SubscribeMessage('refuseGame')
-	async refuseGame(@MessageBody() senderId: number, @ConnectedSocket() client: Socket) {
+	async refuseGame(@MessageBody() defyInfo: any, @ConnectedSocket() client: Socket) {
 		const userId: number = this.users.get(client);
 
-		client.emit("deleteEvent", {type: "gameRequest", senderId: senderId, sender: ""});
+		client.emit("deleteEvent", {type: "gameRequest", senderId: defyInfo.senderId, sender: ""});
 
-		const userSocket: Socket = [...this.users.entries()].filter(({ 1: value}) => value === senderId).map(([key]) => key)[0];
-		userSocket.emit("defy", {id: userId, response: "KO"});
+		const index: number  = this.defyReq.findIndex((elem: DefyReq) => (elem.reqId === defyInfo.senderId && elem.opId === userId));
+		if (index === -1)
+			return ;
+		this.defyReq.splice(index, 1);
+	 
+		const userSocket: Socket = [...this.users.entries()].filter(({ 1: value}) => value === defyInfo.senderId).map(([key]) => key)[0];
+		userSocket.emit("defy", {openentId: userId, response: "KO", mode: ""});
 	}
 }

@@ -70,12 +70,15 @@ function LogInput() {
 export default function LogIn() {
 	const [searchParams] = useSearchParams();
 	const tokenParam = searchParams.get("token");
+	const hereParam = searchParams.get("alreadyHere");
 	if (tokenParam)
 	{
 		localStorage.setItem("token", tokenParam);
 		window.location.replace(client_url);
 		return (<Loading />);
 	}
+	if (hereParam)
+		logError([hereParam + " is already connected on another instance"]);
 
 	function clickButton() {
 		const url = server_url + "/auth/";

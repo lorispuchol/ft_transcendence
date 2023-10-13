@@ -10,13 +10,6 @@ export class RelationshipController {
 		private userService: UserService
 	) {}
 
-	//dev
-	@Public()
-	@Get('all')
-	async getAllRelationship() {
-		return await this.relationshipService.getAllRelationship();
-	}
-
 	@Delete('removeFriend/:recipient') 
 	async removeFriend(
 		@Request() req: any,
@@ -90,7 +83,7 @@ export class RelationshipController {
 			)
 	}
 
-	@Get(':recipient')
+	@Get('user/:recipient')
 	async getRelation(
 		@Request() req: any,
 		@Param('recipient') recipient: string ) {

@@ -1,16 +1,16 @@
 import { useContext, useEffect, useState } from "react";
-import { EventContext, UserContext } from "../utils/Context";
-import { GetRequest } from "../utils/Request";
+import { EventContext, UserContext } from "../../utils/Context";
+import { GetRequest } from "../../utils/Request";
 import { Alert, Avatar, List, Paper, Snackbar } from "@mui/material";
-import { defaultAvatar } from "../pages/Profile/Profile";
+import { defaultAvatar } from "../../pages/Profile/Profile";
 import { NavLink } from "react-router-dom";
-import Friendbutton from "../components/Relationship/Friendbutton";
+import Friendbutton from "../Relationship/Friendbutton";
 import UserStatus from "./UserStatus";
-import Loading from "../utils/Loading";
-import ErrorHandling from "../utils/Error";
-import GamingButton from "../components/game/GamingButton";
-import BlockButton from "../components/Relationship/BlockButton";
-import MessageButton from "../chat/MessageButton";
+import Loading from "../../utils/Loading";
+import ErrorHandling from "../../utils/Error";
+import GamingButton from "../game/GamingButton";
+import BlockButton from "../Relationship/BlockButton";
+import MessageButton from "../../chat/MessageButton";
 import './user.scss'
 
 interface ProfileElementProps {
