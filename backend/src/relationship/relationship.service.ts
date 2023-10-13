@@ -229,7 +229,7 @@ export class RelationshipService{
 			return ({status: relation1.status});
 		if (relation2 && relation2.status === RelationshipStatus.ACCEPTED)
 			return ({status: relation2.status});
-		return ({status: "noRelation"});
+		return ({status: "noRelation", userId: user2.id});
 	}
 
 	async saveRelationship(requester: User, recipient: User, status: string) {

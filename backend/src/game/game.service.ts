@@ -31,6 +31,7 @@ enum padSide {
 	P2 = -1
 }
 
+// @ts-ignore
 interface State {
 	openentKey: string,
 	openentPos: number,

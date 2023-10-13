@@ -120,11 +120,11 @@ function AcceptGame({ senderId, mode }: GameProps) {
 	)
 }
 
-function RefuseGame({ senderId }: GameProps) {
+function RefuseGame({ senderId, mode }: GameProps) {
 	const socket = useContext(EventContext)!;
 
 	function handleClick() {
-		socket.emit("refuseGame", senderId);
+		socket.emit("refuseGame", {senderId, mode});
 	}
 
 	return (
@@ -153,7 +153,7 @@ export default function EventButton ({ event }: EventButtonProps) {
 		return (
 			<div className="grid grid-cols-2">
 				<AcceptGame senderId={event.senderId} mode={event.gameMode}/>
-				<RefuseGame senderId={event.senderId} />
+				<RefuseGame senderId={event.senderId} mode={event.gameMode}/>
 			</div>
 		)
 	if (event.type !== "message")

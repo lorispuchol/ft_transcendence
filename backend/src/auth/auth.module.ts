@@ -4,11 +4,13 @@ import { UserModule } from "src/user/user.module";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
 import { jwtConstants } from "./constants";
-import { IsUsernameAvailable, PasswordMatch } from "./auth.decorator";
+import { AlreadyHere, IsUsernameAvailable, PasswordMatch } from "./auth.decorator";
+import { EventModule } from "src/event/event.module";
 
 @Module({
 	imports : [
 		UserModule,
+		EventModule,
 		JwtModule.register({
 				global: true,
 				secret: jwtConstants.secret,
@@ -16,7 +18,7 @@ import { IsUsernameAvailable, PasswordMatch } from "./auth.decorator";
 		})
 	],
 	controllers: [AuthController],
-	providers: [AuthService, IsUsernameAvailable, PasswordMatch],
+	providers: [AuthService, IsUsernameAvailable, PasswordMatch, AlreadyHere],
 	exports: [AuthService],
 })
 export class AuthModule {}

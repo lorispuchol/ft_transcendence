@@ -1,7 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn, OneToMany, BaseEntity } from "typeorm";
 import { Relationship } from "../relationship/relationship.entity";
 import { Message } from "src/chat/entities/message.entity";
-import { Channel } from "src/chat/entities/channel.entity";
 import { Match } from "src/game/match.entity";
 import { Participant } from "src/chat/entities/participant_chan_x_user.entity";
 

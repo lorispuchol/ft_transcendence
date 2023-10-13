@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import ErrorHandling from "../../utils/Error";
 import NoRouteFound from "../Error/NoRouteFound";
 import Loading from "../../utils/Loading";
-import UserStatus from "../../user/UserStatus";
+import UserStatus from "../../components/user/UserStatus";
 import { IoSettingsSharp } from 'react-icons/io5'
 import defaultPp from './default.png';
 import './Profile.scss'
@@ -109,7 +109,7 @@ export default function Profile() {
 				</div>
 			</Paper>
 			{show &&
-				<SettingsPopup close={closeSettings}/>
+				<SettingsPopup close={closeSettings} login={profile.login}/>
 			}
 		</div>
 	);

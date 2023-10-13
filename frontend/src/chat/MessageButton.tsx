@@ -24,7 +24,7 @@ export default function MessageButton({receiver}: MessageButtonProps) {
 	const navigate = useNavigate();
 	
 	useEffect(() => {
-		GetRequest("/relationship/" + receiver).then((res) => setRes(res));
+		GetRequest("/relationship/user/" + receiver).then((res) => setRes(res));
 	}, [receiver])
 	if (res.status === "loading")
 		return (<IconButton><Message /></IconButton>);
