@@ -1,4 +1,3 @@
-import { Injectable } from "@nestjs/common";
 import { Socket } from "socket.io";
 
 interface ScreenSize {
@@ -41,7 +40,7 @@ interface State {
 	ballDy: number,
 }
 
-export class PongGame {
+export default class PongGame {
 	constructor(
 		private p1: number,
 		private socketP1: Socket,
@@ -57,12 +56,13 @@ export class PongGame {
 	private scoreP1: number = 0;
 	private scoreP2: number = 0;
 	
-	static screen: ScreenSize = {w: 3200, h:1800};
-	static borderGap: number = PongGame.screen.h * 0.006;
-	static winningScore: number = 3;
+	private screen: ScreenSize = {w: 3200, h:1800};
+	private borderGap: number = this.screen.h * 0.006;
+	private winningScore: number = 3;
+	private gameEnded: boolean = false;
 
 	private paddles: Pad = this.init_paddle();
-	private ball: Ball = this.init_ball(PongGame.screen);
+	private ball: Ball = this.init_ball(this.screen);
 
 	public start() {
 		this.clear();
@@ -119,6 +119,8 @@ export class PongGame {
 	}
 
 	public handleDisconnect(id: number) {
+		if (this.gameEnded)
+			return 0;
 		switch(id) {
 			case this.p1:
 				this.socketP2.emit("end", "player1");
@@ -134,58 +136,59 @@ export class PongGame {
 	//////////////GAME LOGIC//////////////
 	
 	private checkWinner() {
-		if (this.scoreP1 != PongGame.winningScore && this.scoreP2 != PongGame.winningScore)
+		if (this.scoreP1 != this.winningScore && this.scoreP2 != this.winningScore)
 			return 0;
-		if (this.scoreP1 === PongGame.winningScore)
+		this.gameEnded = true;
+		if (this.scoreP1 === this.winningScore)
 		{
-			this.socketP1.emit("end", "player1");
-			this.socketP2.emit("end", "player1");
+			this.socketP1.emit("end", this.p1);
+			this.socketP2.emit("end", this.p1);
 		}
 		else
 		{
-			this.socketP1.emit("end", "player2");
-			this.socketP2.emit("end", "player2");
+			this.socketP1.emit("end", this.p2);
+			this.socketP2.emit("end", this.p2);
 		}
 		return 1;
 	}
 
 	private checkPoint() {
 		const hitLeft = this.ball.x <= this.ball.rad;
-		const hitRight = this.ball.x >= (PongGame.screen.w - this.ball.rad);
+		const hitRight = this.ball.x >= (this.screen.w - this.ball.rad);
 	
 		if (!hitLeft && !hitRight)
 			return 0;
 		this.scoreP1 += +hitRight; 
 		this.scoreP2 += +hitLeft;
 		Object.assign(this.paddles, this.init_paddle());
-		Object.assign(this.ball, this.init_ball(PongGame.screen));
+		Object.assign(this.ball, this.init_ball(this.screen));
 		this.start();
 		return 1;
 	}
 
 	//PADDLE
 	private movement(pad: Pad) {	
-		if (this.inputP1 === "ArrowUp" && pad.p1y >= PongGame.borderGap)
+		if (this.inputP1 === "ArrowUp" && pad.p1y >= this.borderGap)
 			pad.p1y -= pad.speed;
-		else if (this.inputP1 === "ArrowDown" && pad.p1y <= PongGame.screen.h - pad.h - PongGame.borderGap)
+		else if (this.inputP1 === "ArrowDown" && pad.p1y <= this.screen.h - pad.h - this.borderGap)
 			pad.p1y += pad.speed;
 		
-		if (this.inputP2 === "ArrowUp" && pad.p2y >= PongGame.borderGap)
+		if (this.inputP2 === "ArrowUp" && pad.p2y >= this.borderGap)
 			pad.p2y -= pad.speed;
-		else if (this.inputP2 === "ArrowDown" && pad.p2y <= PongGame.screen.h - pad.h - PongGame.borderGap)
+		else if (this.inputP2 === "ArrowDown" && pad.p2y <= this.screen.h - pad.h - this.borderGap)
 			pad.p2y += pad.speed;
 	}
 
 	private init_paddle() {
-		const w = PongGame.screen.w * 0.01;
-		const h = PongGame.screen.h * 0.15;
-		const speed: number = PongGame.screen.h * 0.02;
+		const w = this.screen.w * 0.01;
+		const h = this.screen.h * 0.15;
+		const speed: number = this.screen.h * 0.02;
 	
-		const p1x = PongGame.screen.w * 0.1 - w * 0.5;
-		const p1y = PongGame.screen.h * 0.5 - h * 0.5;
+		const p1x = this.screen.w * 0.1 - w * 0.5;
+		const p1y = this.screen.h * 0.5 - h * 0.5;
 	
-		const p2x = PongGame.screen.w * 0.9 - w * 0.5;
-		const p2y = PongGame.screen.h * 0.5 - h * 0.5;
+		const p2x = this.screen.w * 0.9 - w * 0.5;
+		const p2y = this.screen.h * 0.5 - h * 0.5;
 	
 		return {w, h, speed, p1x, p1y, p2x, p2y};
 	}
@@ -255,14 +258,9 @@ export class PongGame {
 
 	private collision() {
 		this.paddleHit(this.paddles, this.ball);
-		if (this.ball.y >= (PongGame.screen.h - this.ball.rad) || this.ball.y <= this.ball.rad)
+		if (this.ball.y >= (this.screen.h - this.ball.rad) || this.ball.y <= this.ball.rad)
 			this.ball.dy *= -1;
-		if (this.ball.x >= (PongGame.screen.w - this.ball.rad) || this.ball.x <= this.ball.rad)
+		if (this.ball.x >= (this.screen.w - this.ball.rad) || this.ball.x <= this.ball.rad)
 			this.ball.dx *= -1;
 	}
-}
-
-@Injectable()
-export class GameService {
-
 }

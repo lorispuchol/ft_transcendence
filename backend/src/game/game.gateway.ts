@@ -3,7 +3,7 @@ import { JwtService } from "@nestjs/jwt";
 import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 import { client_url } from "src/auth/constants";
-import { PongGame } from "./game.service";
+import PongGame from "./game.classique";
 
 @WebSocketGateway({
 	namespace: "game",

@@ -4,7 +4,6 @@ import { User } from "src/user/user.entity";
 import { UserService } from "src/user/user.service";
 import { ftConstants } from "./constants";
 import axios from "axios";
-// @ts-ignore
 import * as bcrypt from 'bcrypt';
 import { EventService } from "src/event/event.service";
 
@@ -81,7 +80,7 @@ export class AlreadyHere {
 
 	async validate(value: string) {
 		const user: User = await this.userService.findOneByUsername(value);
-		if (!user || this.eventService.isAlreadyConnected(user.id))
+		if (user && this.eventService.isAlreadyConnected(user.id))
 			return false;
 		return true;
 	}
