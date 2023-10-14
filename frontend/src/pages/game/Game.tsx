@@ -7,6 +7,7 @@ import MatchMaking from "./online/MatchMaking";
 import LocalGame from './local/LocalGame';
 import { GetRequest } from '../../utils/Request';
 import { EventContext } from '../../utils/Context';
+import LocalSplatong from './local/localSplatong';
 
 interface UserData {
 	id: number,
@@ -24,9 +25,8 @@ interface Response {
 }
 
 interface Player {
-	score: number,
 	id: number,
-	username: string | null,
+	username: string,
 }
 
 export interface Players {
@@ -40,7 +40,7 @@ export interface Setting {
 	mode: string,
 }
 
-function PlayerCard( { player }: any ) {
+function PlayerCard( { player, score }: { player: Player, score: number }) {
 	const [user, setUser]: [any, Function] = useState({
 		avatar: bird,
 		id: player.id,
@@ -48,6 +48,7 @@ function PlayerCard( { player }: any ) {
 	});
 
 	useEffect(() => {
+		console.log(score);
 		if (!user.id)
 			return ;
 		GetRequest("/user/profile/id/" + user.id).then((response: Response) => {
@@ -59,12 +60,12 @@ function PlayerCard( { player }: any ) {
 				})
 		});
 
-	}, [user]);
+	}, [player, user.id]);
 
 	return (
 		<Paper className="player_card in_game_card">
 			<img src={user.avatar} alt="avatar" />
-			<div className="score">{player.score}</div>
+			<div className="score">{score}</div>
 			<Chip label={user.username}/>
 			<div/>
 		</Paper>
@@ -74,6 +75,7 @@ function PlayerCard( { player }: any ) {
 export default function Game() {
 	const socket = useContext(EventContext)!;
 	const [players, setPlayers]: [Players, Function] = useState({p1: null, p2: null});
+	const [score, setScore]: [{p1: number, p2: number}, Function] = useState({p1: 0, p2: 0});
 	const [defy, setDefy]: [number | null, Function] = useState(null);
 	const [setting, setSetting]: [Setting, Function] = useState({type: "menu", mode: "classic"});
 
@@ -101,19 +103,22 @@ export default function Game() {
 			case "menu":
 				return (<GameMenu setSetting={setSetting} setDefy={setDefy}/>);
 			case "local":
-				return (<LocalGame setPlayers={setPlayers}/>)
+				if (setting.mode === "classic")
+					return (<LocalGame setPlayers={setPlayers} setScore={setScore}/>)
+				return (<LocalSplatong setPlayers={setPlayers} setScore={setScore}/>);
 			case "online":
-				return (<MatchMaking mode={setting.mode} setSetting={setSetting} setPlayers={setPlayers} defy={defy} setDefy={setDefy}/>);
+				return (<MatchMaking mode={setting.mode} setSetting={setSetting}
+					setPlayers={setPlayers} defy={defy} setDefy={setDefy} setScore={setScore}/>);
 		}
 	}
 
 	return (
 		<>
 			<div className="canvas_wrap">
-				{players.p1? <PlayerCard player={players.p1}/> 
+				{players.p1? <PlayerCard player={players.p1} score={score.p1}/> 
 					: <Paper className="player_card"><div className="el_pongo">PONGO</div></Paper>}
 				{modeSelect()}
-				{players.p2? <PlayerCard player={players.p2}/>
+				{players.p2? <PlayerCard player={players.p2} score={score.p2}/>
 					: <Paper className="player_card"><div className="el_pongo">PONGO</div></Paper>}
 			</div>
 			{setting.type !== "menu" &&

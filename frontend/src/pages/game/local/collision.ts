@@ -4,9 +4,11 @@ import { Pad } from "./paddle";
 
 export const clamp = (num: number, min: number, max: number) => Math.min(Math.max(num, min), max);
 
-function wallHit(height: number, ball: Ball) {
+function wallHit(height: number, width: number,  ball: Ball) {
 	if (ball.y >= (height - ball.rad) || ball.y <= ball.rad)
 		ball.dy *= -1;
+	if (ball.x >= (width - ball.rad) || ball.x <= ball.rad)
+		ball.dx *= -1;
 }
 
 enum padSide {
@@ -50,5 +52,5 @@ function paddleHit(pad: Pad, ball: Ball) {
 
 export default function collision(screen: ScreenSize, pad: Pad, ball: Ball) {
 	paddleHit(pad, ball);
-	wallHit(screen.h, ball);
+	wallHit(screen.h, screen.w, ball);
 }

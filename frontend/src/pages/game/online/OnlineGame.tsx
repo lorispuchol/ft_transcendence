@@ -4,7 +4,6 @@ import "../Game.scss";
 import handlePaddle, { Pad, clearBehind, drawPaddle, handleKey, init_paddle } from "./paddle";
 import { Ball, drawBall, init_ball } from "../local/ball";
 import { countDown } from "../local/countDown";
-import { Players } from "../Game";
 import collision from "./collision";
 import DisplayWinner from "./winner";
 
@@ -13,7 +12,7 @@ export interface ScreenSize {
 	h: number
 }
 
-export default function OnlineGame( { socket, setPlayers, side }: any ) {
+export default function OnlineGame( { socket, setScore, side }: any ) {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const [winnerId, setWinnerId]: [number, Function] = useState(-1);
 	
@@ -46,11 +45,7 @@ export default function OnlineGame( { socket, setPlayers, side }: any ) {
 		function roundReset(data: any) {
 			window.cancelAnimationFrame(animationFrameId);
 			nextRoundTime = data.nextRound;
-			setPlayers((prev: Players) => {
-				return (
-					{p1: {...prev.p1, score: data.scoreP1},
-					p2: {...prev.p2, score: data.scoreP2}});
-				});
+			setScore({p1: data.scoreP1, p2: data.scoreP2});
 			Object.assign(paddle, init_paddle(screen, side));
 			Object.assign(ball, init_ball(screen));
 			now = Date.now();
@@ -93,7 +88,7 @@ export default function OnlineGame( { socket, setPlayers, side }: any ) {
 			document.removeEventListener("keydown", idKey[0]);
 			document.removeEventListener("keyup", idKey[1]);
 		});
-	}, [setPlayers, socket, side, setWinnerId]);
+	}, [setScore, socket, side, setWinnerId]);
 
 	return (
 			<div className="canvas_container">

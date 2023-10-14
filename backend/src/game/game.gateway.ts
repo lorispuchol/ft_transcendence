@@ -89,7 +89,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	@SubscribeMessage("input")
 	handleGameInput(@MessageBody() input: string | undefined, @ConnectedSocket() client: Socket) {
-		if (!input)
+		if (input == null)
 			return ;
 		const userId = this.users.get(client);
 		const instance = this.lobby.get(userId);

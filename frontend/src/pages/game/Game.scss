@@ -13,6 +13,11 @@
 	max-height: 39vw;
 }
 
+.score {
+	color: c.$primary;
+	font-size: 5vw;
+}
+
 .in_game_card {
 	display: flex;
 	flex-direction: column;

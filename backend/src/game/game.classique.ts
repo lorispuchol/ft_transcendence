@@ -123,10 +123,10 @@ export default class PongGame {
 			return 0;
 		switch(id) {
 			case this.p1:
-				this.socketP2.emit("end", "player1");
+				this.socketP2.emit("end", this.p2);
 				return this.p2;
 			case this.p2:
-				this.socketP1.emit("end", "player2");
+				this.socketP1.emit("end", this.p1);
 				return this.p1;
 			default:
 				return 0;

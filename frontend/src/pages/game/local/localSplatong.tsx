@@ -7,7 +7,6 @@ import collision from "./collision";
 import { countDown } from "./countDown";
 import { ArrowDownward } from "@mui/icons-material";
 
-let freezeFrame = 0;
 
 export interface ScreenSize {
 	w: number,
@@ -24,7 +23,6 @@ function checkPoint(setScore: Function, score: any, ctx: CanvasRenderingContext2
 		setScore({p1: score.p1, p2: score.p2});
 		ball.color = "red"
 		drawBall(ctx, ball);
-		freezeFrame = 20;
 		Object.assign(paddle, init_paddle({w: ctx.canvas.width, h: ctx.canvas.height}));
 		Object.assign(ball, init_ball({w: ctx.canvas.width, h: ctx.canvas.height}));
 		return true;
@@ -32,29 +30,36 @@ function checkPoint(setScore: Function, score: any, ctx: CanvasRenderingContext2
 	return false;
 }
 
-export default function LocalGame( { setPlayers, setScore }: any ) {
+export default function LocalSplatong( { setPlayers, setScore }: any ) {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const [prompt, setPrompt]: [boolean, Function] = useState(true);
 	const [winner, setWinner]: [string, Function] = useState("");
 	const [leftReady, setLeftReady]: [string, Function] = useState("blinking");
 	const [rightReady, setRightReady]: [string, Function] = useState("blinking");
 	
+	
 	useEffect(() => {
 		setPlayers({p1: {id: 0, username: "Player 1"}, p2: {id: 0, username: "Player 2"}});
-		setScore({p1: 0, p2:0});
+		
+		const gameDuration: number = 60;
+		setScore({p1: gameDuration, p2: gameDuration});
+		
 		const ctx = canvasRef!.current!.getContext('2d')!;
 		const screen = {w: 3200, h: 1800}
 		ctx.canvas.width = screen.w;
 		ctx.canvas.height = screen.h;
+		
 		const [idKey] = handleKey();
 		const ball : Ball = init_ball(screen);
 		const paddle: Pad = init_paddle(screen);
-		
+	
 		let animationFrameId: number;
 		let roundStart: boolean = true;
 		let now = performance.now();
 		const score = {p1:0, p2:0};
 		
+		let endTime: number;
+
 		let ready: boolean[] = [false, false];
 		function renderReady() {
 			ctx.clearRect(0,0,screen.w, screen.h);
@@ -78,12 +83,7 @@ export default function LocalGame( { setPlayers, setScore }: any ) {
 		}
 
 		function render() {
-			if (freezeFrame)
-			{
-				freezeFrame--;
-				now = performance.now();
-			}
-			else if (roundStart)
+			if (roundStart)
 			{
 				if (score.p1 >= 3 || score.p2 >= 3)
 				{
