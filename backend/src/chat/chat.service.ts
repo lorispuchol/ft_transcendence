@@ -39,8 +39,17 @@ export class ChatService {
 		
 		const newMember: Participant = new Participant();
 
+		const parts: Participant[] = await this.participantRepository.find({
+			where: {
+				channel: channel.id
+			} as FindOptionsWhere<Channel>
+		})
+		const owner: Participant = parts.find((part) => part.distinction === MemberDistinc.OWNER)
+		if (!owner)
+			newMember.distinction = MemberDistinc.OWNER;
+		else
+			newMember.distinction = dist;
 		newMember.channel = channel;
-		newMember.distinction = dist;
 		newMember.user = user;
 		newMember.muteDate = muteDate
 
@@ -69,8 +78,12 @@ export class ChatService {
 			return ;
 		await this.saveNewMember(newOwner.user, channel, MemberDistinc.OWNER, new Date())
 	}
-	
+
 	async getConvs(user: User): Promise<Channel[]> {
+
+		if (!user)
+			return ;
+
 		const chans: Channel[] = [];
 		const parts: Participant[] = await this.participantRepository.find({
 			where: {
@@ -82,6 +95,9 @@ export class ChatService {
 	}
 
 	async getNoConvs(user: User): Promise<Channel[]> {
+
+		if (!user)
+			return ;
 		
 		const convs: Channel[] = await this.getConvs(user);
 		const allChans: Channel[] = await this.channelRepository.find();
@@ -107,6 +123,9 @@ export class ChatService {
 
 	async leaveChan(requester: User, chanName: string) {
 
+		if (!requester)
+			throw new HttpException("Request impossible", HttpStatus.FORBIDDEN);
+
 		const channel: Channel = await this.findChanByName(chanName)
 		if (!channel)
 			throw new HttpException("Channel not found", HttpStatus.FORBIDDEN);
@@ -126,6 +145,10 @@ export class ChatService {
 	}
 
 	async mute(requester: User, chanName: string, login: string) {		
+
+		if (!requester)
+			throw new HttpException("Request impossible", HttpStatus.FORBIDDEN);
+
 		var muteDate: Date = new Date();
 		muteDate.setMinutes(muteDate.getMinutes() + 1)
 
@@ -167,6 +190,10 @@ export class ChatService {
 	}
 
 	async acceptChan(invited: User, chanName: string) {
+
+		if (!invited)
+			return ({status: "KO", description: "Request impossible"})
+
 		const channel: Channel = await this.findChanByName(chanName)
 		if (!channel)
 			return ({status: "KO", description: "Channel not found"})
@@ -180,6 +207,10 @@ export class ChatService {
 	}
 
 	async refuseChan(invited: User, chanName: string) {
+
+		if (!invited)
+			return ({status: "KO", description: "Request impossible"})
+
 		const channel: Channel = await this.findChanByName(chanName)
 		if (!channel)
 			return ({status: "KO", description: "Channel not found"})
@@ -193,6 +224,9 @@ export class ChatService {
 	}
 
 	async setDistinction(requester: User, chanName: string, login: string, distinction: MemberDistinc) {
+
+		if (!requester)
+			return ({status: "KO", description: "Request impossible"})
 		
 		if (distinction === MemberDistinc.OWNER)
 			return ({status: "KO", description: "Impossible to set someone as owner"})
@@ -260,6 +294,10 @@ export class ChatService {
 	}
 
 	async joinChan(user: User, chanName: string, password: string) {
+
+		if (!user)
+			return ({status: "KO", description: "Request impossible"})
+
 		const channel: Channel = await this.findChanByName(chanName);
 		if (!channel)
 			return ({status: "KO", description: chanName + " not found"})
@@ -272,13 +310,63 @@ export class ChatService {
 		return (await this.addMemberToChan(user, channel, MemberDistinc.MEMBER))
 	}
 
+	async setPwChan(user: User, chanName: string, newPassword: string) {
+
+		if (!user)
+			return ({status: "KO", description: "Request impossible"})
+
+		const channel: Channel = await this.findChanByName(chanName);
+		if (!channel)
+			return ({status: "KO", description: chanName + " not found"})
+		const userPart: Participant = await this.findOneParticipant(channel, user)
+		if (!userPart)
+			return ({status: "KO", description: "You are not part of " + channel.name})
+		if (userPart.distinction !== MemberDistinc.OWNER)
+			return ({status: "KO", description: `You are not ability to change ${channel.name}'s settings`})
+		
+		const wasProt: boolean = channel.mode === ChanMode.PROTECTED
+
+		const salt = await bcrypt.genSalt();
+		const hash = await bcrypt.hash(newPassword, salt);
+		channel.password = hash;
+		channel.mode = ChanMode.PROTECTED;
+		await this.channelRepository.save(channel);
+		return ({status: "OK", description: `Password of ${channel.name} ${wasProt ? "changed" : "set up"}`})
+	}
+
+	async changeModeChan(user: User, chanName: string, newMode: ChanMode) {
+
+		if (!user)
+			return ({status: "KO", description: "Request impossible"})
+
+		const channel: Channel = await this.findChanByName(chanName);
+		if (!channel)
+			return ({status: "KO", description: chanName + " not found"})
+		const userPart: Participant = await this.findOneParticipant(channel, user)
+		if (!userPart)
+			return ({status: "KO", description: "You are not part of " + channel.name})
+		if (userPart.distinction !== MemberDistinc.OWNER)
+			return ({status: "KO", description: `You are not ability to change ${channel.name}'s settings`})
+		if (newMode === ChanMode.PROTECTED)
+			return ({status: "KO", description: `A new password is required`})
+		if (newMode === ChanMode.DM)
+			return ({status: "KO", description: "dm mode is not a valid mode"})
+		channel.password = null;
+		channel.mode = newMode;
+		await this.channelRepository.save(channel);
+		return ({status: "OK", description: `${channel.name} is now ${newMode}`})
+	}
+
 	async createChannel(firstUser: User, name: string, mode: ChanMode, password?: string) {
+
+		if (!firstUser)
+			throw new HttpException("Request impossible", HttpStatus.FORBIDDEN);
 
 		if((!password && mode === ChanMode.PROTECTED) ||
 			(password && (mode === ChanMode.PRIVATE || mode === ChanMode.PUBLIC))) {
 			throw new HttpException("forbidden", HttpStatus.FORBIDDEN);
 		}
-		const newChan: Channel = await this.channelRepository.create({
+		const newChan: Channel = this.channelRepository.create({
 			name: name,
 			mode: mode
 		})
@@ -334,7 +422,9 @@ export class ChatService {
 	}
 
 	async getDm(user1: User, user2: User): Promise<Channel> {
-		
+
+		if (!user1)
+			throw new HttpException("Request impossible", HttpStatus.FORBIDDEN);
 		if (!user2)
 			throw new HttpException("User not found", HttpStatus.FORBIDDEN);
 		if (user1.login === user2.login)
