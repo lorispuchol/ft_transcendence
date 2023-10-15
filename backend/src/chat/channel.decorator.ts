@@ -3,7 +3,7 @@ import { ValidationArguments, ValidatorConstraint } from "class-validator";
 // @ts-ignore
 import * as bcrypt from 'bcrypt';
 import { ChatService } from "./chat.service";
-import { Channel } from "./entities/channel.entity";
+import { ChanMode, Channel } from "./entities/channel.entity";
 
 @ValidatorConstraint({ async: true })
 @Injectable()

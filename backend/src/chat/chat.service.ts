@@ -179,13 +179,11 @@ export class ChatService {
 			throw new HttpException(member.username + " is not part of " + channel.name + ": " + this.getDistStr(memberPart.distinction), HttpStatus.FORBIDDEN);
 		if (memberPart.muteDate > new Date()){
 			let displayDate: Date = new Date(memberPart.muteDate)
-			displayDate.setHours(displayDate.getHours() + 2) //////////// a changer pour le fuseau horaire
 			return ({status: "KO", description: memberPart.user.username + " is already mute until " +  new Date(displayDate).toLocaleTimeString()})
 		}
 		this.saveNewMember(member, channel, memberPart.distinction, muteDate)
 
 		let displayDate: Date = new Date(muteDate)
-		displayDate.setHours(displayDate.getHours() + 2) //////////// a changer pour le fuseau horaire
 		return ({status: "OK", description: memberPart.user.username + " is now mute until " +  new Date(displayDate).toLocaleTimeString()})
 	}
 
