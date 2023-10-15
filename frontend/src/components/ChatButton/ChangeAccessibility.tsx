@@ -141,8 +141,8 @@ export function ChangeAccessibility({channel, newMode, reRenderList, setRerender
 					<FormControlLabel value={ChanMode.PROTECTED} control={<Radio color="default"/>} label={channel.mode === ChanMode.PROTECTED ? "Change Password" : "Protected"} />
 				</RadioGroup>
 				<FormGroup className="w-full flex flex-col items-center">
-					{channel.mode === ChanMode.PROTECTED && <input className="input w-9/12 h-8 bg-neutral-100 mb-3 text-inherit text-black" value={datasAccess.currentPw} type="password" onChange={changeCurrentPw} name="name" placeholder="Current Password" />}
-					{datasAccess.mode === ChanMode.PROTECTED && <input className="input w-9/12 h-8 bg-neutral-100 mb-3 text-inherit text-black" value={datasAccess.newPw} type="password" onChange={changeNewPw} name="password" placeholder="New Password" disabled={datasAccess.mode !== ChanMode.PROTECTED} />}
+					{channel.mode === ChanMode.PROTECTED && <input className="input w-10/12 h-8 bg-neutral-100 mb-3 text-inherit text-black" value={datasAccess.currentPw} type="password" onChange={changeCurrentPw} name="name" placeholder="Current Password" />}
+					{datasAccess.mode === ChanMode.PROTECTED && <input className="input w-10/12 h-8 bg-neutral-100 mb-3 text-inherit text-black" value={datasAccess.newPw} type="password" onChange={changeNewPw} name="password" placeholder="New Password" disabled={datasAccess.mode !== ChanMode.PROTECTED} />}
 				</FormGroup>
 				<button className="h-12 w-10/12 btn send-button text-white" type="submit" >CHANGE ACCESSIBILITY</button>
 			</form>
