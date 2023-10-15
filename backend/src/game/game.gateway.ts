@@ -12,7 +12,7 @@ import PongGame from "./game.classique";
 export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 	constructor(
 		private jwtService: JwtService,
-		) {}
+	) {}
 		
 	private users: Map<Socket, number> = new Map();
 	private lobby: Map<number, PongGame> = new Map();

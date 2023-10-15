@@ -1,9 +1,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import "../Game.scss";
-import handlePaddle, { Pad, clearBehind, handleKey, handlePaddleGetReady, init_paddle } from "./paddle";
+import { Pad, handleKey, init_paddle, splatHandlePaddle, splatHandlePaddleGetReady } from "./paddle";
 import handleBall, { Ball, drawBall, init_ball } from "./ball";
-import collision from "./collision";
+import collision, { clamp } from "./collision";
 import { countDown } from "./countDown";
 import { ArrowDownward } from "@mui/icons-material";
 
@@ -13,21 +13,39 @@ export interface ScreenSize {
 	h: number
 }
 
-function checkPoint(setScore: Function, score: any, ctx: CanvasRenderingContext2D, paddle: Pad, ball: Ball) {
-	const hitLeft = ball.x <= ball.rad;
-	const hitRight = ball.x >= (ctx.canvas.width - ball.rad);
-
-	if (hitLeft || hitRight) {
-		score.p1 += +hitRight; 
-		score.p2 += +hitLeft;
-		setScore({p1: score.p1, p2: score.p2});
-		ball.color = "red"
-		drawBall(ctx, ball);
-		Object.assign(paddle, init_paddle({w: ctx.canvas.width, h: ctx.canvas.height}));
-		Object.assign(ball, init_ball({w: ctx.canvas.width, h: ctx.canvas.height}));
-		return true;
+function drawBackground(ctx: CanvasRenderingContext2D, screen: ScreenSize, background: number[][]) {
+	let x: number = 0;
+	let y: number = 0;
+	let color: number = 0;
+	while (x < 25)
+	{
+		y = 0;
+		while (y < 25)
+		{
+			color = background[y][x]
+			if (color === 1)
+				ctx.fillStyle = "orange";
+			else if (color === 2)
+				ctx.fillStyle = "blue";
+			else
+				ctx.fillStyle = "white";	
+			ctx.fillRect(x * 128, y * 72, 1280, 720);
+			y++;
+		}
+		x++;
 	}
-	return false;
+}
+
+function colorTomatrix(color: string) {
+	switch (color)
+	{
+		case "orange":
+			return 1;
+		case "blue":
+			return 2;
+		default:
+			return 0;
+	}
 }
 
 export default function LocalSplatong( { setPlayers, setScore }: any ) {
@@ -51,57 +69,62 @@ export default function LocalSplatong( { setPlayers, setScore }: any ) {
 		
 		const [idKey] = handleKey();
 		const ball : Ball = init_ball(screen);
+		ball.speedCap = 45;
+		ball.color = "black";
 		const paddle: Pad = init_paddle(screen);
 	
+		const background: number[][] = Array.from({length: 25}, () => Array.from({length: 25}, () => 0));
 		let animationFrameId: number;
-		let roundStart: boolean = true;
-		let now = performance.now();
-		const score = {p1:0, p2:0};
-		
 		let endTime: number;
+		let now: number;
+		
 
 		let ready: boolean[] = [false, false];
 		function renderReady() {
-			ctx.clearRect(0,0,screen.w, screen.h);
-			handlePaddleGetReady(ctx, paddle, ready, setLeftReady, setRightReady);
+			drawBackground(ctx, screen, background);
+			splatHandlePaddleGetReady(ctx, paddle, ready, setLeftReady, setRightReady);
 			drawBall(ctx, ball);
 			if (ready[0] && ready[1])
 			{
 				setPrompt(false);
 				now = performance.now();
-				animationFrameId = window.requestAnimationFrame(render);
-				return;
+				endTime = now + gameDuration * 1000;
+				animationFrameId = window.requestAnimationFrame(renderRoundStart);
+				return ;
 			}
 			animationFrameId = window.requestAnimationFrame(renderReady);
 		}
-
-		function renderEnd() {
-			if (score.p1 === 3)
-				setWinner("player 1 win");
-			if (score.p2 === 3)
-				setWinner("player 2 win");
+		
+		function renderRoundStart() {
+			drawBackground(ctx, screen, background);
+			splatHandlePaddle(ctx, paddle);
+			drawBall(ctx, ball);
+			if (countDown(ctx, now, 500))
+				animationFrameId = window.requestAnimationFrame(renderRoundStart);
+			else
+				animationFrameId = window.requestAnimationFrame(render);
 		}
 
+		function renderEnd() {
+			setWinner("player 1 win");
+			setWinner("player 2 win");
+		}
+
+		function xMatrix() {return (clamp(Math.round(ball.x / 128), 0, 24))}
+		function yMatrix() {return (clamp(Math.round(ball.y / 72), 0, 24))}
+
 		function render() {
-			if (roundStart)
+			drawBackground(ctx, screen, background);
+			splatHandlePaddle(ctx, paddle);
+			ball.color = collision(screen, paddle, ball);
+			handleBall(ctx, ball);
+			background[yMatrix()][xMatrix()] = colorTomatrix(ball.color);
+			now = Math.round((endTime - performance.now()) * 0.001);
+			setScore({p1: now, p2: now})
+			if (now <= 0)
 			{
-				if (score.p1 >= 3 || score.p2 >= 3)
-				{
-					animationFrameId = window.requestAnimationFrame(renderEnd);
-					return ;
-				}
-				ctx.clearRect(0,0,screen.w, screen.h);
-				roundStart = countDown(ctx, now, 500);
-				handlePaddle(ctx, paddle);
-				drawBall(ctx, ball);
-			}
-			else {
-				ctx.clearRect(0,0, screen.w, screen.h);
-				handlePaddle(ctx, paddle);
-				collision(screen, paddle, ball);
-				handleBall(ctx, ball);
-				clearBehind(ctx, paddle);
-				roundStart = checkPoint(setScore, score, ctx, paddle, ball);
+				animationFrameId = window.requestAnimationFrame(renderEnd);
+				return ;
 			}
 			animationFrameId = window.requestAnimationFrame(render);
 		}
@@ -117,17 +140,14 @@ export default function LocalSplatong( { setPlayers, setScore }: any ) {
 	return (
 			<div className="canvas_container">
 				{ winner &&
-				<>
 					<h1 className="get_ready left-[21vw] top-[20vw]">{winner}</h1>
-					<ArrowDownward className="get_ready left-[31vw] top-[30vw] text-[8vw]" />
-				</>
 				}
 				<div className={"prompt_wrapper" + (prompt ? "" : " fade")}>
 					<h1 className="get_ready left-[23vw] top-[5vw]">GET READY</h1>
-					<div className={"key kbd left-[10vw] top-[10vw] " + leftReady}>w</div>
-					<div className={"key kbd left-[10vw] top-[25vw] " + leftReady}>s</div>
-					<div className={"key kbd right-[10vw] top-[10vw] " + rightReady}>▲</div>
-					<div className={"key kbd right-[10vw] top-[25vw] " + rightReady}>▼</div>
+					<div className={"splatkey kbd left-[10vw] top-[10vw] " + leftReady}>w</div>
+					<div className={"splatkey kbd left-[10vw] top-[25vw] " + leftReady}>s</div>
+					<div className={"splatkey kbd right-[10vw] top-[10vw] " + rightReady}>▲</div>
+					<div className={"splatkey kbd right-[10vw] top-[25vw] " + rightReady}>▼</div>
 				</div>
 				<canvas id="pong" ref={canvasRef} className="classique"/>
 			</div>

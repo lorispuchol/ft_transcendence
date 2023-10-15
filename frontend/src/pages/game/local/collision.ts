@@ -22,7 +22,7 @@ function bounce(side: padSide, ball: Ball, ph: number, py:number) {
 	collidePoint = clamp(collidePoint, 0, 1);
 	angle += (collidePoint * (Math.PI * -0.2) + Math.PI * 0.1);
 
-	if (ball.speed < 70)
+	if (ball.speed < ball.speedCap)
 		ball.speed += ball.acc;
 	ball.dx =  Math.abs(Math.sin(angle)) * side;
 	ball.dy = -Math.cos(angle);
@@ -45,12 +45,20 @@ function paddleHit(pad: Pad, ball: Ball) {
 		return (dx*dx + dy*dy <= ball.rad ** 2);
 	}
 	if (hit(pad.rx, pad.ry))
-		bounce(padSide.Right, ball, pad.h, pad.ry);	
+	{
+		bounce(padSide.Right, ball, pad.h, pad.ry);
+		return "blue";
+	}
 	else if (hit(pad.lx, pad.ly))
+	{
 		bounce(padSide.Left, ball, pad.h, pad.ly);
+		return "orange";
+	}
+	return ball.color;
 }
 
 export default function collision(screen: ScreenSize, pad: Pad, ball: Ball) {
-	paddleHit(pad, ball);
+	const color = paddleHit(pad, ball);
 	wallHit(screen.h, screen.w, ball);
+	return (color);
 }

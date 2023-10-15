@@ -8,6 +8,7 @@ export interface Ball {
 	rad: number,
 	dx : number,
 	dy : number,
+	speedCap: number,
 	speed : number,
 	acc: number,
 }
@@ -27,16 +28,21 @@ export function init_ball(screen: ScreenSize) {
 
 	const dx = Math.sin(angle) * (rng(0, 1)? 1 : -1);
 	const dy = -Math.cos(angle);
+	const speedCap = 70;
 	const speed = 15;
 	const acc = 4;
 
-	return {color, x, y, rad, dx, dy, speed, acc};
+	return {color, x, y, rad, dx, dy, speedCap, speed, acc};
 }
 
 export function drawBall(ctx: CanvasRenderingContext2D, ball: Ball) {
-	ctx.fillStyle = ball.color;
 	ctx.beginPath();
+	ctx.fillStyle = "black";
 	ctx.arc(ball.x, ball.y, ball.rad, 0, 2 * Math.PI);
+	ctx.fill();
+	ctx.beginPath();
+	ctx.fillStyle = ball.color;
+	ctx.arc(ball.x, ball.y, ball.rad - 5, 0, 2 * Math.PI);
 	ctx.fill();
 }
 

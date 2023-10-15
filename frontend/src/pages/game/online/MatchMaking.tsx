@@ -70,7 +70,6 @@ export default function MatchMaking({ mode, setPlayers, setSetting, defy, setDef
 	return (
 		<div>
 			<OnlineGame socket={socket} setScore={setScore} side={side} />
-			<Button className="get_ready" onClick={getState}>get State</Button>
 		</div>
 	)
 }

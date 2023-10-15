@@ -32,6 +32,17 @@ export function drawPaddle (ctx: CanvasRenderingContext2D, pad: Pad) {
 	ctx.fill();
 }
 
+function splatDrawPaddle (ctx: CanvasRenderingContext2D, x: number, y: number, pad: Pad, color: string) {
+	ctx.fillStyle = "black";
+	ctx.beginPath();
+	ctx.rect(x, y, pad.w , pad.h);
+	ctx.fill();
+	ctx.fillStyle = color;
+	ctx.beginPath();
+	ctx.rect(x + 5, y + 5, pad.w - 10, pad.h - 10);
+	ctx.fill();
+}
+
 export function clearBehind(ctx: CanvasRenderingContext2D, pad: Pad) {
 	ctx.clearRect(pad.lx - pad.w , pad.ly, pad.w, pad.h);
 	ctx.clearRect(pad.rx + 2 * pad.w , pad.ry, pad.w, pad.h);
@@ -81,6 +92,37 @@ function movement(height: number, pad: Pad) {
 		pad.ly += speed;
 }
 
+export function splatHandlePaddleGetReady(ctx: CanvasRenderingContext2D, pad: Pad, ready: boolean[], setLeftReady: Function, setRightReady: Function) {
+	const height = ctx.canvas.height;
+	const borderGap: number = height * 0.006;
+	const speed: number = height * 0.02;
+
+	if (rightKey.length !== 0)
+	{
+		setRightReady("border-green-500");
+		ready[1] = true;
+	}
+	if (leftKey.length !== 0)
+	{
+		setLeftReady("border-green-500");
+		ready[0] = true;
+	}
+
+
+	if (rightKey[0] === "ArrowUp" && pad.ry >= borderGap)
+		pad.ry -= speed;
+	else if (rightKey[0] === "ArrowDown" && pad.ry <= height - pad.h - borderGap)
+		pad.ry += speed;
+	
+	if (leftKey[0] === "w" && pad.ly >= borderGap)
+		pad.ly -= speed;
+	else if (leftKey[0] === "s" && pad.ly <= height - pad.h - borderGap)
+		pad.ly += speed;
+
+	splatDrawPaddle(ctx, pad.rx, pad.ry, pad, "blue");
+	splatDrawPaddle(ctx, pad.lx, pad.ly, pad, "orange");
+}
+
 export function handlePaddleGetReady(ctx: CanvasRenderingContext2D, pad: Pad, ready: boolean[], setLeftReady: Function, setRightReady: Function) {
 	const height = ctx.canvas.height;
 	const borderGap: number = height * 0.006;
@@ -109,6 +151,12 @@ export function handlePaddleGetReady(ctx: CanvasRenderingContext2D, pad: Pad, re
 		pad.ly += speed;
 
 	drawPaddle(ctx, pad);
+}
+
+export function splatHandlePaddle(ctx: CanvasRenderingContext2D, pad: Pad) {
+	movement(ctx.canvas.height, pad);
+	splatDrawPaddle(ctx, pad.rx, pad.ry, pad, "blue");
+	splatDrawPaddle(ctx, pad.lx, pad.ly, pad, "orange");
 }
 
 export default function handlePaddle(ctx: CanvasRenderingContext2D, pad: Pad) {
