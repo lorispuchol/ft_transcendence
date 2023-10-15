@@ -1,6 +1,7 @@
 import { GetRequest } from "../../utils/Request";
 import { logError, logSuccess, logWarn } from "../../chat/Chat";
 import { useNavigate } from "react-router-dom";
+import { Logout } from "@mui/icons-material";
 
 interface LeaveButtonProps {
 	chanName: string,
@@ -31,8 +32,9 @@ export function LeaveButton({ chanName }: LeaveButtonProps) {
 		});
 	}
 	return (
-		<button className="btn btn-secondary" onClick={leave}>
-			<p>LEAVE</p>
+		<button className="h-12 w-10/12 text-white btn leave-button" onClick={leave}>
+			<p>LEAVE </p>
+			<Logout />
 		</button>
 	);
 }

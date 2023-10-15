@@ -73,6 +73,9 @@ hr {
 	background-color: #323C58;
 	box-shadow: inset 0 0 5px #000000;
 	order: 1;
+	overflow: hidden;
+	overflow: scroll;
+	flex-direction: column;
 	::-webkit-scrollbar {
 		display: none;
 	}
@@ -112,8 +115,13 @@ hr {
 }
 
 .send-button {
-	background-color: #786fa6 !important;
-	border-color: white;
+	background-color: c.$primary !important;
+	border-width: 2px !important;
+	border-color: c.$secondary
+}
+
+.send-button:hover {
+	border-color: rgb(241 245 249) !important;
 }
 
 /* ////////////////////////////////  ListMember  //////////////////////////// */
@@ -159,4 +167,14 @@ hr {
   
 .profile-module {
 	animation: rollout 0.4s;
+}
+
+.leave-button {
+	background-color: rgb(234, 78, 78) !important;
+	border-width: 2px !important;
+	border-color: rgb(144, 49, 49);
+}
+
+.leave-button:hover {
+	border-color: rgb(241 245 249) !important;
 }

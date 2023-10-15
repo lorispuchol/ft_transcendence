@@ -58,7 +58,7 @@ function JoinButton ({channelName, mode, password}: JoinButtonProps) {
 	}
 
 	return (
-		<button onClick={join} className="w-fit btn btn-active bg-white btn-neutral hover:bg-purple-900 m-0">JOIN</button>
+		<button onClick={join} className="w-fit btn bg-purple-700 hover:bg-purple-900 btn-neutral">JOIN</button>
 	)
 }
 
@@ -145,7 +145,7 @@ function Create() {
 						<FormControlLabel value={ChanMode.PRIVATE} control={<Radio color="default"/>} label="Private" />
 						<FormControlLabel value={ChanMode.PROTECTED} control={<Radio color="default"/>} label="Protected by a password" />
 					</RadioGroup>
-					<button className="w-full h-14 btn btn-active text-slate-200 bg-purple-900 btn-neutral hover:bg-purple-700" type="submit" ><Add/></button>
+					<button className="w-full h-14 btn text-slate-200 bg-purple-900 btn-neutral hover:bg-purple-700" type="submit" ><Add/></button>
 				</form>
 			</FormControl>
 		</div>

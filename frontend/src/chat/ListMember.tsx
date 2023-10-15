@@ -180,7 +180,7 @@ export default function ListMembers({chan}: ListMembersProps) {
 
 	return (
 		<div>
-			{owner.length ? <p className="w-full flex flex-row items-center justify-center uppercase">{owner[0].channel.mode}</p> : null}
+			{owner.length ? <p className="w-full flex flex-row items-center justify-center uppercase font-bold text-xl">{owner[0].channel.mode}</p> : null}
 			{owner.length ? <p>Owner</p> : null}
 			{
 				owner.map((own) => 
@@ -200,19 +200,23 @@ export default function ListMembers({chan}: ListMembersProps) {
 				})
 			}
 			<div>
-				<hr className="my-5"/>
+				<hr className="mt-5 mb-3"/>
 				<InviteModule chan={chan} />
-				<hr className="my-5"/>
-				{userParticipant.distinction === MemberDistinc.OWNER
-					&& <ChangeAccessibility 
+				{userParticipant.distinction === MemberDistinc.OWNER && (
+					<div>
+						<hr className="mt-5 mb-3"/>
+						<ChangeAccessibility 
 							channel={owner[0].channel} 
 							newMode={owner[0].channel.mode === ChanMode.PUBLIC ? ChanMode.PRIVATE : ChanMode.PUBLIC}
 							reRenderList={reRenderList}
 							setRerenderList={setRerenderList}
 						/>
-				}
+					</div>
+				)}
 				<hr className="my-5"/>
-				<LeaveButton chanName={chan}/>
+				<div className="w-full flex flex-col items-center justify-center">
+					<LeaveButton chanName={chan}/>
+				</div>
 			</div>
 		</div>
 	)
