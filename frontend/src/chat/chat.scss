@@ -112,8 +112,13 @@ hr {
 }
 
 .send-button {
-	background-color: #786fa6 !important;
-	border-color: white;
+	background-color: c.$primary !important;
+	border-width: 2px !important;
+	border-color: c.$secondary
+}
+
+.send-button:hover {
+	border-color: rgb(241 245 249) !important;
 }
 
 /* ////////////////////////////////  ListMember  //////////////////////////// */
@@ -159,4 +164,35 @@ hr {
   
 .profile-module {
 	animation: rollout 0.4s;
+}
+
+.leave-button {
+	background-color: rgb(234, 78, 78) !important;
+	border-width: 2px !important;
+	border-color: rgb(144, 49, 49);
+}
+
+.leave-button:hover {
+	border-color: rgb(241 245 249) !important;
+}
+
+.control-group-buttons {
+	display: flex;
+	flex-direction: row;
+	width: 100%;
+	justify-content: space-around;
+	align-items: center;
+	flex-wrap: wrap;
+	margin-top: 2rem;
+}
+
+.control-group-buttons > button {
+	margin: 5px;
+	background-color: c.$primary !important;
+	border-width: 2px !important;
+	border-color: c.$secondary;
+	color: rgb(255 255 255);
+}
+.control-group-buttons > button:hover {
+	border-color: rgb(241 245 249) !important;
 }

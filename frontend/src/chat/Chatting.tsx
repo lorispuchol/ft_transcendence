@@ -94,9 +94,9 @@ function MessageInput({ chan }: MessagesProps) {
 	};
 
 	return (
-		<form onSubmit={submitForm}>
-			<input autoFocus value={value} placeholder="type" onChange={(e) => {setValue(e.currentTarget.value);}} />
-			<button className="btn send-button rounded-full w-12" type="submit"><Send /></button>
+		<form className="w-full flex flex-row justify-center mt-2 mb-1 items-center" onSubmit={submitForm}>
+			<input className="input h-10 bg-neutral-200 w-9/12 mx-1" autoFocus value={value} placeholder="type" onChange={(e) => {setValue(e.currentTarget.value);}} />
+			<button className="btn send-button rounded-full h-14 w-14 mx-1" type="submit"><Send style={{ color: 'white' }}/></button>
 		</form>
 	);
 }

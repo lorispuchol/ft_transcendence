@@ -9,3 +9,4 @@ export const SetRerenderListContext = createContext<Function>(() => {});
 export const RerenderListContext = createContext<number>(0);
 export const SetDisplayMemberContext = createContext<Function>(() => {});
 export const DisplayMemberContext = createContext<UserData | null>(null);
+export const SetSettingsContext = createContext<Function>(() => {});

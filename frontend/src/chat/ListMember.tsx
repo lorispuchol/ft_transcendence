@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { GetRequest } from "../utils/Request";
 import ErrorHandling from "../utils/Error";
 import Loading from "../utils/Loading";
-import { ChanMode, MemberDistinc, ParticipantData, UserData } from "./interfaceData";
+import { ChanMode, ChannelData, MemberDistinc, ParticipantData, UserData } from "./interfaceData";
 import { defaultAvatar } from "../pages/Profile/Profile";
 import { Avatar, Paper } from "@mui/material";
 import UserStatus from "../components/user/UserStatus";
@@ -15,7 +15,7 @@ import { logInfo } from "./Chat";
 import { DisplayMemberContext, RerenderListContext, SetDisplayMemberContext, SetRerenderListContext, UserContext } from "../utils/Context";
 import './chat.scss'
 import '../components/user/user.scss'
-import { ArrowForward, VolumeOff } from "@mui/icons-material";
+import { ArrowForward, SettingsApplications, VolumeOff } from "@mui/icons-material";
 import { ControlButton } from "../components/ChatButton/ControlButtons";
 import { MuteButton } from "../components/ChatButton/MuteButton";
 import { InviteModule } from "../components/ChatButton/InviteModule";
@@ -45,6 +45,8 @@ interface ProfileProps {
 }
 interface ListMembersProps {
 	chan: string
+	settings: boolean,
+	setSettings: Function,
 }
 
 function log(message: string) {
@@ -94,7 +96,7 @@ function Member({ member, userPart, memberPart}: MemberProps) {
 			<button onClick={close}><ArrowForward /></button>
 			<Profile member={member} isDm={false} />
 			{control && (
-				<div className="flex flex-row items-center justify-center my-8 flex-wrap">
+				<div className="control-group-buttons">
 					<ControlButton memberPart={memberPart} distinction={MemberDistinc.KICK} />
 					<ControlButton memberPart={memberPart} distinction={MemberDistinc.BANNED}/>
 					{memberPart.distinction === MemberDistinc.ADMIN ?  
@@ -135,7 +137,7 @@ function MemberButton({ member, setDisplayProfile, muted}: MemberButtonProps) {
 	)
 }
 
-export default function ListMembers({chan}: ListMembersProps) {
+export default function ListMembers({ chan, settings, setSettings }: ListMembersProps) {
 
 	const user = useContext(UserContext);
 	const isDm: boolean = chan.includes("+");
@@ -158,6 +160,11 @@ export default function ListMembers({chan}: ListMembersProps) {
 	const owner: ParticipantData[] = response.data.filter((member) => member.distinction === 3)!;
 	const admins: ParticipantData[] = response.data.filter((member) => member.distinction === 2)!;
 	const members: ParticipantData[] = response.data.filter((member) => member.distinction === 1)!;
+
+	function closeSettings() {
+		setSettings(false);
+		setRerenderList(reRenderList + 1);
+	}
 	
 	if (isDm)
 		if (response.data[0].user.id !== userParticipant.user.id)
@@ -177,43 +184,59 @@ export default function ListMembers({chan}: ListMembersProps) {
 			</SetRerenderListContext.Provider>
 		)
 	}
-
-	return (
-		<div>
-			{owner.length ? <p className="w-full flex flex-row items-center justify-center uppercase">{owner[0].channel.mode}</p> : null}
-			{owner.length ? <p>Owner</p> : null}
-			{
-				owner.map((own) => 
-					<MemberButton member={own.user} setDisplayProfile={setDisplayProfile} muted={false} key={own.user.login}/>
-				)
-			}
-			{admins.length ? <p>Admins</p> : null}
-			{
-				admins.map((admin) =>
-					<MemberButton member={admin.user} setDisplayProfile={setDisplayProfile} muted={(new Date(admin.muteDate) as any).getTime() > new Date().getTime()} key={admin.user.login} />
-				)
-			}
-			{members.length ? <p>Members</p> : null}
-			{
-				members.map((member) => {
-					return <MemberButton member={member.user} setDisplayProfile={setDisplayProfile} muted={(new Date(member.muteDate) as any).getTime() > new Date().getTime()} key={member.user.login} />
-				})
-			}
-			<div>
-				<hr className="my-5"/>
+	if (settings) {
+		return (
+			<div className="profile-module">
+				<button onClick={closeSettings}><ArrowForward /></button>
+				<p className="w-full flex flex-row items-center justify-center uppercase font-bold text-xl">{owner[0].channel.mode}</p>
+				<hr className="mt-3 mb-3"/>
 				<InviteModule chan={chan} />
-				<hr className="my-5"/>
-				{userParticipant.distinction === MemberDistinc.OWNER
-					&& <ChangeAccessibility 
+				{userParticipant.distinction === MemberDistinc.OWNER && (
+					<div>
+						<hr className="mt-5 mb-3"/>
+						<ChangeAccessibility 
 							channel={owner[0].channel} 
 							newMode={owner[0].channel.mode === ChanMode.PUBLIC ? ChanMode.PRIVATE : ChanMode.PUBLIC}
 							reRenderList={reRenderList}
 							setRerenderList={setRerenderList}
 						/>
+					</div>
+				)}
+				<hr className="my-5"/>
+				<div className="w-full flex flex-col items-center justify-center">
+					<LeaveButton chanName={chan}/>
+				</div>
+			</div>
+		)
+	}
+	else {
+		return (
+			<div>
+				{owner.length ? <p className="w-full flex flex-row items-center justify-center uppercase font-bold text-xl">{owner[0].channel.mode}</p> : null}
+				{owner.length ? <p>Owner</p> : null}
+				{
+					owner.map((own) => 
+						<MemberButton member={own.user} setDisplayProfile={setDisplayProfile} muted={false} key={own.user.login}/>
+					)
+				}
+				{admins.length ? <p>Admins</p> : null}
+				{
+					admins.map((admin) =>
+						<MemberButton member={admin.user} setDisplayProfile={setDisplayProfile} muted={(new Date(admin.muteDate) as any).getTime() > new Date().getTime()} key={admin.user.login} />
+					)
+				}
+				{members.length ? <p>Members</p> : null}
+				{
+					members.map((member) => {
+						return <MemberButton member={member.user} setDisplayProfile={setDisplayProfile} muted={(new Date(member.muteDate) as any).getTime() > new Date().getTime()} key={member.user.login} />
+					})
 				}
 				<hr className="my-5"/>
-				<LeaveButton chanName={chan}/>
+				<button className="w-full btn send-button text-white" onClick={() => setSettings(true)}>
+					<p>SETTINGS</p>
+					<SettingsApplications />
+				</button>
 			</div>
-		</div>
-	)
+		)
+	}
 }

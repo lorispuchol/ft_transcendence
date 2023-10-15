@@ -58,7 +58,7 @@ function JoinButton ({channelName, mode, password}: JoinButtonProps) {
 	}
 
 	return (
-		<button onClick={join} className="w-fit btn btn-active bg-white btn-neutral hover:bg-purple-900 m-0">JOIN</button>
+		<button onClick={join} className="w-fit btn bg-purple-700 hover:bg-purple-900 btn-neutral">JOIN</button>
 	)
 }
 
@@ -145,7 +145,7 @@ function Create() {
 						<FormControlLabel value={ChanMode.PRIVATE} control={<Radio color="default"/>} label="Private" />
 						<FormControlLabel value={ChanMode.PROTECTED} control={<Radio color="default"/>} label="Protected by a password" />
 					</RadioGroup>
-					<button className="w-full h-14 btn btn-active text-slate-200 bg-purple-900 btn-neutral hover:bg-purple-700" type="submit" ><Add/></button>
+					<button className="w-full h-14 btn text-slate-200 bg-purple-900 btn-neutral hover:bg-purple-700" type="submit" ><Add/></button>
 				</form>
 			</FormControl>
 		</div>
@@ -221,10 +221,10 @@ export default function ChannelNav() {
 	return (
 		<>
 			<div className="chan-nav">
-				<button className="tooltip btn btn-neutral h-1/3 w-1/3 m-5" data-tip="Explore Channels" onClick={() => setActivePopUp("explore")}>
+				<button className="tooltip btn send-button text-white h-1/3 w-1/3 m-5" data-tip="Explore Channels" onClick={() => setActivePopUp("explore")}>
 					<TravelExplore sx={{ width: 64, height: 64 }}/>
 				</button>
-				<button className="tooltip btn btn-neutral h-1/3 w-1/3 m-5" data-tip="Create Channel" onClick={() => setActivePopUp("create")}>
+				<button className="tooltip btn send-button text-white h-1/3 w-1/3 m-5" data-tip="Create Channel" onClick={() => setActivePopUp("create")}>
 					<AddCircleOutline sx={{ width: 64, height: 64 }}/>
 				</button>
 				{

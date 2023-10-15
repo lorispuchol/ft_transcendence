@@ -30,6 +30,7 @@ export class NewChannelWithPassword {
 	@IsNotEmpty()
 	@IsString()
 	@IsStrongPassword({minLength: 8, minLowercase: 1, minNumbers: 1, minUppercase: 1, minSymbols: 0})
+	@MaxLength(30)
 	password: string;
 
 	@IsEnum(ChanMode)
@@ -52,6 +53,7 @@ export class SetPasswordChannel {
 	@IsNotEmpty()
 	@IsString()
 	@IsStrongPassword({minLength: 8, minLowercase: 1, minNumbers: 1, minUppercase: 1, minSymbols: 0})
+	@MaxLength(30)
 	newPw: string;
 }
 
@@ -60,6 +62,7 @@ export class AddPwChan {
 	@IsNotEmpty()
 	@IsString()
 	@IsStrongPassword({minLength: 8, minLowercase: 1, minNumbers: 1, minUppercase: 1, minSymbols: 0})
+	@MaxLength(30)
 	newPw: string;
 }
 

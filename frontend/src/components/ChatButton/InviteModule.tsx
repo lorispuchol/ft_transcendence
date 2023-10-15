@@ -33,11 +33,12 @@ export function InviteModule({chan}: InviteButtonProps) {
 	};
 
 	return (
-		<div>
-			<form onSubmit={invite}>
-				<input className="w-full" value={guestUsername} placeholder="Username" onChange={(e) => {setGuest(e.currentTarget.value);}} />
-				<button className="btn" type="submit">INVITE</button>
-			</form>
-		</div>
+		<form className="flex flex-col justify-start items-center"onSubmit={invite}>
+			<p className="font-bold text-lg">Invitation</p>
+			<div className="flex w-full flex-col items-center justify-center">
+				<input className="input w-10/12 h-8 bg-neutral-100 m-2" value={guestUsername} placeholder="Username" onChange={(e) => {setGuest(e.currentTarget.value);}} />
+				<button className="btn w-10/12 h-12 send-button text-white" type="submit">INVITE</button>
+			</div>
+		</form>
 	);
 }
