@@ -3,6 +3,7 @@ import { MemberDistinc, ParticipantData } from "../../chat/interfaceData";
 import { PostRequest } from "../../utils/Request";
 import { logError, logSuccess, logWarn } from "../../chat/Chat";
 import { RerenderListContext, SetDisplayMemberContext, SetRerenderListContext } from "../../utils/Context";
+import { ArrowCircleDown, ArrowCircleUp, KeyboardDoubleArrowDown, KeyboardDoubleArrowUp } from "@mui/icons-material";
 
 interface ControlButtonProps {
 	memberPart: ParticipantData,
@@ -37,8 +38,8 @@ export function ControlButton({ memberPart, distinction }: ControlButtonProps) {
 		<button className="btn" onClick={changeDistinction}>
 			{distinction === MemberDistinc.BANNED && <p>BAN</p>}
 			{distinction === MemberDistinc.KICK && <p>KICK</p>}
-			{distinction === MemberDistinc.MEMBER && <p>DEGRADE AS MEMBER</p>}
-			{distinction === MemberDistinc.ADMIN && <p>UPGRADE AS ADMIN</p>}
+			{distinction === MemberDistinc.MEMBER && <p>DEGRADE AS MEMBER <KeyboardDoubleArrowDown/></p>}
+			{distinction === MemberDistinc.ADMIN && <p>UPGRADE AS ADMIN <KeyboardDoubleArrowUp/></p>}
 		</button>
 	);
 }

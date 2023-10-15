@@ -221,10 +221,10 @@ export default function ChannelNav() {
 	return (
 		<>
 			<div className="chan-nav">
-				<button className="tooltip btn btn-neutral h-1/3 w-1/3 m-5" data-tip="Explore Channels" onClick={() => setActivePopUp("explore")}>
+				<button className="tooltip btn send-button text-white h-1/3 w-1/3 m-5" data-tip="Explore Channels" onClick={() => setActivePopUp("explore")}>
 					<TravelExplore sx={{ width: 64, height: 64 }}/>
 				</button>
-				<button className="tooltip btn btn-neutral h-1/3 w-1/3 m-5" data-tip="Create Channel" onClick={() => setActivePopUp("create")}>
+				<button className="tooltip btn send-button text-white h-1/3 w-1/3 m-5" data-tip="Create Channel" onClick={() => setActivePopUp("create")}>
 					<AddCircleOutline sx={{ width: 64, height: 64 }}/>
 				</button>
 				{

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ChanMode, ChannelData } from "../../chat/interfaceData";
-import { FormControl, FormControlLabel, FormGroup, FormLabel, Radio, RadioGroup } from "@mui/material";
+import { FormControl, FormControlLabel, FormGroup, Radio, RadioGroup } from "@mui/material";
 import { PostRequest } from "../../utils/Request";
 import { logError, logSuccess, logWarn } from "../../chat/Chat";
 
