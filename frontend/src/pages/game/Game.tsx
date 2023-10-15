@@ -1,5 +1,5 @@
 import './Game.scss';
-import { Chip, Paper } from "@mui/material";
+import { Paper } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import GameMenu from "./GameMenu";
 import bird from "./bird.png";
@@ -48,7 +48,6 @@ function PlayerCard( { player, score }: { player: Player, score: number }) {
 	});
 
 	useEffect(() => {
-		console.log(score);
 		if (!user.id)
 			return ;
 		GetRequest("/user/profile/id/" + user.id).then((response: Response) => {
@@ -66,7 +65,7 @@ function PlayerCard( { player, score }: { player: Player, score: number }) {
 		<Paper className="player_card in_game_card">
 			<img src={user.avatar} alt="avatar" />
 			<div className="score">{score}</div>
-			<Chip label={user.username}/>
+			<strong className='score text-[2vw]'>{user.username}</strong>
 			<div/>
 		</Paper>
 	);

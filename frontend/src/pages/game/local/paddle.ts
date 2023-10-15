@@ -1,5 +1,6 @@
 import { teritaryColor } from "../../../style/color";
 import { ScreenSize } from "./LocalGame";
+import { p1Color, p2Color } from "./localSplatong";
 
 export interface Pad {
 	w: number,
@@ -119,8 +120,8 @@ export function splatHandlePaddleGetReady(ctx: CanvasRenderingContext2D, pad: Pa
 	else if (leftKey[0] === "s" && pad.ly <= height - pad.h - borderGap)
 		pad.ly += speed;
 
-	splatDrawPaddle(ctx, pad.rx, pad.ry, pad, "blue");
-	splatDrawPaddle(ctx, pad.lx, pad.ly, pad, "orange");
+	splatDrawPaddle(ctx, pad.rx, pad.ry, pad, p2Color);
+	splatDrawPaddle(ctx, pad.lx, pad.ly, pad, p1Color);
 }
 
 export function handlePaddleGetReady(ctx: CanvasRenderingContext2D, pad: Pad, ready: boolean[], setLeftReady: Function, setRightReady: Function) {
@@ -155,8 +156,8 @@ export function handlePaddleGetReady(ctx: CanvasRenderingContext2D, pad: Pad, re
 
 export function splatHandlePaddle(ctx: CanvasRenderingContext2D, pad: Pad) {
 	movement(ctx.canvas.height, pad);
-	splatDrawPaddle(ctx, pad.rx, pad.ry, pad, "blue");
-	splatDrawPaddle(ctx, pad.lx, pad.ly, pad, "orange");
+	splatDrawPaddle(ctx, pad.rx, pad.ry, pad, p2Color);
+	splatDrawPaddle(ctx, pad.lx, pad.ly, pad, p1Color);
 }
 
 export default function handlePaddle(ctx: CanvasRenderingContext2D, pad: Pad) {

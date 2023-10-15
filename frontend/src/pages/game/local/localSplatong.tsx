@@ -5,43 +5,21 @@ import { Pad, handleKey, init_paddle, splatHandlePaddle, splatHandlePaddleGetRea
 import handleBall, { Ball, drawBall, init_ball } from "./ball";
 import collision, { clamp } from "./collision";
 import { countDown } from "./countDown";
-import { ArrowDownward } from "@mui/icons-material";
-
 
 export interface ScreenSize {
 	w: number,
 	h: number
 }
 
-function drawBackground(ctx: CanvasRenderingContext2D, screen: ScreenSize, background: number[][]) {
-	let x: number = 0;
-	let y: number = 0;
-	let color: number = 0;
-	while (x < 25)
-	{
-		y = 0;
-		while (y < 25)
-		{
-			color = background[y][x]
-			if (color === 1)
-				ctx.fillStyle = "orange";
-			else if (color === 2)
-				ctx.fillStyle = "blue";
-			else
-				ctx.fillStyle = "white";	
-			ctx.fillRect(x * 128, y * 72, 1280, 720);
-			y++;
-		}
-		x++;
-	}
-}
+export const p1Color = "orange";
+export const p2Color = "blue";
 
 function colorTomatrix(color: string) {
 	switch (color)
 	{
-		case "orange":
+		case p1Color:
 			return 1;
-		case "blue":
+		case p2Color:
 			return 2;
 		default:
 			return 0;
@@ -57,31 +35,56 @@ export default function LocalSplatong( { setPlayers, setScore }: any ) {
 	
 	
 	useEffect(() => {
-		setPlayers({p1: {id: 0, username: "Player 1"}, p2: {id: 0, username: "Player 2"}});
+		setPlayers({p1: {id: 0, username: p1Color}, p2: {id: 0, username: p2Color}});
 		
-		const gameDuration: number = 60;
+		const gameDuration: number = 5;
 		setScore({p1: gameDuration, p2: gameDuration});
 		
 		const ctx = canvasRef!.current!.getContext('2d')!;
 		const screen = {w: 3200, h: 1800}
 		ctx.canvas.width = screen.w;
 		ctx.canvas.height = screen.h;
-		
+
 		const [idKey] = handleKey();
 		const ball : Ball = init_ball(screen);
 		ball.speedCap = 45;
-		ball.color = "black";
 		const paddle: Pad = init_paddle(screen);
 	
-		const background: number[][] = Array.from({length: 25}, () => Array.from({length: 25}, () => 0));
+		const cell: number = 25;
+		const cellSize: {w: number, h: number} = {w: screen.w / cell, h: screen.h / cell};
+		const background: number[][] = Array.from({length: cell}, () => Array.from({length: cell}, () => 0));
+		
 		let animationFrameId: number;
 		let endTime: number;
 		let now: number;
 		
+		function drawBackground() {
+	
+			let x: number = 0;
+			let y: number = 0;
+			let color: number = 0;
+			while (x < cell)
+			{
+				y = 0;
+				while (y < cell)
+				{
+					color = background[y][x]
+					if (color === 1)
+						ctx.fillStyle = p1Color;
+					else if (color === 2)
+						ctx.fillStyle = p2Color;
+					else
+						ctx.fillStyle = "white";	
+					ctx.fillRect(x * cellSize.w, y * cellSize.h, cellSize.w, cellSize.h);
+					y++;
+				}
+				x++;
+			}
+		}
 
 		let ready: boolean[] = [false, false];
 		function renderReady() {
-			drawBackground(ctx, screen, background);
+			drawBackground();
 			splatHandlePaddleGetReady(ctx, paddle, ready, setLeftReady, setRightReady);
 			drawBall(ctx, ball);
 			if (ready[0] && ready[1])
@@ -96,7 +99,7 @@ export default function LocalSplatong( { setPlayers, setScore }: any ) {
 		}
 		
 		function renderRoundStart() {
-			drawBackground(ctx, screen, background);
+			drawBackground();
 			splatHandlePaddle(ctx, paddle);
 			drawBall(ctx, ball);
 			if (countDown(ctx, now, 500))
@@ -106,15 +109,40 @@ export default function LocalSplatong( { setPlayers, setScore }: any ) {
 		}
 
 		function renderEnd() {
-			setWinner("player 1 win");
-			setWinner("player 2 win");
+			let p1Score: number = 0;
+			let p2Score: number = 0;
+			let x: number = 0;
+			let y: number = 0;
+			let color: number = 0;
+			while (x < cell)
+			{
+				y = 0;
+				while (y < cell)
+				{
+					color = background[y][x]
+					if (color === 1)
+						p1Score++;
+					else if (color === 2)
+						p2Score++;	
+					y++;
+				}
+				x++;
+			}
+			if (p1Score > p2Score)
+				setWinner(p1Color + " win");
+			else if (p2Score > p1Score)
+				setWinner(p2Color + " win");
+			else
+				setWinner("wtf les amis")
 		}
 
-		function xMatrix() {return (clamp(Math.round(ball.x / 128), 0, 24))}
-		function yMatrix() {return (clamp(Math.round(ball.y / 72), 0, 24))}
+		const widthRatio = 1 / cellSize.w;
+		const heighRatio = 1 / cellSize.h;
+		function xMatrix() {return (clamp(Math.floor(ball.x * widthRatio), 0, cell - 1))}
+		function yMatrix() {return (clamp(Math.floor(ball.y * heighRatio), 0, cell - 1))}
 
 		function render() {
-			drawBackground(ctx, screen, background);
+			drawBackground();
 			splatHandlePaddle(ctx, paddle);
 			ball.color = collision(screen, paddle, ball);
 			handleBall(ctx, ball);

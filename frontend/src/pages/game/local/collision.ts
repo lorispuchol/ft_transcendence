@@ -1,5 +1,6 @@
 import { ScreenSize } from "./LocalGame";
 import { Ball } from "./ball";
+import { p1Color, p2Color } from "./localSplatong";
 import { Pad } from "./paddle";
 
 export const clamp = (num: number, min: number, max: number) => Math.min(Math.max(num, min), max);
@@ -47,12 +48,12 @@ function paddleHit(pad: Pad, ball: Ball) {
 	if (hit(pad.rx, pad.ry))
 	{
 		bounce(padSide.Right, ball, pad.h, pad.ry);
-		return "blue";
+		return p2Color;
 	}
 	else if (hit(pad.lx, pad.ly))
 	{
 		bounce(padSide.Left, ball, pad.h, pad.ly);
-		return "orange";
+		return p1Color;
 	}
 	return ball.color;
 }

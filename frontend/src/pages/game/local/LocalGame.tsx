@@ -90,7 +90,7 @@ export default function LocalGame( { setPlayers, setScore }: any ) {
 					animationFrameId = window.requestAnimationFrame(renderEnd);
 					return ;
 				}
-				ctx.clearRect(0,0,screen.w, screen.h);
+				ctx.clearRect(0, 0, screen.w, screen.h);
 				roundStart = countDown(ctx, now, 500);
 				handlePaddle(ctx, paddle);
 				drawBall(ctx, ball);
