@@ -12,10 +12,11 @@ interface Props {
 	setSetting: Function,
 	setPlayers: Function,
 	defy: number | null,
-	setDefy: Function
+	setDefy: Function,
+	setScore: Function
 }
 
-export default function MatchMaking({ mode, setPlayers, setSetting, defy, setDefy }: Props) {
+export default function MatchMaking({ mode, setPlayers, setSetting, defy, setDefy, setScore }: Props) {
 	const [socket, setSocket]: [Socket | null, Function] = useState(null);
 	const [openent, setOpenent]: [boolean, Function] = useState(false);
 	const [side, setSide]: [number, Function] = useState(1);
@@ -68,8 +69,7 @@ export default function MatchMaking({ mode, setPlayers, setSetting, defy, setDef
 	
 	return (
 		<div>
-			<OnlineGame socket={socket} setPlayers={setPlayers} side={side} />
-			<Button className="get_ready" onClick={getState}>get State</Button>
+			<OnlineGame socket={socket} setScore={setScore} side={side} />
 		</div>
 	)
 }

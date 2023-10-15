@@ -1,7 +1,7 @@
 import { Button, ButtonGroup, CircularProgress, Paper } from "@mui/material";
 import DemoGame from "./local/DemoGame";
 import './GameMenu.scss';
-import { Public, RocketLaunch, SportsTennis, Weekend } from "@mui/icons-material";
+import { Brush, Public, SportsTennis, Weekend } from "@mui/icons-material";
 import { useContext, useEffect, useState } from "react";
 import { EventContext } from "../../utils/Context";
 
@@ -106,7 +106,7 @@ export default function GameMenu({ setSetting, setDefy }: MenuProps) {
 					<div className="border-t-2 border-inherit">
 						<ButtonGroup className="menu_select" orientation="vertical" variant="text">
 							<Button key="classic" className={focus("classic")} onClick={() => setMode("classic")}><SportsTennis />classic</Button>
-							<Button key="turbo" className={focus("turbo")} onClick={() => setMode("turbo")}><RocketLaunch />turbo</Button>
+							<Button key="turbo" className={focus("turbo")} onClick={() => setMode("turbo")}><Brush />splatong</Button>
 						</ButtonGroup>
 					</div>
 					{waitResponse ?

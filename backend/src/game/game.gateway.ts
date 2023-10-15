@@ -3,7 +3,7 @@ import { JwtService } from "@nestjs/jwt";
 import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 import { client_url } from "src/auth/constants";
-import { PongGame } from "./game.service";
+import PongGame from "./game.classique";
 
 @WebSocketGateway({
 	namespace: "game",
@@ -12,7 +12,7 @@ import { PongGame } from "./game.service";
 export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 	constructor(
 		private jwtService: JwtService,
-		) {}
+	) {}
 		
 	private users: Map<Socket, number> = new Map();
 	private lobby: Map<number, PongGame> = new Map();
@@ -89,7 +89,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	@SubscribeMessage("input")
 	handleGameInput(@MessageBody() input: string | undefined, @ConnectedSocket() client: Socket) {
-		if (!input)
+		if (input == null)
 			return ;
 		const userId = this.users.get(client);
 		const instance = this.lobby.get(userId);

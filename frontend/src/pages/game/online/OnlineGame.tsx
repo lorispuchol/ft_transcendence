@@ -4,20 +4,20 @@ import "../Game.scss";
 import handlePaddle, { Pad, clearBehind, drawPaddle, handleKey, init_paddle } from "./paddle";
 import { Ball, drawBall, init_ball } from "../local/ball";
 import { countDown } from "../local/countDown";
-import { Players } from "../Game";
 import collision from "./collision";
+import DisplayWinner from "./winner";
 
 export interface ScreenSize {
 	w: number,
 	h: number
 }
 
-export default function OnlineGame( { socket, setPlayers, side }: any ) {
+export default function OnlineGame( { socket, setScore, side }: any ) {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
-	const [winner, setWinner]: [string, Function] = useState("");
+	const [winnerId, setWinnerId]: [number, Function] = useState(-1);
 	
 	useEffect(() => {
-		setWinner("");
+		setWinnerId(-1);
 		const ctx = canvasRef!.current!.getContext('2d')!;
 		const screen = {w: 3200, h: 1800}
 		ctx.canvas.width = screen.w;
@@ -45,11 +45,7 @@ export default function OnlineGame( { socket, setPlayers, side }: any ) {
 		function roundReset(data: any) {
 			window.cancelAnimationFrame(animationFrameId);
 			nextRoundTime = data.nextRound;
-			setPlayers((prev: Players) => {
-				return (
-					{p1: {...prev.p1, score: data.scoreP1},
-					p2: {...prev.p2, score: data.scoreP2}});
-				});
+			setScore({p1: data.scoreP1, p2: data.scoreP2});
 			Object.assign(paddle, init_paddle(screen, side));
 			Object.assign(ball, init_ball(screen));
 			now = Date.now();
@@ -58,9 +54,9 @@ export default function OnlineGame( { socket, setPlayers, side }: any ) {
 		}
 		socket.on("roundReset", roundReset);
 		
-		function gameEnd(winner: string) {
+		function gameEnd(winner: number) {
 			window.cancelAnimationFrame(animationFrameId);
-			setWinner(winner);
+			setWinnerId(winner);
 		}
 		socket.on("end", gameEnd);
 
@@ -92,11 +88,11 @@ export default function OnlineGame( { socket, setPlayers, side }: any ) {
 			document.removeEventListener("keydown", idKey[0]);
 			document.removeEventListener("keyup", idKey[1]);
 		});
-	}, [setPlayers, socket, side, setWinner]);
+	}, [setScore, socket, side, setWinnerId]);
 
 	return (
 			<div className="canvas_container">
-				<h1 className="get_ready left-[21vw] top-[20vw]">{winner}</h1>
+				<DisplayWinner winnerId={winnerId} />
 				<canvas id="pong" ref={canvasRef} className="classique"/>
 			</div>
 	);

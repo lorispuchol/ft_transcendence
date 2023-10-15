@@ -1,9 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { ValidationArguments, ValidatorConstraint } from "class-validator";
-// @ts-ignore
 import * as bcrypt from 'bcrypt';
 import { ChatService } from "./chat.service";
-import { Channel } from "./entities/channel.entity";
+import { ChanMode, Channel } from "./entities/channel.entity";
 
 @ValidatorConstraint({ async: true })
 @Injectable()
@@ -34,7 +33,7 @@ export class PasswordChannelMatch {
 	async validate(value: string, args: ValidationArguments) {
 		const log: any = args.object;
 		const channel: Channel = await this.chatService.findChanByName(log.channelName);
-		if (!channel || channel && channel.mode !== ChanMode.PROTECTED)
+		if (!channel || channel.mode !== ChanMode.PROTECTED)
 			return false;
 		const isMatch = await bcrypt.compare(log.password, channel.password);
 		if (!isMatch)
