@@ -12,7 +12,7 @@ export interface ScreenSize {
 }
 
 export const p1Color = "orange";
-export const p2Color = "blue";
+export const p2Color = "cyan";
 
 function colorTomatrix(color: string) {
 	switch (color)
@@ -37,7 +37,7 @@ export default function LocalSplatong( { setPlayers, setScore }: any ) {
 	useEffect(() => {
 		setPlayers({p1: {id: 0, username: p1Color}, p2: {id: 0, username: p2Color}});
 		
-		const gameDuration: number = 5;
+		const gameDuration: number = 30;
 		setScore({p1: gameDuration, p2: gameDuration});
 		
 		const ctx = canvasRef!.current!.getContext('2d')!;
