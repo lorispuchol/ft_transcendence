@@ -45,7 +45,7 @@ function WebSocket({ children }: {children: ReactElement}) {
 		// 	window.location.replace(client_url);
 		// }
 		// newSocket.on("disconnect", notConnected);
-
+		setConnected(true);
 		setSocket(newSocket);
 		return () => {newSocket.close()};
 	}, [setSocket, setConnected]);
