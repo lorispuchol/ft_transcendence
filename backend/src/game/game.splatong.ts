@@ -22,6 +22,7 @@ interface Ball {
 	dx : number,
 	dy : number,
 	speed : number,
+	speedCap: number,
 	acc: number,
 }
 
@@ -40,7 +41,7 @@ interface State {
 	ballDy: number,
 }
 
-export default class PongGame {
+export default class Splatong {
 	constructor(
 		private p1: number,
 		private socketP1: Socket,
@@ -49,46 +50,59 @@ export default class PongGame {
 	) {}
 
 	private intervalId: NodeJS.Timer;
+	private endIntervalId: NodeJS.Timer;
 	private timeoutId: NodeJS.Timeout;
 
 	private inputP1: string  = "";
 	private inputP2: string = "";
-	private scoreP1: number = 0;
-	private scoreP2: number = 0;
-	
+
 	private screen: ScreenSize = {w: 3200, h:1800};
 	private borderGap: number = this.screen.h * 0.006;
-	private winningScore: number = 3;
 	private gameEnded: boolean = false;
+
+	private gameDuration: number = 30;
+	private endTime: number = 0;
+	private coinflipLoser: number;
+	
+	private p1Cell = 1;
+	private p2Cell = 2;
+	private currentCell = 0;
+	private cell: number = 25;
+	private cellSize: {w: number, h: number} = {w: this.screen.w / this.cell, h: this.screen.h / this.cell};
+	private background: number[][] = Array.from({length: this.cell}, () => Array.from({length: this.cell}, () => 0));
 
 	private paddles: Pad = this.init_paddle();
 	private ball: Ball = this.init_ball(this.screen);
 
 	public start() {
-		this.clear();
 		const perSec = 1000 / 60;
 		const startDelay = 1000;
 		const startTime: number = Date.now() + startDelay;
-		this.socketP1.emit("roundReset", {scoreP1: this.scoreP1, scoreP2: this.scoreP2, nextRound: startTime});
-		this.socketP2.emit("roundReset", {scoreP1: this.scoreP1, scoreP2: this.scoreP2, nextRound: startTime});
-		if (this.checkWinner())
-			return ;
+		this.endTime = startTime + this.gameDuration * 1000;
+		this.socketP1.emit("roundStart", startTime);
+		this.socketP2.emit("roundStart", startTime);
 		this.timeoutId = setTimeout(() => {
 			this.intervalId = setInterval(() => this.update(this), perSec);
 		}, startDelay);
+		this.endIntervalId = setInterval(() => {this.checkEnd()}, 1000)
 	}
+
+	private widthRatio = 1 / this.cellSize.w;
+	private heighRatio = 1 / this.cellSize.h;
+	private xMatrix() {return (this.clamp(Math.floor(this.ball.x * this.widthRatio), 0, this.cell - 1))}
+	private yMatrix() {return (this.clamp(Math.floor(this.ball.y * this.heighRatio), 0, this.cell - 1))}
 
 	private update(self: this) {
 		self.movement(self.paddles);
 		self.collision();
 		self.handleBall(self.ball);
-		if (self.checkPoint())
-			return ;
+		self.background[this.yMatrix()][this.xMatrix()] = self.currentCell;
 		self.sendState();
 	}
 
 	public clear() {
 		clearInterval(this.intervalId);
+		clearInterval(this.endIntervalId);
 		clearTimeout(this.timeoutId);
 	}
 
@@ -135,34 +149,52 @@ export default class PongGame {
 
 	//////////////GAME LOGIC//////////////
 	
-	private checkWinner() {
-		if (this.scoreP1 != this.winningScore && this.scoreP2 != this.winningScore)
-			return 0;
-		this.gameEnded = true;
-
-		let winner: number = 0;
-		if (this.scoreP1 === this.winningScore)
-			winner = this.p1;
-		else
-			winner = this.p2;
-		
-		this.socketP1.emit("end", winner);
-		this.socketP2.emit("end", winner);
-		
-		return 1;
+	private checkEnd() {
+		if (this.endTime <= Date.now())
+		{
+			this.clear();
+			this.gameEnded = true;
+			this.sendWinner();
+		}
 	}
 
-	private checkPoint() {
-		const hitLeft = this.ball.x <= this.ball.rad;
-		const hitRight = this.ball.x >= (this.screen.w - this.ball.rad);
+	private sendWinner() {
+		let p1Score: number = 0;
+		let p2Score: number = 0;
+		let color: number = 0;
 	
-		if (!hitLeft && !hitRight)
-			return 0;
-		this.scoreP1 += +hitRight; 
-		this.scoreP2 += +hitLeft;
-		Object.assign(this.paddles, this.init_paddle());
-		Object.assign(this.ball, this.init_ball(this.screen));
-		this.start();
+		let x: number = 0;
+		let y: number = 0;
+		while (x < this.cell)
+		{
+			y = 0;
+			while (y < this.cell)
+			{
+				color = this.background[y][x]
+				if (color === this.p1Cell)
+					p1Score++;
+				else if (color === this.p2Cell)
+					p2Score++;	
+				y++;
+			}
+			x++;
+		}
+
+		let winner: number;
+		if (p1Score > p2Score)
+			winner = this.p1;
+		else if (p2Score > p1Score)
+			winner = this.p2;
+		else
+			winner = this.coinflipLoser;
+
+		p1Score = Math.floor(p1Score / (this.cell * this.cell / 100));
+		p2Score = Math.floor(p2Score / (this.cell * this.cell / 100))
+		const result = {winner, p1Score, p2Score}
+	
+		this.socketP1.emit("end", result);
+		this.socketP2.emit("end", result);
+
 		return 1;
 	}
 
@@ -207,11 +239,16 @@ export default class PongGame {
 		const angle = -Math.PI * 0.5 + (collidePoint * (Math.PI * -0.2) + Math.PI * 0.2);
 	
 		const dx = Math.sin(angle) * (this.rng(0, 1)? 1 : -1);
+		if (dx < 0)
+			this.coinflipLoser = this.p2;
+		else
+			this.coinflipLoser = this.p1;
 		const dy = -Math.cos(angle);
+		const speedCap = 45;
 		const speed = 15;
 		const acc = 4;
 	
-		return {x, y, rad, dx, dy, speed, acc};
+		return {x, y, rad, dx, dy, speedCap, speed, acc};
 	}
 
 	handleBall (ball: Ball) {
@@ -228,7 +265,7 @@ export default class PongGame {
 		collidePoint = this.clamp(collidePoint, 0, 1);
 		angle += (collidePoint * (Math.PI * -0.2) + Math.PI * 0.1);
 
-		if (ball.speed < 70)
+		if (ball.speed < ball.speedCap)
 			ball.speed += ball.acc;
 		ball.dx =  Math.abs(Math.sin(angle)) * side;
 		ball.dy = -Math.cos(angle);
@@ -251,9 +288,15 @@ export default class PongGame {
 			return (dx*dx + dy*dy <= ball.rad ** 2);
 		}
 		if (hit(pad.p1x, pad.p1y))
-			this.bounce(padSide.P1, ball, pad.h, pad.p1y);	
+		{
+			this.bounce(padSide.P1, ball, pad.h, pad.p1y);
+			this.currentCell = this.p1Cell;
+		}
 		else if (hit(pad.p2x, pad.p2y))
+		{
 			this.bounce(padSide.P2, ball, pad.h, pad.p2y);
+			this.currentCell = this.p2Cell;
+		}
 	}
 
 	private collision() {

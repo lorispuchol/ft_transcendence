@@ -4,9 +4,11 @@ import { Pad } from "./paddle";
 
 export const clamp = (num: number, min: number, max: number) => Math.min(Math.max(num, min), max);
 
-function wallHit(height: number, ball: Ball) {
+function wallHit(height: number, width: number, ball: Ball) {
 	if (ball.y >= (height - ball.rad) || ball.y <= ball.rad)
 		ball.dy *= -1;
+	if (ball.x >= (width - ball.rad) || ball.x <= ball.rad)
+		ball.dx *= -1;
 }
 
 function bounce(side: number, ball: Ball, ph: number, py:number) {
@@ -38,12 +40,20 @@ function paddleHit(side: number, pad: Pad, ball: Ball) {
 		return (dx*dx + dy*dy <= ball.rad ** 2);
 	}
 	if (hit(pad.ownX, pad.ownY))
-		bounce(side, ball, pad.h, pad.ownY);	
+	{
+		bounce(side, ball, pad.h, pad.ownY);
+		return (pad.ownColor);
+	}	
 	else if (hit(pad.opX, pad.opY))
+	{
 		bounce(-side, ball, pad.h, pad.opY);
+		return (pad.opColor);
+	}
+	return ball.color;
 }
 
 export default function collision(screen: ScreenSize, side: number, pad: Pad, ball: Ball) {
-	paddleHit(side, pad, ball);
-	wallHit(screen.h, ball);
+	const color = paddleHit(side, pad, ball);
+	wallHit(screen.h, screen.w, ball);
+	return color;
 }

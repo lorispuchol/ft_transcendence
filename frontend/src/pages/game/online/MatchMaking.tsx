@@ -6,6 +6,7 @@ import { Players } from "../Game";
 import { Button, CircularProgress, Paper } from "@mui/material";
 import OnlineGame from "./OnlineGame";
 import { UserContext } from "../../../utils/Context";
+import OnlineSplatong from "./onlineSplatong";
 
 interface Props {
 	mode: string,
@@ -37,7 +38,7 @@ export default function MatchMaking({ mode, setPlayers, setSetting, defy, setDef
 		newSocket.on("matchmaking", handleSearch);
 		if (defy)
 		{
-			newSocket.emit("defy", defy);
+			newSocket.emit("defy", {defyId: defy, mode});
 			setDefy(null);
 		}
 		else
@@ -69,7 +70,11 @@ export default function MatchMaking({ mode, setPlayers, setSetting, defy, setDef
 	
 	return (
 		<div>
-			<OnlineGame socket={socket} setScore={setScore} side={side} />
+			{ mode === "classic" ?
+				<OnlineGame socket={socket} setScore={setScore} side={side} />
+			:
+				<OnlineSplatong socket={socket} setScore={setScore} side={side} />
+			}
 		</div>
 	)
 }

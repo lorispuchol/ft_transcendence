@@ -25,7 +25,7 @@ export function init_paddle(screen: ScreenSize) {
 }
 
 
-export function drawPaddle (ctx: CanvasRenderingContext2D, pad: Pad) {
+function drawPaddle (ctx: CanvasRenderingContext2D, pad: Pad) {
 	ctx.fillStyle = teritaryColor;
 	ctx.beginPath();
 	ctx.rect(pad.lx, pad.ly, pad.w , pad.h);
@@ -35,13 +35,9 @@ export function drawPaddle (ctx: CanvasRenderingContext2D, pad: Pad) {
 
 function splatDrawPaddle (ctx: CanvasRenderingContext2D, x: number, y: number, pad: Pad, color: string) {
 	ctx.fillStyle = "black";
-	ctx.beginPath();
-	ctx.rect(x, y, pad.w , pad.h);
-	ctx.fill();
+	ctx.fillRect(x, y, pad.w , pad.h);
 	ctx.fillStyle = color;
-	ctx.beginPath();
-	ctx.rect(x + 5, y + 5, pad.w - 10, pad.h - 10);
-	ctx.fill();
+	ctx.fillRect(x + 5, y + 5, pad.w - 10, pad.h - 10);
 }
 
 export function clearBehind(ctx: CanvasRenderingContext2D, pad: Pad) {

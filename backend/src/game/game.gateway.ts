@@ -4,6 +4,7 @@ import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect,
 import { Server, Socket } from "socket.io";
 import { client_url } from "src/auth/constants";
 import PongGame from "./game.classique";
+import Splatong from "./game.splatong";
 
 @WebSocketGateway({
 	namespace: "game",
@@ -15,8 +16,8 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	) {}
 		
 	private users: Map<Socket, number> = new Map();
-	private lobby: Map<number, PongGame> = new Map();
-	private queue: Socket[] = [];
+	private lobby: Map<number, PongGame | Splatong> = new Map();
+	private queue: {socket: Socket, mode: string}[] = [];
 	private defyQueue: number[] = [];
 
 	afterInit(server: Server) {}
@@ -29,10 +30,10 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	handleDisconnect(client: Socket) {
 		const offId: number = this.users.get(client);
-		this.queue = this.queue.filter((socket) => socket.id !== client.id);
+		this.queue = this.queue.filter((elem) => elem.socket.id !== client.id);
 		this.defyQueue= this.defyQueue.filter((id) => id !== offId);
 		this.users.delete(client);
-		const instance: PongGame = this.lobby.get(offId);
+		const instance: PongGame | Splatong = this.lobby.get(offId);
 		if (instance) {
 			const otherPlayer = instance.handleDisconnect(offId);
 			instance.clear();
@@ -44,28 +45,42 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@SubscribeMessage("search")
 	async matchmaking(@MessageBody() mode: string, @ConnectedSocket() client: Socket) {
 		const userId = this.users.get(client);
+		
+		let openentSock: Socket;
+		this.queue = this.queue.filter((elem) => {
+			if (!openentSock && elem.mode === mode)
+			{
+				openentSock = elem.socket;
+				return 0;
+			}
+			return 1;
+		});
 
-		 if (!this.queue.length)
+		if (!openentSock)
 		{
-			this.queue.push(client);
+			this.queue.push({socket: client, mode});
 			return ;
 		}
 
-		const openentSock = this.queue.shift();
 		const openentId: number = this.users.get(openentSock);
 
 		client.emit("matchmaking", {side: -1, p1: {score:0, id: openentId, username: null}, p2: {score:0, id: userId, username: null}});
 		openentSock.emit("matchmaking", {side: 1, p1: {score:0, id: openentId, username: null}, p2: {score:0, id: userId, username: null}});
 
 		//create game with openent
-		const instance: PongGame = new PongGame(openentId, openentSock, userId, client);
+		let instance: PongGame | Splatong;
+		if (mode === "classic") 
+			instance = new PongGame(openentId, openentSock, userId, client);
+		else
+			instance = new Splatong(openentId, openentSock, userId, client);
 		this.lobby.set(userId, instance);
 		this.lobby.set(openentId, instance);
 		setTimeout(() => instance.start(), 100);
 	}
 
 	@SubscribeMessage("defy")
-	async defy(@MessageBody() defyId: number, @ConnectedSocket() client: Socket) {
+	async defy(@MessageBody() defyInfo: {defyId: number, mode: string}, @ConnectedSocket() client: Socket) {
+		const defyId = defyInfo.defyId;
 		const userId = this.users.get(client);
 		const i = this.defyQueue.indexOf(defyId);
 		if (i < 0)
@@ -81,7 +96,11 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		defySocket.emit("matchmaking", {side: 1, p1: {score:0, id: defyId, username: null}, p2: {score:0, id: userId, username: null}});
 
 		//create game with defy
-		const instance: PongGame = new PongGame(defyId, defySocket, userId, client);
+		let instance: PongGame | Splatong;
+		if (defyInfo.mode === "classic")
+			instance = new PongGame(defyId, defySocket, userId, client);
+		else
+			instance = new Splatong(defyId, defySocket, userId, client);
 		this.lobby.set(userId, instance);
 		this.lobby.set(defyId, instance);
 		setTimeout(() => instance.start(), 100);
