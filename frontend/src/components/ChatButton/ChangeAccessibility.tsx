@@ -135,6 +135,7 @@ export function ChangeAccessibility({channel, newMode, reRenderList, setRerender
 					aria-labelledby="demo-radio-buttons-group-label"
 					defaultValue="public"
 					name="radio-buttons-group"
+					
 				>
 					{channel.mode !== ChanMode.PUBLIC && <FormControlLabel value={ChanMode.PUBLIC} control={<Radio color="default"/>} label="Public" />}
 					{channel.mode !== ChanMode.PRIVATE && <FormControlLabel value={ChanMode.PRIVATE} control={<Radio color="default"/>} label="Private" />}

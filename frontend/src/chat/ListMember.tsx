@@ -166,11 +166,14 @@ export default function ListMembers({ chan, settings, setSettings }: ListMembers
 		setRerenderList(reRenderList + 1);
 	}
 	
-	if (isDm)
+	if (isDm) {
+		if (!response.data[0] || !response.data[1])
+			return null
 		if (response.data[0].user.id !== userParticipant.user.id)
 			return <Profile member={response.data[0].user} isDm={true} />
 		else
 			return <Profile member={response.data[1].user} isDm={true} />
+	}
 	if (displayProfile) {
 		return (
 			<SetRerenderListContext.Provider value={setRerenderList}>
