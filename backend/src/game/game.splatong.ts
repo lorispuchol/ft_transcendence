@@ -61,6 +61,8 @@ export default class Splatong {
 
 	private screen: ScreenSize = {w: 3200, h:1800};
 	private borderGap: number = this.screen.h * 0.006;
+
+	private winner: number = 0;
 	private gameEnded: boolean = false;
 
 	private gameDuration: number = 30;
@@ -110,12 +112,21 @@ export default class Splatong {
 	}
 
 	public matchInfo(): MatchInfo {
+		if (this.winner === this.p1)
+			return ({
+				mode: "classic",
+				winnerId: this.p1,
+				loserId: this.p2,
+				winnerScore: this.scoreP1,
+				loserScore: this.scoreP2,
+			});
+		
 		return ({
-			mode: "splatong",
-			user1Id: this.p1,
-			user2Id: this.p2,
-			user1_score: this.scoreP1,
-			user2_score: this.scoreP2,
+			mode: "classic",
+			winnerId: this.p2,
+			loserId: this.p1,
+			winnerScore: this.scoreP2,
+			loserScore: this.scoreP1,
 		});
 	}
 
@@ -146,14 +157,14 @@ export default class Splatong {
 	}
 
 	public handleDisconnect(id: number) {
-		if (this.gameEnded)
-			return 0;
 		switch(id) {
 			case this.p1:
-				this.socketP2.emit("end", this.p2);
+				if (!this.gameEnded)
+					this.socketP2.emit("end", this.p2);
 				return this.p2;
 			case this.p2:
-				this.socketP1.emit("end", this.p1);
+				if (!this.gameEnded)
+					this.socketP1.emit("end", this.p1);
 				return this.p1;
 			default:
 				return 0;
@@ -193,17 +204,16 @@ export default class Splatong {
 			x++;
 		}
 
-		let winner: number;
 		if (p1Score > p2Score)
-			winner = this.p1;
+			this.winner = this.p1;
 		else if (p2Score > p1Score)
-			winner = this.p2;
+			this.winner = this.p2;
 		else
-			winner = this.coinflipLoser;
+			this.winner = this.coinflipLoser;
 
 		this.scoreP1 = Math.floor(p1Score / (this.cell * this.cell / 100));
 		this.scoreP2 = Math.floor(p2Score / (this.cell * this.cell / 100))
-		const result = {winner, p1Score: this.scoreP1, p2Score: this.scoreP2}
+		const result = {winner: this.winner, p1Score: this.scoreP1, p2Score: this.scoreP2}
 	
 		this.socketP1.emit("end", result);
 		this.socketP2.emit("end", result);

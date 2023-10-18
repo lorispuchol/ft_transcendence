@@ -10,7 +10,7 @@ export class GameController {
 	) {}
 
 	@Public()
-	@Get('matchHistory/:id')
+	@Get('history/:id')
 	async getMatchHistory(@Param('id') userId: number) {
 		const matchs: Match[] = await this.gameService.getMatchHistory(userId);
 		//console.log(matchs);

@@ -41,7 +41,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			const otherPlayer = instance.handleDisconnect(offId);
 			console.log("other->" + otherPlayer);
 			instance.clear();
-			// this.gameService.addNewMatch(instance.matchInfo());
+			this.gameService.addNewMatch(instance.matchInfo());
 			this.lobby.delete(offId);
 			this.lobby.delete(otherPlayer);
 		}

@@ -7,10 +7,10 @@ import { User } from "src/user/user.entity";
 
 export interface MatchInfo {
 	mode: string,
-	user1Id: number,
-	user2Id: number,
-	user1_score: number,
-	user2_score: number,
+	winnerId: number,
+	loserId: number,
+	winnerScore: number,
+	loserScore: number,
 }
 
 @Injectable()
@@ -29,25 +29,28 @@ export class GameService {
 	}
 
 	async addNewMatch(matchInfo: MatchInfo) {
-		const user1: User = await this.userService.findOneById(matchInfo.user1Id);
-		const user2: User = await this.userService.findOneById(matchInfo.user2Id);
-		if (!user1 || !user2)
+		const winner: User = await this.userService.findOneById(matchInfo.winnerId);
+		const loser: User = await this.userService.findOneById(matchInfo.loserId);
+		if (!winner || !loser)
 		{
 			console.log("error addNewMatch: user not found");
 			return ;
 		}
-		this.createMatch(matchInfo.mode, user1, user2, matchInfo.user1_score, matchInfo.user2_score);
-		this.createMatch(matchInfo.mode, user2, user1, matchInfo.user2_score, matchInfo.user1_score);
+
+		this.userService.addWin(winner.id);
+		this.userService.addDefeat(loser.id);
+
+		this.createMatch(matchInfo.mode, winner, loser, matchInfo.winnerScore, matchInfo.loserScore);
 	}
 
-	createMatch(mode: string, user: User, opponent: User, userScore: number, opponentScore: number) {
+	createMatch(mode: string, winner: User, loser: User, winnerScore: number, loserScore: number) {
 		const match: Match = new Match();
 
-		match.user = user;
-		match.opponent = opponent;
+		match.winner = winner;
+		match.loser = loser;
 		match.mode = mode;
-		match.user_score = userScore;
-		match.opponent_score = opponentScore;
+		match.winner_score = winnerScore;
+		match.loser_score = loserScore;
 
 		this.matchRepository.save(match);
 	}

@@ -57,7 +57,7 @@ export default function GameMenu({ setSetting, setDefy }: MenuProps) {
 			socket.emit("clear");
 			setSelect(defyId);
 			setWaitResponse(true);
-			socket.emit("challenge", {to: defyId, mode: "classique"});
+			socket.emit("challenge", {to: defyId, mode: "classic"});
 		}
 		socket.on("waitDefy", waitDefy);
 

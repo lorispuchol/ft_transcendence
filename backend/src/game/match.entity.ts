@@ -6,22 +6,20 @@ export class Match extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	// challenger is the inviter 
-	// or the user with smallest id
-	@ManyToOne(() => User, (user) => user.userMatches, {eager : true})
-	user: User;
+	@ManyToOne(() => User, (user) => user.winnerMatches, {eager : true})
+	winner: User;
 
-	@ManyToOne(() => User, (user) => user.opponMatches, {eager : true})
-	opponent: User;
+	@ManyToOne(() => User, (user) => user.loserMatches, {eager : true})
+	loser: User;
 
 	@Column({type: 'varchar'})
 	mode: string;
 
 	@Column({ type: 'integer' })
-	user_score: number;
+	winner_score: number;
 
 	@Column({ type: 'integer' })
-	opponent_score: number;
+	loser_score: number;
 
 	@CreateDateColumn()
 	date: Date;

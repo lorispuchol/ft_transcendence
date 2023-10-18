@@ -60,6 +60,8 @@ export default class PongGame {
 	private screen: ScreenSize = {w: 3200, h:1800};
 	private borderGap: number = this.screen.h * 0.006;
 	private winningScore: number = 3;
+
+	private winner: number = 0;
 	private gameEnded: boolean = false;
 
 	private paddles: Pad = this.init_paddle();
@@ -94,12 +96,21 @@ export default class PongGame {
 	}
 
 	public matchInfo(): MatchInfo {
+		if (this.winner === this.p1)
+			return ({
+				mode: "classic",
+				winnerId: this.p1,
+				loserId: this.p2,
+				winnerScore: this.scoreP1,
+				loserScore: this.scoreP2,
+			});
+		
 		return ({
 			mode: "classic",
-			user1Id: this.p1,
-			user2Id: this.p2,
-			user1_score: this.scoreP1,
-			user2_score: this.scoreP2,
+			winnerId: this.p2,
+			loserId: this.p1,
+			winnerScore: this.scoreP2,
+			loserScore: this.scoreP1,
 		});
 	}
 
@@ -130,14 +141,14 @@ export default class PongGame {
 	}
 
 	public handleDisconnect(id: number) {
-		if (this.gameEnded)
-			return 0;
 		switch(id) {
 			case this.p1:
-				this.socketP2.emit("end", this.p2);
+				if (!this.gameEnded)
+					this.socketP2.emit("end", this.p2);
 				return this.p2;
 			case this.p2:
-				this.socketP1.emit("end", this.p1);
+				if (!this.gameEnded)
+					this.socketP1.emit("end", this.p1);
 				return this.p1;
 			default:
 				return 0;
@@ -151,14 +162,13 @@ export default class PongGame {
 			return 0;
 		this.gameEnded = true;
 
-		let winner: number = 0;
 		if (this.scoreP1 === this.winningScore)
-			winner = this.p1;
+			this.winner = this.p1;
 		else
-			winner = this.p2;
+			this.winner = this.p2;
 		
-		this.socketP1.emit("end", winner);
-		this.socketP2.emit("end", winner);
+		this.socketP1.emit("end", this.winner);
+		this.socketP2.emit("end", this.winner);
 		
 		return 1;
 	}
