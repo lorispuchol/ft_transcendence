@@ -4,14 +4,15 @@ import { useContext, useEffect, useState } from "react";
 import ErrorHandling from "../../utils/Error";
 import NoRouteFound from "../Error/NoRouteFound";
 import Loading from "../../utils/Loading";
-import UserStatus from "../../components/user/UserStatus";
 import { IoSettingsSharp } from 'react-icons/io5'
 import defaultPp from './default.png';
 import './Profile.scss'
-import { Avatar, Paper } from "@mui/material";
+import ProfileImg from "../../components/Profile/ProfileImg";
 
 import SettingsPopup from "./SettingsPopup";
 import { UserContext } from "../../utils/Context";
+import { Paper } from "@mui/material";
+import MatchHistory from "../../components/Profile/MatchHistory";
 
 interface UserData {
 	id: number,
@@ -60,54 +61,17 @@ export default function Profile() {
 	return (
 		<div className="profile_page">
 			<div className='profile_top items-center grid grid-cols-3 py-4 px-4 relative flex flex-wrap'>
-				<Avatar className='profile_image' alt={profile.username + " pp"} src={profile.avatar} sx={{ width: 256, height: 256 }}/>
-				<Paper className='profile_username col-span-2 flex'><div className="pr-3">{profile.username}</div><UserStatus userId={profile.id} /></Paper>
+				<div className="profile_image"><ProfileImg userId={profile.id} userAvatar={profile.avatar}/></div>
+				<Paper className='profile_username col-span-2 flex'><div className="pr-3">{profile.username}</div></Paper>
 				{profile.username === me && <button className="absolute top-0 end-0 pt-4 pr-4" onClick={handleShow}><IoSettingsSharp size={32}/></button>}
 			</div>
 			<Paper className='grid grid-cols-6 profile_score'>
-				<div className='flex col-span-2 victory'>VICTORY</div>
-				<div className='flex score'>{profile.nb_victory}</div>
-				<div className='flex col-span-2 defeat'>DEFEAT</div>
-				<div className='flex score'>{profile.nb_defeat}</div>
+				<div className='col-span-2 victory_p'>VICTORY</div>
+				<div className='score_p'>{profile.nb_victory}</div>
+				<div className='col-span-2 defeat_p'>DEFEAT</div>
+				<div className='score_p'>{profile.nb_defeat}</div>
 			</Paper>
-			<Paper className='profile_mh'>
-				<div className='profile_mh_header'>MATCH HISTORY</div>
-				<div className='grid grid-cols-7'>
-					<div className='profile_mh_score col-span-2'>DOMICILE</div>
-					<div className='profile_mh_score'>0</div>
-					<div className='profile_mh_score'>VS</div>
-					<div className='profile_mh_score'>0</div>
-					<div className='profile_mh_score col-span-2'>EXTERIEUR</div>
-				</div>
-				<div className='grid grid-cols-7'>
-					<div className='profile_mh_score col-span-2'>DOMICILE</div>
-					<div className='profile_mh_score'>0</div>
-					<div className='profile_mh_score'>VS</div>
-					<div className='profile_mh_score'>0</div>
-					<div className='profile_mh_score col-span-2'>EXTERIEUR</div>
-				</div>
-				<div className='grid grid-cols-7'>
-					<div className='profile_mh_score col-span-2'>DOMICILE</div>
-					<div className='profile_mh_score'>0</div>
-					<div className='profile_mh_score'>VS</div>
-					<div className='profile_mh_score'>0</div>
-					<div className='profile_mh_score col-span-2'>EXTERIEUR</div>
-				</div>
-				<div className='grid grid-cols-7'>
-					<div className='profile_mh_score col-span-2'>DOMICILE</div>
-					<div className='profile_mh_score'>0</div>
-					<div className='profile_mh_score'>VS</div>
-					<div className='profile_mh_score'>0</div>
-					<div className='profile_mh_score col-span-2'>EXTERIEUR</div>
-				</div>
-				<div className='grid grid-cols-7'>
-					<div className='profile_mh_score col-span-2'>DOMICILE</div>
-					<div className='profile_mh_score'>0</div>
-					<div className='profile_mh_score'>VS</div>
-					<div className='profile_mh_score'>0</div>
-					<div className='profile_mh_score col-span-2'>EXTERIEUR</div>
-				</div>
-			</Paper>
+			<MatchHistory ProfileId={profile.id} />
 			{show &&
 				<SettingsPopup close={closeSettings} login={profile.login}/>
 			}
