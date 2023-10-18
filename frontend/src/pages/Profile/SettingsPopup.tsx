@@ -17,7 +17,7 @@ function updateError(error: string[]) {
 
 export default function SettingsPopup({ close, login }: {close: any, login: string}) {
 	const [newUsername, setNewUsername]: [string, Function] = useState('')
-	const [pp, setPp] = useState<any>()
+	const [pp, setPp]: [File | null, Function] = useState(null);
 	const username = useContext(UserContext);
 
 	useEffect(() => {
@@ -28,9 +28,25 @@ export default function SettingsPopup({ close, login }: {close: any, login: stri
 	}
 
 	function ppChange(event: ChangeEvent<HTMLInputElement>) {
+		const reader = new FileReader();
+
 		const files = (event.target as HTMLInputElement).files;
-		if (files && files.length > 0)
-			setPp(files[0]);
+		if (!files || files.length === 0)
+			return ;
+		
+		const imageFile = files[0];
+		reader.onload = (e: any) => {
+    		const img = new Image();
+      		img.onload = () => {
+				setPp(imageFile);
+      		};
+      		img.onerror = () => {
+        		updateError(["bad file"]);
+        		return false;
+      		};
+			img.src = e.target.result;
+    	};
+    	reader.readAsDataURL(imageFile);
 	}
 
 	function updateUsername(e: FormEvent) {
@@ -50,6 +66,8 @@ export default function SettingsPopup({ close, login }: {close: any, login: stri
 
 	function updatePp(e: FormEvent) {
 		e.preventDefault();
+		if (!pp)
+			return ;
 		const formData = new FormData();
 		formData.append('file', pp);
 		const allowedTypes = ["image/jpeg", "image/png", "image/gif"];

@@ -411,7 +411,7 @@ export class ChatService {
 	}
 
 	async saveNewMsg(sender: User, chan: Channel, content: string) {
-		const newMsg: Message = await this.messagesRepository.create({
+		const newMsg: Message = this.messagesRepository.create({
 			sender: sender,
 			channel: chan,
 			content: content,

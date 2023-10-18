@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { GetRequest } from "../utils/Request";
 import ErrorHandling from "../utils/Error";
 import Loading from "../utils/Loading";
-import { ChanMode, ChannelData, MemberDistinc, ParticipantData, UserData } from "./interfaceData";
+import { ChanMode, MemberDistinc, ParticipantData, UserData } from "./interfaceData";
 import { defaultAvatar } from "../pages/Profile/Profile";
 import { Avatar, Paper } from "@mui/material";
 import UserStatus from "../components/user/UserStatus";

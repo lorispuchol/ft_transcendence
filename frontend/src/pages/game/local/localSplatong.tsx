@@ -30,6 +30,7 @@ export default function LocalSplatong( { setPlayers, setScore }: any ) {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const [prompt, setPrompt]: [boolean, Function] = useState(true);
 	const [winner, setWinner]: [string, Function] = useState("");
+	const [clock, setClock]: [number | null, Function] = useState(null);
 	const [leftReady, setLeftReady]: [string, Function] = useState("blinking");
 	const [rightReady, setRightReady]: [string, Function] = useState("blinking");
 	
@@ -38,7 +39,7 @@ export default function LocalSplatong( { setPlayers, setScore }: any ) {
 		setPlayers({p1: {id: 0, username: p1Color}, p2: {id: 0, username: p2Color}});
 		
 		const gameDuration: number = 30;
-		setScore({p1: gameDuration, p2: gameDuration});
+		setScore({p1: 0, p2: 0});
 		
 		const ctx = canvasRef!.current!.getContext('2d')!;
 		const screen = {w: 3200, h: 1800}
@@ -133,7 +134,9 @@ export default function LocalSplatong( { setPlayers, setScore }: any ) {
 			else if (p2Score > p1Score)
 				setWinner(p2Color + " win");
 			else
-				setWinner("wtf les amis")
+				setWinner("tie");
+			setClock(null);
+			setScore({p1: Math.floor(p1Score / (cell * cell / 100)), p2: Math.floor(p2Score / (cell * cell / 100))})
 		}
 
 		const widthRatio = 1 / cellSize.w;
@@ -148,7 +151,7 @@ export default function LocalSplatong( { setPlayers, setScore }: any ) {
 			handleBall(ctx, ball);
 			background[yMatrix()][xMatrix()] = colorTomatrix(ball.color);
 			now = Math.round((endTime - performance.now()) * 0.001);
-			setScore({p1: now, p2: now})
+			setClock(now)
 			if (now <= 0)
 			{
 				animationFrameId = window.requestAnimationFrame(renderEnd);
@@ -167,11 +170,14 @@ export default function LocalSplatong( { setPlayers, setScore }: any ) {
 
 	return (
 			<div className="canvas_container">
-				{ winner &&
-					<h1 className="get_ready left-[21vw] top-[20vw]">{winner}</h1>
-				}
+				<div className="prompt_wrapper z-[3]">
+					{ winner &&
+						<h1 className="get_ready top-[20vw]">{winner}</h1>
+					}
+					<div className="get_ready">{clock}</div>
+				</div>
 				<div className={"prompt_wrapper" + (prompt ? "" : " fade")}>
-					<h1 className="get_ready left-[23vw] top-[5vw]">GET READY</h1>
+					<h1 className="get_ready top-[5vw]">GET READY</h1>
 					<div className={"splatkey kbd left-[10vw] top-[10vw] " + leftReady}>w</div>
 					<div className={"splatkey kbd left-[10vw] top-[25vw] " + leftReady}>s</div>
 					<div className={"splatkey kbd right-[10vw] top-[10vw] " + rightReady}>▲</div>

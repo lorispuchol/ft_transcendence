@@ -1,5 +1,4 @@
 import { Module } from "@nestjs/common";
-import { User } from "src/user/user.entity";
 import { Relationship } from "./relationship.entity";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { RelationshipController } from "./relationship.controller";
@@ -10,7 +9,7 @@ import { EventModule } from "src/event/event.module";
 
 @Module({
 	imports: [
-		TypeOrmModule.forFeature([User, Relationship], 'lorisforever'),
+		TypeOrmModule.forFeature([Relationship], 'lorisforever'),
 		UserModule,
 		EventModule
 	],

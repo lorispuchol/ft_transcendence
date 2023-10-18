@@ -3,7 +3,7 @@ import { MemberDistinc, ParticipantData } from "../../chat/interfaceData";
 import { PostRequest } from "../../utils/Request";
 import { logError, logSuccess, logWarn } from "../../chat/Chat";
 import { RerenderListContext, SetDisplayMemberContext, SetRerenderListContext } from "../../utils/Context";
-import { ArrowCircleDown, ArrowCircleUp, KeyboardDoubleArrowDown, KeyboardDoubleArrowUp } from "@mui/icons-material";
+import { KeyboardDoubleArrowDown, KeyboardDoubleArrowUp } from "@mui/icons-material";
 
 interface ControlButtonProps {
 	memberPart: ParticipantData,

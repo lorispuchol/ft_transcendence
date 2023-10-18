@@ -4,6 +4,8 @@ import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect,
 import { Server, Socket } from "socket.io";
 import { client_url } from "src/auth/constants";
 import PongGame from "./game.classique";
+import Splatong from "./game.splatong";
+import { GameService } from "./game.service";
 
 @WebSocketGateway({
 	namespace: "game",
@@ -12,11 +14,13 @@ import PongGame from "./game.classique";
 export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 	constructor(
 		private jwtService: JwtService,
+		// @ts-ignore
+		private gameService: GameService
 	) {}
 		
 	private users: Map<Socket, number> = new Map();
-	private lobby: Map<number, PongGame> = new Map();
-	private queue: Socket[] = [];
+	private lobby: Map<number, PongGame | Splatong> = new Map();
+	private queue: {socket: Socket, mode: string}[] = [];
 	private defyQueue: number[] = [];
 
 	afterInit(server: Server) {}
@@ -29,13 +33,15 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	handleDisconnect(client: Socket) {
 		const offId: number = this.users.get(client);
-		this.queue = this.queue.filter((socket) => socket.id !== client.id);
+		this.queue = this.queue.filter((elem) => elem.socket.id !== client.id);
 		this.defyQueue= this.defyQueue.filter((id) => id !== offId);
 		this.users.delete(client);
-		const instance: PongGame = this.lobby.get(offId);
+		const instance: PongGame | Splatong = this.lobby.get(offId);
 		if (instance) {
 			const otherPlayer = instance.handleDisconnect(offId);
+			console.log("other->" + otherPlayer);
 			instance.clear();
+			this.gameService.addNewMatch(instance.matchInfo());
 			this.lobby.delete(offId);
 			this.lobby.delete(otherPlayer);
 		}
@@ -44,28 +50,42 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@SubscribeMessage("search")
 	async matchmaking(@MessageBody() mode: string, @ConnectedSocket() client: Socket) {
 		const userId = this.users.get(client);
+		
+		let opponentSock: Socket;
+		this.queue = this.queue.filter((elem) => {
+			if (!opponentSock && elem.mode === mode)
+			{
+				opponentSock = elem.socket;
+				return 0;
+			}
+			return 1;
+		});
 
-		 if (!this.queue.length)
+		if (!opponentSock)
 		{
-			this.queue.push(client);
+			this.queue.push({socket: client, mode});
 			return ;
 		}
 
-		const openentSock = this.queue.shift();
-		const openentId: number = this.users.get(openentSock);
+		const opponentId: number = this.users.get(opponentSock);
 
-		client.emit("matchmaking", {side: -1, p1: {score:0, id: openentId, username: null}, p2: {score:0, id: userId, username: null}});
-		openentSock.emit("matchmaking", {side: 1, p1: {score:0, id: openentId, username: null}, p2: {score:0, id: userId, username: null}});
+		client.emit("matchmaking", {side: -1, p1: {score:0, id: opponentId, username: null}, p2: {score:0, id: userId, username: null}});
+		opponentSock.emit("matchmaking", {side: 1, p1: {score:0, id: opponentId, username: null}, p2: {score:0, id: userId, username: null}});
 
-		//create game with openent
-		const instance: PongGame = new PongGame(openentId, openentSock, userId, client);
+		//create game with opponent
+		let instance: PongGame | Splatong;
+		if (mode === "classic") 
+			instance = new PongGame(opponentId, opponentSock, userId, client);
+		else
+			instance = new Splatong(opponentId, opponentSock, userId, client);
 		this.lobby.set(userId, instance);
-		this.lobby.set(openentId, instance);
+		this.lobby.set(opponentId, instance);
 		setTimeout(() => instance.start(), 100);
 	}
 
 	@SubscribeMessage("defy")
-	async defy(@MessageBody() defyId: number, @ConnectedSocket() client: Socket) {
+	async defy(@MessageBody() defyInfo: {defyId: number, mode: string}, @ConnectedSocket() client: Socket) {
+		const defyId = defyInfo.defyId;
 		const userId = this.users.get(client);
 		const i = this.defyQueue.indexOf(defyId);
 		if (i < 0)
@@ -81,7 +101,11 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		defySocket.emit("matchmaking", {side: 1, p1: {score:0, id: defyId, username: null}, p2: {score:0, id: userId, username: null}});
 
 		//create game with defy
-		const instance: PongGame = new PongGame(defyId, defySocket, userId, client);
+		let instance: PongGame | Splatong;
+		if (defyInfo.mode === "classic")
+			instance = new PongGame(defyId, defySocket, userId, client);
+		else
+			instance = new Splatong(defyId, defySocket, userId, client);
 		this.lobby.set(userId, instance);
 		this.lobby.set(defyId, instance);
 		setTimeout(() => instance.start(), 100);

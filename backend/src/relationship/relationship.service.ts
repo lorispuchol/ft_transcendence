@@ -11,7 +11,7 @@ import { EventService } from "src/event/event.service";
 export class RelationshipService{
 	constructor(
 		@InjectRepository(Relationship, 'lorisforever')
-		private relationshipRepository: Repository<Relationship>,
+			private relationshipRepository: Repository<Relationship>,
 		private	eventService: EventService,
 	) {}
 	
