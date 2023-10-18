@@ -12,6 +12,7 @@ import ProfileImg from "../../components/Profile/ProfileImg";
 import SettingsPopup from "./SettingsPopup";
 import { UserContext } from "../../utils/Context";
 import { Paper } from "@mui/material";
+import MatchHistory from "../../components/Profile/MatchHistory";
 
 interface UserData {
 	id: number,
@@ -70,44 +71,7 @@ export default function Profile() {
 				<div className='col-span-2 defeat_p'>DEFEAT</div>
 				<div className='score_p'>{profile.nb_defeat}</div>
 			</Paper>
-			<Paper className='profile_mh'>
-				<div className='profile_mh_header'>MATCH HISTORY</div>
-				<div className='grid grid-cols-7'>
-					<div className='profile_mh_score col-span-2'>DOMICILE</div>
-					<div className='profile_mh_score'>0</div>
-					<div className='profile_mh_score'>VS</div>
-					<div className='profile_mh_score'>0</div>
-					<div className='profile_mh_score col-span-2'>EXTERIEUR</div>
-				</div>
-				<div className='grid grid-cols-7'>
-					<div className='profile_mh_score col-span-2'>DOMICILE</div>
-					<div className='profile_mh_score'>0</div>
-					<div className='profile_mh_score'>VS</div>
-					<div className='profile_mh_score'>0</div>
-					<div className='profile_mh_score col-span-2'>EXTERIEUR</div>
-				</div>
-				<div className='grid grid-cols-7'>
-					<div className='profile_mh_score col-span-2'>DOMICILE</div>
-					<div className='profile_mh_score'>0</div>
-					<div className='profile_mh_score'>VS</div>
-					<div className='profile_mh_score'>0</div>
-					<div className='profile_mh_score col-span-2'>EXTERIEUR</div>
-				</div>
-				<div className='grid grid-cols-7'>
-					<div className='profile_mh_score col-span-2'>DOMICILE</div>
-					<div className='profile_mh_score'>0</div>
-					<div className='profile_mh_score'>VS</div>
-					<div className='profile_mh_score'>0</div>
-					<div className='profile_mh_score col-span-2'>EXTERIEUR</div>
-				</div>
-				<div className='grid grid-cols-7'>
-					<div className='profile_mh_score col-span-2'>DOMICILE</div>
-					<div className='profile_mh_score'>0</div>
-					<div className='profile_mh_score'>VS</div>
-					<div className='profile_mh_score'>0</div>
-					<div className='profile_mh_score col-span-2'>EXTERIEUR</div>
-				</div>
-			</Paper>
+			<MatchHistory ProfileId={profile.id} />
 			{show &&
 				<SettingsPopup close={closeSettings} login={profile.login}/>
 			}
