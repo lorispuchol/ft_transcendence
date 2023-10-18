@@ -61,13 +61,8 @@ export default function Profile() {
 		<div className="profile_page">
 			<div className='profile_top items-center grid grid-cols-3 py-4 px-4 relative flex flex-wrap'>
 				<Avatar className='profile_image' alt={profile.username + " pp"} src={profile.avatar} sx={{ width: 256, height: 256 }}/>
-<<<<<<< HEAD:client/src/pages/Profile/Profile.tsx
-				<Paper className='profile_username col-span-2 flex'><div className="pr-3">{profile.username}</div><UserStatus login={profile.login} /></Paper>
-				{profile.username === me && <button className="absolute top-0 end-0 pt-4 pr-4" onClick={handleShow}><IoSettingsSharp size={32}/></button>}
-=======
 				<Paper className='profile_username col-span-2 flex'><div className="pr-3">{profile.username}</div><UserStatus userId={profile.id} /></Paper>
-				<button className="absolute top-0 end-0 pt-4 pr-4" onClick={handleShow}><IoSettingsSharp size={32}/></button>
->>>>>>> 36e6b437bd15ec4df1b0fdc464ad933171f3960a:frontend/src/pages/Profile/Profile.tsx
+				{profile.username === me && <button className="absolute top-0 end-0 pt-4 pr-4" onClick={handleShow}><IoSettingsSharp size={32}/></button>}
 			</div>
 			<Paper className='grid grid-cols-6 profile_score'>
 				<div className='flex col-span-2 victory'>VICTORY</div>
