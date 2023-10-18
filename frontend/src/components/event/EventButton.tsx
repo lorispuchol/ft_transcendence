@@ -3,7 +3,7 @@ import { Button } from "@mui/material";
 import { DeleteRequest, PatchRequest } from "../../utils/Request";
 import ErrorHandling from "../../utils/Error";
 import { useContext, useState } from "react";
-import { EventContext, SocketChatContext } from "../../utils/Context";
+import { EventContext } from "../../utils/Context";
 import { useNavigate } from "react-router-dom";
 
 

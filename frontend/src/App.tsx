@@ -34,6 +34,7 @@ function WebSocket({ children }: {children: ReactElement}) {
 
 	useEffect(() => {
 		//const id = setTimeout(() => {setConnected(true)}, 500);
+		setConnected(true);
 		const token = localStorage.getItem("token");
 		const option = { transportOptions: { polling: { extraHeaders: { token: token }}}};
 		const newSocket = io(server_url + "/event", option);
@@ -45,7 +46,6 @@ function WebSocket({ children }: {children: ReactElement}) {
 		// 	window.location.replace(client_url);
 		// }
 		// newSocket.on("disconnect", notConnected);
-		setConnected(true);
 		setSocket(newSocket);
 		return () => {newSocket.close()};
 	}, [setSocket, setConnected]);

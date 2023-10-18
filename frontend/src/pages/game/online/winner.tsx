@@ -1,4 +1,3 @@
-import { ArrowDownward } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import { GetRequest } from "../../../utils/Request";
 
@@ -19,8 +18,7 @@ export default function DisplayWinner({ winnerId }: { winnerId: number }) {
 
 	if (winnerId === -1)
 		return (<></>);
-	return (<>
-		<h1 className="get_ready left-[21vw] top-[20vw]">{winner + " win"}</h1>
-		<ArrowDownward className="get_ready left-[31vw] top-[30vw] text-[8vw]" />
-	</>);
+	return (
+			<h1 className="get_ready top-[20vw]">{winner + " win"}</h1>
+	);
 }

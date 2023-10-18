@@ -1,12 +1,13 @@
 import { Socket } from "socket.io-client";
-import { teritaryColor } from "../../../style/color";
 import { ScreenSize } from "./OnlineGame";
 
 export interface Pad {
 	w: number,
 	h: number,
+	ownColor: string,
 	ownX: number,
 	ownY: number,
+	opColor: string,
 	opX: number,
 	opY: number,
 }
@@ -17,6 +18,8 @@ export function init_paddle(screen: ScreenSize, side: number) {
 
 	const ownY = screen.h * 0.5 - h * 0.5;
 	const opY = screen.h * 0.5 - h * 0.5;
+	const ownColor = "white";
+	const opColor = "white";
 
 	let ownX: number;
 	let opX: number;
@@ -32,16 +35,20 @@ export function init_paddle(screen: ScreenSize, side: number) {
 		opX = screen.w * 0.1 - w * 0.5;
 	}
 
-	return {w, h, ownX, ownY, opX, opY};
+	return {w, h, ownColor, ownX, ownY, opColor, opX, opY};
 }
 
 
 export function drawPaddle (ctx: CanvasRenderingContext2D, pad: Pad) {
-	ctx.fillStyle = teritaryColor;
-	ctx.beginPath();
-	ctx.rect(pad.ownX, pad.ownY, pad.w , pad.h);
-	ctx.rect(pad.opX, pad.opY, pad.w , pad.h);
-	ctx.fill();
+	ctx.fillStyle = "black";
+	ctx.fillRect(pad.ownX, pad.ownY, pad.w , pad.h);
+	ctx.fillRect(pad.opX, pad.opY, pad.w , pad.h);
+	
+	ctx.fillStyle = pad.ownColor;
+	ctx.fillRect(pad.ownX + 5, pad.ownY + 5, pad.w - 10, pad.h - 10);
+	ctx.fillStyle = pad.opColor;
+	ctx.fillRect(pad.opX + 5, pad.opY + 5, pad.w - 10, pad.h - 10);
+
 }
 
 export function clearBehind(ctx: CanvasRenderingContext2D, pad: Pad, side: number) {
@@ -80,7 +87,7 @@ export function handleKey(): any[] {
 	return ([onKeyDown, onkeyup]);
 }
 
-function movement(height: number, pad: Pad, openentKey: string) {
+function movement(height: number, pad: Pad, opponentKey: string) {
 	const borderGap: number = height * 0.006;
 	const speed: number = height * 0.02;
 
@@ -89,14 +96,14 @@ function movement(height: number, pad: Pad, openentKey: string) {
 	else if (key === "ArrowDown" && pad.ownY <= height - pad.h - borderGap)
 		pad.ownY += speed;
 	
-	if (openentKey === "ArrowUp" && pad.opY >= borderGap)
+	if (opponentKey === "ArrowUp" && pad.opY >= borderGap)
 		pad.opY -= speed;
-	else if (openentKey === "ArrowDown" && pad.opY <= height - pad.h - borderGap)
+	else if (opponentKey === "ArrowDown" && pad.opY <= height - pad.h - borderGap)
 		pad.opY += speed;
 }
 
-export default function handlePaddle(ctx: CanvasRenderingContext2D, pad: Pad, openentKey: string, socket: Socket) {
-	movement(ctx.canvas.height, pad, openentKey);
+export default function handlePaddle(ctx: CanvasRenderingContext2D, pad: Pad, opponentKey: string, socket: Socket) {
+	movement(ctx.canvas.height, pad, opponentKey);
 	socket.emit("input", key);
 	drawPaddle(ctx, pad);
 }
