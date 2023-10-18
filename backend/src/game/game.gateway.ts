@@ -14,6 +14,7 @@ import { GameService } from "./game.service";
 export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 	constructor(
 		private jwtService: JwtService,
+		// @ts-ignore
 		private gameService: GameService
 	) {}
 		
@@ -38,8 +39,9 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		const instance: PongGame | Splatong = this.lobby.get(offId);
 		if (instance) {
 			const otherPlayer = instance.handleDisconnect(offId);
+			console.log("other->" + otherPlayer);
 			instance.clear();
-			this.gameService.addNewMatch(instance.matchInfo());
+			// this.gameService.addNewMatch(instance.matchInfo());
 			this.lobby.delete(offId);
 			this.lobby.delete(otherPlayer);
 		}
