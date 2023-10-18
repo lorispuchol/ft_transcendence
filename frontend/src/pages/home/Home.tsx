@@ -1,9 +1,9 @@
 import { Logout } from "@mui/icons-material";
 import { IconButton, Paper } from "@mui/material";
-import { client_url } from "../utils/Request";
-import Everyone from "../user/Everyone";
-import Header from "../components/home/Header"
-import Us from "../components/home/Us";
+import { client_url } from "../../utils/Request";
+import Everyone from "../../user/Everyone";
+import Header from "../../components/home/Header"
+import Us from "../../components/home/Us";
 import './Home.scss';
 
 

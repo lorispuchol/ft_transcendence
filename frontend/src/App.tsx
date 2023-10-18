@@ -1,6 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import './App.css'
-import Home from './home/Home';
+import Home from './pages/home/Home';
 import Profile from './pages/Profile/Profile';
 import LogIn from './pages/LogIn/LogIn';
 import NoRouteFound from './pages/Error/NoRouteFound';
