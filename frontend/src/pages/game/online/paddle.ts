@@ -87,7 +87,7 @@ export function handleKey(): any[] {
 	return ([onKeyDown, onkeyup]);
 }
 
-function movement(height: number, pad: Pad, openentKey: string) {
+function movement(height: number, pad: Pad, opponentKey: string) {
 	const borderGap: number = height * 0.006;
 	const speed: number = height * 0.02;
 
@@ -96,14 +96,14 @@ function movement(height: number, pad: Pad, openentKey: string) {
 	else if (key === "ArrowDown" && pad.ownY <= height - pad.h - borderGap)
 		pad.ownY += speed;
 	
-	if (openentKey === "ArrowUp" && pad.opY >= borderGap)
+	if (opponentKey === "ArrowUp" && pad.opY >= borderGap)
 		pad.opY -= speed;
-	else if (openentKey === "ArrowDown" && pad.opY <= height - pad.h - borderGap)
+	else if (opponentKey === "ArrowDown" && pad.opY <= height - pad.h - borderGap)
 		pad.opY += speed;
 }
 
-export default function handlePaddle(ctx: CanvasRenderingContext2D, pad: Pad, openentKey: string, socket: Socket) {
-	movement(ctx.canvas.height, pad, openentKey);
+export default function handlePaddle(ctx: CanvasRenderingContext2D, pad: Pad, opponentKey: string, socket: Socket) {
+	movement(ctx.canvas.height, pad, opponentKey);
 	socket.emit("input", key);
 	drawPaddle(ctx, pad);
 }

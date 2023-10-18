@@ -1,4 +1,5 @@
 import { Socket } from "socket.io";
+import { MatchInfo } from "./game.service";
 
 interface ScreenSize {
 	w: number,
@@ -33,8 +34,8 @@ enum padSide {
 
 // @ts-ignore
 interface State {
-	openentKey: string,
-	openentPos: number,
+	opponentKey: string,
+	opponentPos: number,
 	ballX: number,
 	ballY: number,
 	ballDx: number,
@@ -55,6 +56,8 @@ export default class Splatong {
 
 	private inputP1: string  = "";
 	private inputP2: string = "";
+	private scoreP1: number = 0;
+	private scoreP2: number = 0;
 
 	private screen: ScreenSize = {w: 3200, h:1800};
 	private borderGap: number = this.screen.h * 0.006;
@@ -106,6 +109,16 @@ export default class Splatong {
 		clearTimeout(this.timeoutId);
 	}
 
+	public matchInfo(): MatchInfo {
+		return ({
+			mode: "splatong",
+			user1Id: this.p1,
+			user2Id: this.p2,
+			user1_score: this.scoreP1,
+			user2_score: this.scoreP2,
+		});
+	}
+
 	//////////////SOCKET//////////////
 
 	private sendState() {
@@ -115,8 +128,8 @@ export default class Splatong {
 			ballDx: this.ball.dx,
 			ballDy: this.ball.dy
 		}
-		this.socketP1.emit("GameState", {openentKey: this.inputP2, openentPos: this.paddles.p2y, ...state});
-		this.socketP2.emit("GameState", {openentKey: this.inputP1, openentPos: this.paddles.p1y, ...state});
+		this.socketP1.emit("GameState", {opponentKey: this.inputP2, opponentPos: this.paddles.p2y, ...state});
+		this.socketP2.emit("GameState", {opponentKey: this.inputP1, opponentPos: this.paddles.p1y, ...state});
 	}
 
 	public input(id: number, input: string) {
@@ -188,9 +201,9 @@ export default class Splatong {
 		else
 			winner = this.coinflipLoser;
 
-		p1Score = Math.floor(p1Score / (this.cell * this.cell / 100));
-		p2Score = Math.floor(p2Score / (this.cell * this.cell / 100))
-		const result = {winner, p1Score, p2Score}
+		this.scoreP1 = Math.floor(p1Score / (this.cell * this.cell / 100));
+		this.scoreP2 = Math.floor(p2Score / (this.cell * this.cell / 100))
+		const result = {winner, p1Score: this.scoreP1, p2Score: this.scoreP2}
 	
 		this.socketP1.emit("end", result);
 		this.socketP2.emit("end", result);

@@ -5,7 +5,6 @@ import handlePaddle, { Pad, clearBehind, handleKey, handlePaddleGetReady, init_p
 import handleBall, { Ball, drawBall, init_ball } from "./ball";
 import collision from "./collision";
 import { countDown } from "./countDown";
-import { ArrowDownward } from "@mui/icons-material";
 
 let freezeFrame = 0;
 
@@ -115,21 +114,20 @@ export default function LocalGame( { setPlayers, setScore }: any ) {
 	}, [setPlayers, setScore]);
 
 	return (
-			<div className="canvas_container">
-				{ winner &&
-				<>
-					<h1 className="get_ready left-[21vw] top-[20vw]">{winner}</h1>
-					<ArrowDownward className="get_ready left-[31vw] top-[30vw] text-[8vw]" />
-				</>
-				}
-				<div className={"prompt_wrapper" + (prompt ? "" : " fade")}>
-					<h1 className="get_ready left-[23vw] top-[5vw]">GET READY</h1>
-					<div className={"key kbd left-[10vw] top-[10vw] " + leftReady}>w</div>
-					<div className={"key kbd left-[10vw] top-[25vw] " + leftReady}>s</div>
-					<div className={"key kbd right-[10vw] top-[10vw] " + rightReady}>▲</div>
-					<div className={"key kbd right-[10vw] top-[25vw] " + rightReady}>▼</div>
-				</div>
-				<canvas id="pong" ref={canvasRef} className="classique"/>
-			</div>
+		<div className="canvas_container">
+		<div className="prompt_wrapper z-[3]">
+			{ winner &&
+				<h1 className="get_ready top-[20vw]">{winner}</h1>
+			}
+		</div>
+		<div className={"prompt_wrapper" + (prompt ? "" : " fade")}>
+			<h1 className="get_ready top-[5vw]">GET READY</h1>
+			<div className={"key kbd left-[10vw] top-[10vw] " + leftReady}>w</div>
+			<div className={"key kbd left-[10vw] top-[25vw] " + leftReady}>s</div>
+			<div className={"key kbd right-[10vw] top-[10vw] " + rightReady}>▲</div>
+			<div className={"key kbd right-[10vw] top-[25vw] " + rightReady}>▼</div>
+		</div>
+		<canvas id="pong" ref={canvasRef} className="classique"/>
+	</div>
 	);
 }

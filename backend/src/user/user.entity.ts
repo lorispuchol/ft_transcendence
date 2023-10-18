@@ -62,8 +62,8 @@ export class User extends BaseEntity {
 	@OneToMany(() => Participant, (part) => part.user)
 	participants: Participant[]
 
-	@OneToMany(() => Match, (match) => match.challenger)
-	challengeMatches: Match[]
+	@OneToMany(() => Match, (match) => match.user)
+	userMatches: Match[]
 	
 	@OneToMany(() => Match, (match) => match.opponent)
 	opponMatches: Match[]

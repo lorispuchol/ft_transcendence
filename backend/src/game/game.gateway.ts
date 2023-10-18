@@ -5,6 +5,7 @@ import { Server, Socket } from "socket.io";
 import { client_url } from "src/auth/constants";
 import PongGame from "./game.classique";
 import Splatong from "./game.splatong";
+import { GameService } from "./game.service";
 
 @WebSocketGateway({
 	namespace: "game",
@@ -13,6 +14,7 @@ import Splatong from "./game.splatong";
 export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 	constructor(
 		private jwtService: JwtService,
+		private gameService: GameService
 	) {}
 		
 	private users: Map<Socket, number> = new Map();
@@ -37,6 +39,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		if (instance) {
 			const otherPlayer = instance.handleDisconnect(offId);
 			instance.clear();
+			this.gameService.addNewMatch(instance.matchInfo());
 			this.lobby.delete(offId);
 			this.lobby.delete(otherPlayer);
 		}
@@ -46,35 +49,35 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	async matchmaking(@MessageBody() mode: string, @ConnectedSocket() client: Socket) {
 		const userId = this.users.get(client);
 		
-		let openentSock: Socket;
+		let opponentSock: Socket;
 		this.queue = this.queue.filter((elem) => {
-			if (!openentSock && elem.mode === mode)
+			if (!opponentSock && elem.mode === mode)
 			{
-				openentSock = elem.socket;
+				opponentSock = elem.socket;
 				return 0;
 			}
 			return 1;
 		});
 
-		if (!openentSock)
+		if (!opponentSock)
 		{
 			this.queue.push({socket: client, mode});
 			return ;
 		}
 
-		const openentId: number = this.users.get(openentSock);
+		const opponentId: number = this.users.get(opponentSock);
 
-		client.emit("matchmaking", {side: -1, p1: {score:0, id: openentId, username: null}, p2: {score:0, id: userId, username: null}});
-		openentSock.emit("matchmaking", {side: 1, p1: {score:0, id: openentId, username: null}, p2: {score:0, id: userId, username: null}});
+		client.emit("matchmaking", {side: -1, p1: {score:0, id: opponentId, username: null}, p2: {score:0, id: userId, username: null}});
+		opponentSock.emit("matchmaking", {side: 1, p1: {score:0, id: opponentId, username: null}, p2: {score:0, id: userId, username: null}});
 
-		//create game with openent
+		//create game with opponent
 		let instance: PongGame | Splatong;
 		if (mode === "classic") 
-			instance = new PongGame(openentId, openentSock, userId, client);
+			instance = new PongGame(opponentId, opponentSock, userId, client);
 		else
-			instance = new Splatong(openentId, openentSock, userId, client);
+			instance = new Splatong(opponentId, opponentSock, userId, client);
 		this.lobby.set(userId, instance);
-		this.lobby.set(openentId, instance);
+		this.lobby.set(opponentId, instance);
 		setTimeout(() => instance.start(), 100);
 	}
 

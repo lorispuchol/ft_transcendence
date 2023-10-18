@@ -17,7 +17,7 @@ interface UserData {
 }
 
 interface DefyInfo {
-	openentId: number,
+	opponentId: number,
 	mode: string,
 	response: string,
 }
@@ -42,7 +42,7 @@ export default function GameMenu({ setSetting, setDefy }: MenuProps) {
 		}
 		socket.on('userDisconnect', delUser);
 		function handleDefy(data: DefyInfo) {
-			if (data.openentId !== select || !waitResponse)
+			if (data.opponentId !== select || !waitResponse)
 				return ;
 			if (data.response === "OK")
 			{

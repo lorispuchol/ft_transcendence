@@ -1,4 +1,5 @@
 import { Socket } from "socket.io";
+import { MatchInfo } from "./game.service";
 
 interface ScreenSize {
 	w: number,
@@ -32,8 +33,8 @@ enum padSide {
 
 // @ts-ignore
 interface State {
-	openentKey: string,
-	openentPos: number,
+	opponentKey: string,
+	opponentPos: number,
 	ballX: number,
 	ballY: number,
 	ballDx: number,
@@ -92,6 +93,16 @@ export default class PongGame {
 		clearTimeout(this.timeoutId);
 	}
 
+	public matchInfo(): MatchInfo {
+		return ({
+			mode: "classic",
+			user1Id: this.p1,
+			user2Id: this.p2,
+			user1_score: this.scoreP1,
+			user2_score: this.scoreP2,
+		});
+	}
+
 	//////////////SOCKET//////////////
 
 	private sendState() {
@@ -101,8 +112,8 @@ export default class PongGame {
 			ballDx: this.ball.dx,
 			ballDy: this.ball.dy
 		}
-		this.socketP1.emit("GameState", {openentKey: this.inputP2, openentPos: this.paddles.p2y, ...state});
-		this.socketP2.emit("GameState", {openentKey: this.inputP1, openentPos: this.paddles.p1y, ...state});
+		this.socketP1.emit("GameState", {opponentKey: this.inputP2, opponentPos: this.paddles.p2y, ...state});
+		this.socketP2.emit("GameState", {opponentKey: this.inputP1, opponentPos: this.paddles.p1y, ...state});
 	}
 
 	public input(id: number, input: string) {

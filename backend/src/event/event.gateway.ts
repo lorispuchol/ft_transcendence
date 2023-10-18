@@ -219,7 +219,7 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 		const mode = this.defyReq.splice(index, 1)[0].mode;
 	
 		const userSocket: Socket = [...this.users.entries()].filter(({ 1: value}) => value === defyInfo.senderId).map(([key]) => key)[0];
-		userSocket.emit("defy", {openentId: userId, mode: mode,response: "OK"});
+		userSocket.emit("defy", {opponentId: userId, mode: mode,response: "OK"});
 		const intervalId = setInterval(() => {client.emit("goDefy", defyInfo), console.log("interval menu")}, 200);
 		this.userInterval.push({userId, intervalId});
 		setTimeout(() => {this.clearUserInterval(userId)}, 2000);
@@ -237,6 +237,6 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 		this.defyReq.splice(index, 1);
 	 
 		const userSocket: Socket = [...this.users.entries()].filter(({ 1: value}) => value === defyInfo.senderId).map(([key]) => key)[0];
-		userSocket.emit("defy", {openentId: userId, response: "KO", mode: ""});
+		userSocket.emit("defy", {opponentId: userId, response: "KO", mode: ""});
 	}
 }

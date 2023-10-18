@@ -56,7 +56,7 @@ export default function OnlineSplatong( { socket, setScore, side }: any ) {
 			paddle.ownColor = p2Color;
 			paddle.opColor = p1Color;
 		}
-		let openentKey: string = "";
+		let opponentKey: string = "";
 
 		const cell: number = 25;
 		const cellSize: {w: number, h: number} = {w: screen.w / cell, h: screen.h / cell};
@@ -92,8 +92,8 @@ export default function OnlineSplatong( { socket, setScore, side }: any ) {
 		}
 
 		function updateState(state: any) {
-			openentKey = state.openentKey;
-			paddle.opY = state.openentPos;
+			opponentKey = state.opponentKey;
+			paddle.opY = state.opponentPos;
 			ball.x = state.ballX;
 			ball.y = state.ballY;
 			ball.dx = state.ballDx;
@@ -137,7 +137,7 @@ export default function OnlineSplatong( { socket, setScore, side }: any ) {
 
 		function render() {
 			drawBackground();
-			handlePaddle(ctx, paddle, openentKey, socket);
+			handlePaddle(ctx, paddle, opponentKey, socket);
 			ball.color = collision(screen, side, paddle, ball);
 			drawBall(ctx, ball);
 			background[yMatrix()][xMatrix()] = colorTomatrix(ball.color);

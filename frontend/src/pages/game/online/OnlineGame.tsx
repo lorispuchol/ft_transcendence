@@ -24,7 +24,7 @@ export default function OnlineGame( { socket, setScore, side }: any ) {
 		const [idKey] = handleKey();
 		const ball : Ball = init_ball(screen);
 		const paddle: Pad = init_paddle(screen, side);
-		let openentKey: string = "";
+		let opponentKey: string = "";
 		
 		let animationFrameId: number = 0;
 		let nextRoundTime: number = 0;
@@ -32,8 +32,8 @@ export default function OnlineGame( { socket, setScore, side }: any ) {
 		let now: number = 0;
 
 		function updateState(state: any) {
-			openentKey = state.openentKey;
-			paddle.opY = state.openentPos;
+			opponentKey = state.opponentKey;
+			paddle.opY = state.opponentPos;
 			ball.x = state.ballX;
 			ball.y = state.ballY;
 			ball.dx = state.ballDx;
@@ -72,7 +72,7 @@ export default function OnlineGame( { socket, setScore, side }: any ) {
 
 		function render() {
 			ctx.clearRect(0,0, screen.w, screen.h);
-			handlePaddle(ctx, paddle, openentKey, socket);
+			handlePaddle(ctx, paddle, opponentKey, socket);
 			collision(screen, side, paddle, ball);
 			drawBall(ctx, ball);
 			clearBehind(ctx, paddle, side);

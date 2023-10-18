@@ -18,6 +18,13 @@ export class UserService {
 		return await this.userRepository.save(newUser);
 	}
 
+	async findUserMatches(userId: number) {
+		const user : User = await this.userRepository.findOne({relations: ["userMatches"], where: {id: userId}});
+		if (!user)
+			return null;
+		return user.userMatches;
+	}
+	
 	async findOneById(id: number): Promise<User | undefined> {
 		return this.userRepository.findOneBy({id: id});
 	}
