@@ -41,6 +41,11 @@ export default function OnlineGame( { socket, setScore, side }: any ) {
 		}
 		socket.on("GameState", updateState);
 
+		function updateOwnPos(ownPos: number) {
+			paddle.ownY = ownPos;
+		}
+		socket.on("ownPos", updateOwnPos);
+
 		function roundReset(data: any) {
 			window.cancelAnimationFrame(animationFrameId);
 			nextRoundTime = data.nextRound;
@@ -81,6 +86,7 @@ export default function OnlineGame( { socket, setScore, side }: any ) {
 	
 		return (() => {
 			socket.off("GameState", updateState);
+			socket.off("ownPos", updateOwnPos);
 			socket.off("roundReset", roundReset);
 			socket.off("end", gameEnd);
 			window.cancelAnimationFrame(animationFrameId);

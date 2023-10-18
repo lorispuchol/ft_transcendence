@@ -50,6 +50,7 @@ export default class PongGame {
 	) {}
 
 	private intervalId: NodeJS.Timer;
+	private ownPosIntervalId: NodeJS.Timer;
 	private timeoutId: NodeJS.Timeout;
 
 	private inputP1: string  = "";
@@ -76,6 +77,7 @@ export default class PongGame {
 		this.socketP2.emit("roundReset", {scoreP1: this.scoreP1, scoreP2: this.scoreP2, nextRound: startTime});
 		if (this.checkWinner())
 			return ;
+		this.ownPosIntervalId = setInterval(() => this.sendOwnPos(), 2000);
 		this.timeoutId = setTimeout(() => {
 			this.intervalId = setInterval(() => this.update(this), perSec);
 		}, startDelay);
@@ -92,6 +94,7 @@ export default class PongGame {
 
 	public clear() {
 		clearInterval(this.intervalId);
+		clearInterval(this.ownPosIntervalId);
 		clearTimeout(this.timeoutId);
 	}
 
@@ -125,6 +128,11 @@ export default class PongGame {
 		}
 		this.socketP1.emit("GameState", {opponentKey: this.inputP2, opponentPos: this.paddles.p2y, ...state});
 		this.socketP2.emit("GameState", {opponentKey: this.inputP1, opponentPos: this.paddles.p1y, ...state});
+	}
+
+	private sendOwnPos() {
+		this.socketP1.emit("ownPos", this.paddles.p1y);
+		this.socketP2.emit("ownPos", this.paddles.p2y);
 	}
 
 	public input(id: number, input: string) {

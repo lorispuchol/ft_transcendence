@@ -16,7 +16,7 @@ export default function DisplayWinner({ winnerId }: { winnerId: number }) {
 		})
 	}, [winnerId, setWinner])
 
-	if (winnerId === -1)
+	if (!winner)
 		return (<></>);
 	return (
 			<h1 className="get_ready top-[20vw]">{winner + " win"}</h1>
