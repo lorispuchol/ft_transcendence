@@ -19,7 +19,7 @@ function renderColor(status: string) {
 			return "red"
 	}
 }
-
+  
 export default function UserStatus({ userId }: UserStatusprops) {
 	const socket: Socket = useContext(EventContext)!;
 	const [userStatus, setUserStatus]: [string, Function] = useState("loading");

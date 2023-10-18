@@ -12,7 +12,7 @@
 
 .everyone_list {
 	overflow: auto;
-	max-height: 86.3vh;
+	max-height: 30vh;
 	max-width: 100%;
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(808px, 1fr));
@@ -22,9 +22,9 @@
 	display: none !important;
   }
 
-.everyone_list > div {
-	margin-bottom: 0px;
-}
+// .everyone_list > div {
+// 	margin-bottom: 0px;
+// }
 
 .profile_element {
 	margin: 0.5rem;

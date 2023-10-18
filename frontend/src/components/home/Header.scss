@@ -1,0 +1,36 @@
+.basic {
+	margin-bottom: 20px;
+	display: flex;
+	// flex-wrap: wrap;
+	justify-content: center;
+}
+
+.preview_pong {
+	width: 50%;
+	margin-right: 12px;
+}
+
+.text_pong {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+.font_pong {
+	color: white;
+	font-size: 1.5rem;
+}
+
+@media screen and (max-width: 666px){
+	.basic {
+		flex-wrap: wrap;
+	}
+	.preview_pong {
+		// display: contents;
+		width: 313px;
+		margin-bottom: 12px;
+	}
+	.text_pong {
+		display: block;
+	}
+}

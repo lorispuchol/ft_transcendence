@@ -1,0 +1,30 @@
+.mh_score {
+	font-family: 'Poppins';
+	font-size: 1.5rem;
+	display: flex;
+	justify-content: center;
+}
+
+.mh_base {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-evenly;
+}
+
+.mh_card_w {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	width: 15%;
+	border: 2px solid green;
+}
+
+.mh_card_l {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	width: 15%;
+	border: 2px solid red;
+}

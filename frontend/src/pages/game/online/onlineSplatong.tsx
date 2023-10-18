@@ -92,6 +92,7 @@ export default function OnlineSplatong( { socket, setScore, side }: any ) {
 		}
 
 		function updateState(state: any) {
+			ball.color = state.ballColor === 1 ? p1Color : p2Color;
 			opponentKey = state.opponentKey;
 			paddle.opY = state.opponentPos;
 			ball.x = state.ballX;
@@ -100,6 +101,11 @@ export default function OnlineSplatong( { socket, setScore, side }: any ) {
 			ball.dy = state.ballDy;
 		}
 		socket.on("GameState", updateState);
+
+		function updateOwnPos(ownPos: number) {
+			paddle.ownY = ownPos;
+		}
+		socket.on("ownPos", updateOwnPos);
 
 		function roundStart(startTime: number) {
 			nextRoundTime = startTime;
@@ -147,6 +153,7 @@ export default function OnlineSplatong( { socket, setScore, side }: any ) {
 	
 		return (() => {
 			socket.off("GameState", updateState);
+			socket.off("ownPos", updateOwnPos);
 			socket.off("roundStart", roundStart);
 			socket.off("end", gameEnd);
 			window.cancelAnimationFrame(animationFrameId);
