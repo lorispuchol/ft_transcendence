@@ -7,7 +7,7 @@ import { useLocation } from "react-router-dom";
 import { Socket, io } from "socket.io-client";
 import './chat.scss'
 import { ChanMode, ChannelData, MemberDistinc, MessageData, ParticipantData, UserData } from "./interfaceData";
-import { DisplayMemberContext, SetDisplayMemberContext, SocketChatContext, UserContext } from "../utils/Context";
+import { DisplayMemberContext, SetDisplayMemberContext, SetSettingsContext, SocketChatContext, UserContext } from "../utils/Context";
 import ChannelNav from "./ChannelNav";
 import { Avatar } from "@mui/material";
 import { Tag } from "@mui/icons-material";
@@ -81,6 +81,7 @@ function ChanButtonConv({chan, focusConv, setFocusConv}: ButtonConvProps) {
 
 	const [resMembers, setResMembers]: [ResMembers, Function] = useState({status: "loading"});
 	const user = useContext(UserContext);
+	const setSettingsContext = useContext(SetSettingsContext);
 	const setDisplayMemberContext = useContext(SetDisplayMemberContext);
 
 	useEffect(() => {
@@ -100,6 +101,7 @@ function ChanButtonConv({chan, focusConv, setFocusConv}: ButtonConvProps) {
 	function handleOnClick() {
 		setFocusConv(chan.name);
 		setDisplayMemberContext(null)
+		setSettingsContext(false);
 	}
 
 	return (
@@ -120,6 +122,7 @@ function DmButtonConv({chan, focusConv, setFocusConv}: ButtonConvProps) {
 
 	const user = useContext(UserContext);
 	const setDisplayMemberContext = useContext(SetDisplayMemberContext);
+	const setSettingsContext = useContext(SetSettingsContext);
 	const [resMembers, setResMembers]: [ResMembers, Function] = useState({status: "loading"});
 
 	useEffect(() => {
@@ -146,7 +149,8 @@ function DmButtonConv({chan, focusConv, setFocusConv}: ButtonConvProps) {
 
 	function handleOnClick() {
 		setFocusConv(chan.name);
-		setDisplayMemberContext(null)
+		setDisplayMemberContext(null);
+		setSettingsContext(false);
 	}
 
 	return (
@@ -180,6 +184,9 @@ function ListConv({focusConv, setFocusConv}: focusConvProps) {
 	if (response.status !== "OK")
 		return (<ErrorHandling status={response.status} message={response.error} />);
 
+	if (!response.data)
+		return null;
+
 	const dms: ChannelData[]  = response.data!.filter((conv) => conv.mode === ChanMode.DM)
 	const chans: ChannelData[]  = response.data!.filter((conv) => conv.mode !== ChanMode.DM)
 	return (
@@ -204,6 +211,7 @@ export default function Chat() {
 
 	const [focusConv, setFocusConv]: [string, Function] = useState(location.state?.to);
 	const [displayProfile, setDisplayProfile]: [UserData | null, Function] = useState(null);
+	const [settings, setSettings]: [boolean, Function] = useState(false);
 
 	const [socket, setSocket]: [Socket | null, Function] = useState(null);
 
@@ -226,7 +234,7 @@ export default function Chat() {
 		<SocketChatContext.Provider value={socket}>
 		<SetDisplayMemberContext.Provider value={setDisplayProfile}>
 		<DisplayMemberContext.Provider value={displayProfile}>
-
+		<SetSettingsContext.Provider value={setSettings}>
 			<div className="chat-page">
 				<div className="list-conv">
 					<ListConv focusConv={focusConv} setFocusConv={setFocusConv}/>
@@ -235,10 +243,11 @@ export default function Chat() {
 					{focusConv ? <Chatting chan={focusConv} /> : <ChannelNav />}
 				</div>
 				<div className="list-member">
-					{focusConv ? <ListMembers chan={focusConv} /> : null}
+					{focusConv ? <ListMembers chan={focusConv} settings={settings} setSettings={setSettings} /> : null}
 				</div>
 			</div>
 			<ToastContainer />
+		</SetSettingsContext.Provider>
 		</DisplayMemberContext.Provider>
 		</SetDisplayMemberContext.Provider>
 		</SocketChatContext.Provider>

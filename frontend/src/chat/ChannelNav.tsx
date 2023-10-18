@@ -8,6 +8,7 @@ import { ChanMode, ChannelData } from "./interfaceData";
 import Loading from "../utils/Loading";
 import ErrorHandling from "../utils/Error";
 import { logError, logSuccess, logWarn } from "./Chat";
+import { useNavigate } from "react-router-dom";
 
 interface Response {
 	status: string | number,
@@ -19,13 +20,11 @@ interface JoinButtonProps {
 	channelName: string,
 	mode: ChanMode,
 	password: string,
-	reRender: number,
-	setRerender: Function
 }
 
-function JoinButton ({channelName, mode, password, reRender, setRerender}: JoinButtonProps) {
+function JoinButton ({channelName, mode, password}: JoinButtonProps) {
 
-	const socket = useContext(SocketChatContext);
+	const navigate = useNavigate();
 
 	function join () {
 		if (mode === ChanMode.PUBLIC) {
@@ -34,9 +33,8 @@ function JoinButton ({channelName, mode, password, reRender, setRerender}: JoinB
 					if (response.data.status === "KO")
 						logWarn(response.data.description)
 					else {
-						socket!.emit('message',channelName, "Hello Everybody!");
+						navigate("/chat", {replace: true, state: {to: channelName}})
 						logSuccess(response.data.description)
-						setRerender(reRender + 1);
 					}	
 				}
 				else
@@ -49,9 +47,8 @@ function JoinButton ({channelName, mode, password, reRender, setRerender}: JoinB
 					if (response.data.status === "KO")
 						logWarn(response.data.description)
 					else {
-						socket!.emit('message',channelName, "Hello Everybody!");
+						navigate("/chat", {replace: true, state: {to: channelName}})
 						logSuccess(response.data.description)
-						setRerender(reRender + 1);
 					}	
 				}
 				else
@@ -61,13 +58,14 @@ function JoinButton ({channelName, mode, password, reRender, setRerender}: JoinB
 	}
 
 	return (
-		<button onClick={join} className="w-fit btn btn-active bg-white btn-neutral hover:bg-purple-900 m-0">JOIN</button>
+		<button onClick={join} className="w-fit btn bg-purple-700 hover:bg-purple-900 btn-neutral">JOIN</button>
 	)
 }
 
-function Create({close}: any) {
+function Create() {
 
 	const socket = useContext(SocketChatContext);
+	const navigate = useNavigate();
 
 	const [datasChan, setDatasChan] = useState({
 		channelName: "",
@@ -106,8 +104,8 @@ function Create({close}: any) {
 			PostRequest("/chat/createChanWithPw", {channelName, password, mode}).then((response: any) => {
 				if (response.status === "OK"){
 					socket!.emit('message',channelName, "Welcome To Everybody!");
-					close();
 					logSuccess(`Channel ${channelName} created successfully`)
+					navigate("/chat", {replace: true, state: {to: channelName}})
 				}
 				else
 					logError(response.error);
@@ -117,8 +115,8 @@ function Create({close}: any) {
 			PostRequest("/chat/createChanWithoutPw", {channelName, mode}).then((response: any) => {
 				if (response.status === "OK"){
 					socket!.emit('message',channelName, "Welcome To Everybody!");
-					close();
 					logSuccess(`Channel ${channelName} created successfully`)
+					navigate("/chat", {replace: true, state: {to: channelName}})
 				}
 				else
 					logError(response.error);
@@ -132,8 +130,8 @@ function Create({close}: any) {
 				<FormLabel className=" text-inherit mb-3 text-base font-semibold">CREATE YOUR OWN CHANNEL</FormLabel>
 				<form onSubmit={submitChannel}>
 					<FormGroup>
-						<input className="input w-full max-w-xs bg-white mb-3 text-inherit text-black" value={datasChan.channelName} onChange={changeName} name="name" placeholder="Channel Name" />	
-						<input className="input w-full max-w-xs bg-white mb-3 text-inherit text-black" disabled={datasChan.mode !== ChanMode.PROTECTED} type="password" placeholder="Password" value={datasChan.password} onChange={changePw} name="password" />	
+						<input className="input w-full h-11 max-w-xs bg-white mb-3 text-inherit text-black" value={datasChan.channelName} onChange={changeName} name="name" placeholder="Channel Name" />	
+						<input className={`input w-full h-11 max-w-xs ${datasChan.mode === ChanMode.PROTECTED ? 'bg-white' : 'bg-gray-100'} mb-3 text-inherit text-black`} disabled={datasChan.mode !== ChanMode.PROTECTED} type="password" placeholder="Password" value={datasChan.password} onChange={changePw} name="password" />
 					</FormGroup>
 					<RadioGroup
 						className="mb-3"
@@ -147,7 +145,7 @@ function Create({close}: any) {
 						<FormControlLabel value={ChanMode.PRIVATE} control={<Radio color="default"/>} label="Private" />
 						<FormControlLabel value={ChanMode.PROTECTED} control={<Radio color="default"/>} label="Protected by a password" />
 					</RadioGroup>
-					<button className="w-full btn btn-active bg-white btn-neutral hover:bg-purple-900" type="submit" ><Add/></button>
+					<button className="w-full h-14 btn text-slate-200 bg-purple-900 btn-neutral hover:bg-purple-700" type="submit" ><Add/></button>
 				</form>
 			</FormControl>
 		</div>
@@ -156,10 +154,8 @@ function Create({close}: any) {
 
 function Explore() {
 
-	const [reRender, setReRender]: [number, Function] = useState(0);
 	const [response, setResponse]: [Response, Function] = useState({status: "loading"});
 	const [inputPw, setInputPw]: [Map<string, string>, Function] = useState(new Map());
-
 
 	useEffect(() => {
 			GetRequest("/chat/getNoConvs/").then((response) => {
@@ -168,7 +164,7 @@ function Explore() {
 				response.data.map((chan: any) => temp.set(chan.name, ""))
 				setInputPw(temp)
 			});
-	}, [reRender]);
+	}, []);
 	if (response.status === "loading")
 		return (<Loading />);
 	if (response.status !== "OK")
@@ -192,8 +188,8 @@ function Explore() {
 						<div className=" w-full flex- flex-col">
 							<p className="text-lg">#{chan.name}</p>
 							<div className="flex flex-row justify-between">
-								<input value={inputPw.get(chan.name)} type="password" className="input bg-white text-inherit text-black w-64 h-12" disabled={chan.mode !== ChanMode.PROTECTED} placeholder="Password" onChange={(e) => changeMap(chan.name, e.target.value)}/>
-								<JoinButton channelName={chan.name} mode={chan.mode} password={inputPw.get(chan.name)!} reRender={reRender} setRerender={setReRender}/>
+								<input value={inputPw.get(chan.name)} type="password" className={`input ${chan.mode === ChanMode.PROTECTED ? 'bg-white' : 'bg-gray-100'} text-inherit text-black w-64 h-12`} disabled={chan.mode !== ChanMode.PROTECTED} placeholder="Password" onChange={(e) => changeMap(chan.name, e.target.value)}/>
+								<JoinButton channelName={chan.name} mode={chan.mode} password={inputPw.get(chan.name)!} />
 							</div>
 						</div>
 					</li>
@@ -225,16 +221,16 @@ export default function ChannelNav() {
 	return (
 		<>
 			<div className="chan-nav">
-				<button className="tooltip btn btn-neutral h-1/3 w-1/3 m-5" data-tip="Explore Channels" onClick={() => setActivePopUp("explore")}>
+				<button className="tooltip btn send-button text-white h-1/3 w-1/3 m-5" data-tip="Explore Channels" onClick={() => setActivePopUp("explore")}>
 					<TravelExplore sx={{ width: 64, height: 64 }}/>
 				</button>
-				<button className="tooltip btn btn-neutral h-1/3 w-1/3 m-5" data-tip="Create Channel" onClick={() => setActivePopUp("create")}>
+				<button className="tooltip btn send-button text-white h-1/3 w-1/3 m-5" data-tip="Create Channel" onClick={() => setActivePopUp("create")}>
 					<AddCircleOutline sx={{ width: 64, height: 64 }}/>
 				</button>
 				{
 					activePopUp !== "" &&
 						<PopUp close={() => setActivePopUp("")}>
-							{activePopUp === "create" ? <Create close={() => setActivePopUp("")}/> : <Explore />}
+							{activePopUp === "create" ? <Create /> : <Explore />}
 						</PopUp>
 				}
 			</div>

@@ -1,4 +1,4 @@
-import { IsDate, IsEnum, IsNotEmpty, IsString, IsStrongPassword, MaxLength, MinLength, NotContains, Validate } from "class-validator";
+import { IsEnum, IsNotEmpty, IsString, IsStrongPassword, MaxLength, MinLength, NotContains, Validate } from "class-validator";
 import { IsChannelNameAvailable, PasswordChannelMatch } from "./channel.decorator";
 import { ChanMode } from "./entities/channel.entity";
 import { MemberDistinc } from "./entities/participant_chan_x_user.entity";
@@ -30,6 +30,7 @@ export class NewChannelWithPassword {
 	@IsNotEmpty()
 	@IsString()
 	@IsStrongPassword({minLength: 8, minLowercase: 1, minNumbers: 1, minUppercase: 1, minSymbols: 0})
+	@MaxLength(30)
 	password: string;
 
 	@IsEnum(ChanMode)
@@ -52,7 +53,41 @@ export class SetPasswordChannel {
 	@IsNotEmpty()
 	@IsString()
 	@IsStrongPassword({minLength: 8, minLowercase: 1, minNumbers: 1, minUppercase: 1, minSymbols: 0})
-	NewPassword: string;
+	@MaxLength(30)
+	newPw: string;
+}
+
+export class AddPwChan {
+
+	@IsNotEmpty()
+	@IsString()
+	@IsStrongPassword({minLength: 8, minLowercase: 1, minNumbers: 1, minUppercase: 1, minSymbols: 0})
+	@MaxLength(30)
+	newPw: string;
+}
+
+export class RemovePwChannel {
+
+	@IsNotEmpty()
+	@IsString()
+	@MaxLength(33)
+	@MinLength(2)
+	@NotContains("+")
+	channelName: string;
+
+	@IsNotEmpty()
+	@IsString()
+	@Validate(PasswordChannelMatch)
+	password: string;
+
+	@IsEnum(ChanMode)
+	mode: ChanMode;
+}
+
+export class ChangeModeChan {
+
+	@IsEnum(ChanMode)
+	mode: ChanMode;
 }
 
 export class JoinChannelWithPassword {

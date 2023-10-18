@@ -29,6 +29,10 @@ export class EventService {
 		private userService: UserService,
 	) {}
 
+	isAlreadyConnected(userId: number): boolean {
+		return (this.eventGateway.isAlreadyConnected(userId));
+	}
+
 	newEvent(userId: number, event: Event) {
 		this.eventGateway.newEvent(userId, event);
 	}

@@ -1,4 +1,4 @@
-import { IsAlpha, IsNotEmpty, IsString, IsStrongPassword, MaxLength, MinLength, Validate, isNotEmpty } from "class-validator";
+import { IsAlpha, IsNotEmpty, IsString, MaxLength, MinLength, Validate } from "class-validator";
 import { IsUsernameAvailable } from "src/auth/auth.decorator";
 
 export class newUsername {

@@ -3,6 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "./user.entity";
 import { Repository } from "typeorm";
 import { server_url } from "src/auth/constants";
+import { Match } from "src/game/match.entity";
 
 @Injectable()
 export class UserService {
@@ -17,15 +18,7 @@ export class UserService {
 		newUser.password = password;
 		return await this.userRepository.save(newUser);
 	}
-
-	async deleteOne(login: string) {
-		if (! await this.findOneByLogin(login)) {
-			return `Error: User ${login} doesn't exist`
-		}
-		this.userRepository.delete({login});
-		return `User ${login} deleted`;
-	}
-
+	
 	async findOneById(id: number): Promise<User | undefined> {
 		return this.userRepository.findOneBy({id: id});
 	}
@@ -45,14 +38,40 @@ export class UserService {
 		return user.avatar
 	}
 
+	async findUserMatches(userId: number) {
+		const user : User = await this.userRepository.findOne({relations: ["winnerMatches", "loserMatches"], where: {id: userId}});
+		if (!user)
+			return null;
+		const matches: Match[] = [...user.winnerMatches, ...user.loserMatches];
+		matches.forEach((match) => {
+			delete match.winner.login;
+			delete match.winner.password;
+			delete match.winner.nb_victory;
+			delete match.winner.nb_defeat;
+			delete match.loser.login;
+			delete match.loser.password;
+			delete match.loser.nb_victory;
+			delete match.loser.nb_defeat;
+		});
+		return matches;
+	}
+
+	addWin(userId: number) {
+		this.userRepository.increment({id: userId}, "nb_victory", 1);
+	}
+
+	addDefeat(userId: number) {
+		this.userRepository.increment({id: userId}, "nb_defeat", 1);
+	}
+
 	async changeUsername(userId: number, newUsername: string) {
 		this.userRepository.update({id: userId}, {username: newUsername});
-		return ("OK")
+		return ("OK");
 	}
 
 	async changeAvatar(userId: number, newAvatar: string) {
 		this.userRepository.update({id: userId}, {avatar: server_url + '//' + newAvatar});
-		return ("OK")
+		return ("OK");
 	}
 
 	async getAllUsers() {
@@ -73,6 +92,6 @@ export class UserService {
 			avatar: user.avatar,
 			nb_victory: user.nb_victory,
 			nb_defeat: user.nb_defeat
-		})
+		});
 	}
 }

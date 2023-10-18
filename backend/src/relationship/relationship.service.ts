@@ -11,7 +11,7 @@ import { EventService } from "src/event/event.service";
 export class RelationshipService{
 	constructor(
 		@InjectRepository(Relationship, 'lorisforever')
-		private relationshipRepository: Repository<Relationship>,
+			private relationshipRepository: Repository<Relationship>,
 		private	eventService: EventService,
 	) {}
 	
@@ -212,6 +212,11 @@ export class RelationshipService{
 
 	async getRelation(user1: User, user2: User) {
 
+		if (!user1)
+			return ({status: "KO", description: "Request impossible"})
+		if (!user2)
+			return ({status: "KO", description: "User not found"})
+
 		const relation1: Relationship = await this.getRelationship(user1, user2);
 		if (relation1 && relation1.status === RelationshipStatus.BLOCKED)
 			return ({status: "blocked"});
@@ -224,7 +229,7 @@ export class RelationshipService{
 			return ({status: relation1.status});
 		if (relation2 && relation2.status === RelationshipStatus.ACCEPTED)
 			return ({status: relation2.status});
-		return ({status: "noRelation"});
+		return ({status: "noRelation", userId: user2.id});
 	}
 
 	async saveRelationship(requester: User, recipient: User, status: string) {

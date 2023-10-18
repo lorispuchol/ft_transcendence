@@ -7,7 +7,6 @@ import NoRouteFound from './pages/Error/NoRouteFound';
 import { ReactElement, useEffect, useState } from 'react';
 import { GetRequest, server_url } from './utils/Request';
 import ErrorHandling from './utils/Error';
-import Loading from './utils/Loading';
 import Chat from './chat/Chat';
 import Game from './pages/game/Game';
 import Loader from './components/Loading/Loader'
@@ -29,24 +28,30 @@ interface Response {
 	error?: string,
 }
 
-interface WebSocketProps {
-	children: ReactElement,
-}
-
-function WebSocket({ children }: WebSocketProps) {
+function WebSocket({ children }: {children: ReactElement}) {
 	const [socket, setSocket]: [Socket | null, Function] = useState(null);
+	const [connected, setConnected]: [boolean, Function] = useState(false);
 
 	useEffect(() => {
+		//const id = setTimeout(() => {setConnected(true)}, 500);
+		setConnected(true);
 		const token = localStorage.getItem("token");
 		const option = { transportOptions: { polling: { extraHeaders: { token: token }}}};
 		const newSocket = io(server_url + "/event", option);
+
+		//dev remettre pour prod
+		// function notConnected () {
+		// 	clearTimeout(id);
+		// 	localStorage.clear();
+		// 	window.location.replace(client_url);
+		// }
+		// newSocket.on("disconnect", notConnected);
 		setSocket(newSocket);
 		return () => {newSocket.close()};
-	}, [setSocket]);
+	}, [setSocket, setConnected]);
 
-	if (!socket)
-		return (<Loading />);
-	
+	if (!socket || !connected)
+		return (<Loader />);
 	return (
 		<EventContext.Provider value={socket}>
 			{children}
@@ -58,11 +63,11 @@ export default function App() {
 	const [response, setResponse]: [Response, Function] = useState({status: "loading"});
 
 	useEffect(() => {
-			GetRequest("/user/me").then((response) => setResponse(response));
+			GetRequest("/user/me").then((response) => (setResponse(response)));
 	}, []);
 
 	if (response.status === "loading")
-		return (<Loading />);
+		return (<Loader />);
 	if (response.status === 401)
 	{
 		return (

@@ -1,6 +1,5 @@
-import { Body, Controller, Get, Param, Patch, Request, UploadedFile, UseInterceptors,} from "@nestjs/common";
+import { Body, Controller, Get, HttpException, Param, Patch, Request, UploadedFile, UseInterceptors } from "@nestjs/common";
 import { UserService } from "./user.service";
-import { Public } from "src/auth/constants";
 import { User } from "./user.entity";
 import { newUsername } from "./user.dto";
 
@@ -9,6 +8,7 @@ import { diskStorage } from "multer";
 import Path = require('path');
 import { FileInterceptor } from "@nestjs/platform-express";
 import * as fs from 'fs';
+import { HttpStatusCode } from "axios";
 
 const	storage = {
 	storage: diskStorage ({
@@ -34,7 +34,7 @@ export class UserController {
 	) {
 		const user: User = await this.userService.findOneByLogin(req.user.login);
 		if (!user)
-			return ;
+			throw new HttpException('unauthorized', HttpStatusCode.Unauthorized);
 		return (this.userService.parseUser(user));
 	}
 
@@ -49,15 +49,29 @@ export class UserController {
 		@Request() req: any,
 		@Body() newUsername: newUsername
 	) {
+		const user: User = await this.userService.findOneById(req.user.id);
+		if (!user)
+			return ;
 		this.userService.changeUsername(req.user.id, newUsername.username);
 		return {username: newUsername.username};
 	}
-	
+
+	@Patch('usernameToLogin')
+	async changeUsernameToLogin(
+		@Request() req: any
+	) {
+		const user: User = await this.userService.findOneById(req.user.id);
+		if (!user)
+			return ;
+		this.userService.changeUsername(user.id, user.login);
+		return {username: user.login};
+	}
+
 	@Patch('avatar')
 	@UseInterceptors(FileInterceptor('file', storage))
 	async changeAvatar(
 		@Request() req: any,
-		@UploadedFile() file:any,
+		@UploadedFile() file: any,
 	) {
 		const user = await this.userService.findOneByLogin(req.user.login);
 		if (!user)
@@ -104,5 +118,3 @@ export class UserController {
 		return (this.userService.parseUser(user));
 	}
 }
-
-	

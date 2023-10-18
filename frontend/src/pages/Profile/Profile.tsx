@@ -109,7 +109,7 @@ export default function Profile() {
 				</div>
 			</Paper>
 			{show &&
-				<SettingsPopup close={closeSettings}/>
+				<SettingsPopup close={closeSettings} login={profile.login}/>
 			}
 		</div>
 	)

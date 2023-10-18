@@ -1,7 +1,7 @@
 import { Button, ButtonGroup, CircularProgress, Paper } from "@mui/material";
 import DemoGame from "./local/DemoGame";
 import './GameMenu.scss';
-import { Public, RocketLaunch, SportsTennis, Weekend } from "@mui/icons-material";
+import { Brush, Public, SportsTennis, Weekend } from "@mui/icons-material";
 import { useContext, useEffect, useState } from "react";
 import { EventContext } from "../../utils/Context";
 
@@ -16,6 +16,12 @@ interface UserData {
 	username: string,
 }
 
+interface DefyInfo {
+	opponentId: number,
+	mode: string,
+	response: string,
+}
+
 export default function GameMenu({ setSetting, setDefy }: MenuProps) {
 	const [type, setType]: [string, Function] = useState("local");
 	const [mode, setMode]: [string, Function] = useState("classic");
@@ -28,32 +34,42 @@ export default function GameMenu({ setSetting, setDefy }: MenuProps) {
 		function addUser(newUser: UserData) {
 			setUsers((prev: UserData[]) => [...prev, newUser])
 		}
+		socket.on('everyone', addUser);
 		function delUser(oldUser: UserData) {
 			setUsers((prev: UserData[]) => prev.filter((user) => user.id !== oldUser.id));
 			if (select === oldUser.id)
 				setSelect(null);
 		}
-		function handleDefy(data: any) {
-			if (data.id !== select)
+		socket.on('userDisconnect', delUser);
+		function handleDefy(data: DefyInfo) {
+			if (data.opponentId !== select || !waitResponse)
 				return ;
 			if (data.response === "OK")
 			{
 				setDefy(select);
-				setSetting({type: "online", mode: mode})
+				setSetting({type: "online", mode: data.mode})
 			}
 			else
 				setWaitResponse(false);
 		}
-		socket.on('everyone', addUser);
-		socket.on('userDisconnect', delUser);
 		socket.on("defy", handleDefy);
-		
+		function waitDefy(defyId: number) {
+			socket.emit("clear");
+			setSelect(defyId);
+			setWaitResponse(true);
+			socket.emit("challenge", {to: defyId, mode: "classic"});
+		}
+		socket.on("waitDefy", waitDefy);
+
 		return () => {
+			if (waitResponse)
+				socket.emit("cancelChallenge");
 			socket.off('everyone', addUser);
 			socket.off('userDisconnect', delUser);
 			socket.off("defy", handleDefy);
+			socket.off("waitDefy", waitDefy);
 		};
-	}, [socket, select, mode, setDefy, setSetting])
+	})
 	
 	useEffect(() => {
 		socket.emit("getConnected");
@@ -72,6 +88,11 @@ export default function GameMenu({ setSetting, setDefy }: MenuProps) {
 		setWaitResponse(true);
 	}
 
+	function cancel_defy() {
+		socket.emit("cancelChallenge");
+		setWaitResponse(false);
+	}
+
 	return (
 		<div className="menu_container">
 			<div className="menu_wrapper">
@@ -85,7 +106,7 @@ export default function GameMenu({ setSetting, setDefy }: MenuProps) {
 					<div className="border-t-2 border-inherit">
 						<ButtonGroup className="menu_select" orientation="vertical" variant="text">
 							<Button key="classic" className={focus("classic")} onClick={() => setMode("classic")}><SportsTennis />classic</Button>
-							<Button key="turbo" className={focus("turbo")} onClick={() => setMode("turbo")}><RocketLaunch />turbo</Button>
+							<Button key="turbo" className={focus("turbo")} onClick={() => setMode("turbo")}><Brush />splatong</Button>
 						</ButtonGroup>
 					</div>
 					{waitResponse ?
@@ -93,7 +114,7 @@ export default function GameMenu({ setSetting, setDefy }: MenuProps) {
 							<div />
 							<CircularProgress />
 							<strong>waiting for response</strong>
-							<div />
+							<Button className="text-[1vw]" onClick={cancel_defy}>cancel</Button>
 						</div>
 					:
 					<div className="menu_buttons">

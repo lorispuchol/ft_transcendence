@@ -1,4 +1,4 @@
-import { Entity, ManyToOne, Column, JoinColumn, PrimaryColumn, PrimaryGeneratedColumn, BaseEntity} from "typeorm";
+import { Entity, ManyToOne, Column, PrimaryColumn, BaseEntity} from "typeorm";
 import { User } from "../user/user.entity";
 
 export enum RelationshipStatus {

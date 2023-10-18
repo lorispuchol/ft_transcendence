@@ -3,7 +3,7 @@ import { Button } from "@mui/material";
 import { DeleteRequest, PatchRequest } from "../../utils/Request";
 import ErrorHandling from "../../utils/Error";
 import { useContext, useState } from "react";
-import { EventContext, SocketChatContext } from "../../utils/Context";
+import { EventContext } from "../../utils/Context";
 import { useNavigate } from "react-router-dom";
 
 
@@ -53,19 +53,19 @@ function RefuseChannel({ channel }: ButtonChannelProps) {
 }
 
 function AcceptChannel({ channel }: ButtonChannelProps) {
-	const [response, setResponse]: [Response, Function] = useState({status: "inactive"});
 
-	const socket = useContext(SocketChatContext);
+	const [response, setResponse]: [Response, Function] = useState({status: "inactive"});
+	const navigate = useNavigate()
 
 	function handleClick() {
 		PatchRequest("/chat/acceptChannel/" + channel, {}).then((response) => {
 			setResponse(response)
 			if (response.status === "OK")
-				socket!.emit('message', channel, "Hello Everybody!");
+				navigate("/chat", {replace: true, state: {to: channel}})
 		});
-}
+	}
 	if (response.status === "KO")
-			return (<ErrorHandling status={response.status} message={response.error} />);
+		return (<ErrorHandling status={response.status} message={response.error} />);
 	if (response.data?.status === "KO")
 		return (<strong>{response.data.description}</strong>);
 
@@ -120,11 +120,11 @@ function AcceptGame({ senderId, mode }: GameProps) {
 	)
 }
 
-function RefuseGame({ senderId }: GameProps) {
+function RefuseGame({ senderId, mode }: GameProps) {
 	const socket = useContext(EventContext)!;
 
 	function handleClick() {
-		socket.emit("refuseGame", senderId);
+		socket.emit("refuseGame", {senderId, mode});
 	}
 
 	return (
@@ -153,7 +153,7 @@ export default function EventButton ({ event }: EventButtonProps) {
 		return (
 			<div className="grid grid-cols-2">
 				<AcceptGame senderId={event.senderId} mode={event.gameMode}/>
-				<RefuseGame senderId={event.senderId} />
+				<RefuseGame senderId={event.senderId} mode={event.gameMode}/>
 			</div>
 		)
 	if (event.type !== "message")

@@ -1,23 +1,22 @@
-
 import { useEffect, useRef, useState } from "react";
 import "../Game.scss";
 import handlePaddle, { Pad, clearBehind, drawPaddle, handleKey, init_paddle } from "./paddle";
 import { Ball, drawBall, init_ball } from "../local/ball";
-import { countDown } from "../local/countDown";
-import { Players } from "../Game";
+import { countDown } from "./countDown";
 import collision from "./collision";
+import DisplayWinner from "./winner";
 
 export interface ScreenSize {
 	w: number,
 	h: number
 }
 
-export default function OnlineGame( { socket, setPlayers, side }: any ) {
+export default function OnlineGame( { socket, setScore, side }: any ) {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
-	const [winner, setWinner]: [string, Function] = useState("");
+	const [winnerId, setWinnerId]: [number, Function] = useState(-1);
 	
 	useEffect(() => {
-		setWinner("");
+		setWinnerId(-1);
 		const ctx = canvasRef!.current!.getContext('2d')!;
 		const screen = {w: 3200, h: 1800}
 		ctx.canvas.width = screen.w;
@@ -25,16 +24,16 @@ export default function OnlineGame( { socket, setPlayers, side }: any ) {
 		const [idKey] = handleKey();
 		const ball : Ball = init_ball(screen);
 		const paddle: Pad = init_paddle(screen, side);
-		let openentKey: string = "";
+		let opponentKey: string = "";
 		
 		let animationFrameId: number = 0;
 		let nextRoundTime: number = 0;
 		let timer: number = 0;
-		let now = performance.now();
+		let now: number = 0;
 
 		function updateState(state: any) {
-			openentKey = state.openentKey;
-			paddle.opY = state.openentPos;
+			opponentKey = state.opponentKey;
+			paddle.opY = state.opponentPos;
 			ball.x = state.ballX;
 			ball.y = state.ballY;
 			ball.dx = state.ballDx;
@@ -45,11 +44,7 @@ export default function OnlineGame( { socket, setPlayers, side }: any ) {
 		function roundReset(data: any) {
 			window.cancelAnimationFrame(animationFrameId);
 			nextRoundTime = data.nextRound;
-			setPlayers((prev: Players) => {
-				return (
-					{p1: {...prev.p1, score: data.scoreP1},
-					p2: {...prev.p2, score: data.scoreP2}});
-				});
+			setScore({p1: data.scoreP1, p2: data.scoreP2});
 			Object.assign(paddle, init_paddle(screen, side));
 			Object.assign(ball, init_ball(screen));
 			now = Date.now();
@@ -58,9 +53,9 @@ export default function OnlineGame( { socket, setPlayers, side }: any ) {
 		}
 		socket.on("roundReset", roundReset);
 		
-		function gameEnd(winner: string) {
+		function gameEnd(winner: number) {
 			window.cancelAnimationFrame(animationFrameId);
-			setWinner(winner);
+			setWinnerId(winner);
 		}
 		socket.on("end", gameEnd);
 
@@ -77,7 +72,7 @@ export default function OnlineGame( { socket, setPlayers, side }: any ) {
 
 		function render() {
 			ctx.clearRect(0,0, screen.w, screen.h);
-			handlePaddle(ctx, paddle, openentKey, socket);
+			handlePaddle(ctx, paddle, opponentKey, socket);
 			collision(screen, side, paddle, ball);
 			drawBall(ctx, ball);
 			clearBehind(ctx, paddle, side);
@@ -92,11 +87,13 @@ export default function OnlineGame( { socket, setPlayers, side }: any ) {
 			document.removeEventListener("keydown", idKey[0]);
 			document.removeEventListener("keyup", idKey[1]);
 		});
-	}, [setPlayers, socket, side, setWinner]);
+	}, [setScore, socket, side, setWinnerId]);
 
 	return (
 			<div className="canvas_container">
-				<h1 className="get_ready left-[21vw] top-[20vw]">{winner}</h1>
+				<div className="prompt_wrapper z-[3]">
+					<DisplayWinner winnerId={winnerId} />
+				</div>
 				<canvas id="pong" ref={canvasRef} className="classique"/>
 			</div>
 	);

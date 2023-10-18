@@ -5,11 +5,13 @@ import { UserService } from "src/user/user.service";
 import { ftConstants } from "./constants";
 import axios, { AxiosResponse } from "axios";
 import * as bcrypt from 'bcrypt';
+import { EventService } from "src/event/event.service";
 
 @Injectable()
 export class AuthService {
 	constructor(
 		private userService: UserService,
+		private eventService: EventService,
 		private jwtService: JwtService
 		) {}
 	
@@ -33,6 +35,8 @@ export class AuthService {
 			user = await this.userService.createOne(login);
 	
 		const payload = {id: user.id, login: user.login};
+		if (this.eventService.isAlreadyConnected(payload.id))
+			return "";
 		return await this.jwtService.signAsync(payload);
 	}
 
