@@ -5,7 +5,7 @@ import Loading from "../utils/Loading";
 import { MemberDistinc, ParticipantData, UserData } from "./interfaceData";
 import { defaultAvatar } from "../pages/Profile/Profile";
 import { Avatar, Paper } from "@mui/material";
-import UserStatus from "../user/UserStatus";
+import UserStatus from "../components/user/UserStatus";
 import { NavLink } from "react-router-dom";
 import GamingButton from "../components/game/GamingButton";
 import MessageButton from "./MessageButton";
@@ -14,7 +14,7 @@ import BlockButton from "../components/Relationship/BlockButton";
 import { logInfo } from "./Chat";
 import { DisplayMemberContext, RerenderListContext, SetDisplayMemberContext, SetRerenderListContext, UserContext } from "../utils/Context";
 import './chat.scss'
-import '../user/user.scss'
+import '../components/user/user.scss'
 import { ArrowForward, VolumeOff } from "@mui/icons-material";
 import { ControlButton } from "../components/ChatButton/ControlButtons";
 import { MuteButton } from "../components/ChatButton/MuteButton";
