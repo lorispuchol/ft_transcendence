@@ -51,6 +51,7 @@ export default class Splatong {
 	) {}
 
 	private intervalId: NodeJS.Timer;
+	private ownPosIntervalId: NodeJS.Timer;
 	private endIntervalId: NodeJS.Timer;
 	private timeoutId: NodeJS.Timeout;
 
@@ -89,6 +90,7 @@ export default class Splatong {
 		this.timeoutId = setTimeout(() => {
 			this.intervalId = setInterval(() => this.update(this), perSec);
 		}, startDelay);
+		this.ownPosIntervalId = setInterval(() => this.sendOwnPos(), 2000);
 		this.endIntervalId = setInterval(() => {this.checkEnd()}, 1000)
 	}
 
@@ -107,6 +109,7 @@ export default class Splatong {
 
 	public clear() {
 		clearInterval(this.intervalId);
+		clearInterval(this.ownPosIntervalId);
 		clearInterval(this.endIntervalId);
 		clearTimeout(this.timeoutId);
 	}
@@ -134,6 +137,7 @@ export default class Splatong {
 
 	private sendState() {
 		const state = {
+			ballColor: this.currentCell,
 			ballX: this.ball.x,
 			ballY: this.ball.y,
 			ballDx: this.ball.dx,
@@ -141,6 +145,11 @@ export default class Splatong {
 		}
 		this.socketP1.emit("GameState", {opponentKey: this.inputP2, opponentPos: this.paddles.p2y, ...state});
 		this.socketP2.emit("GameState", {opponentKey: this.inputP1, opponentPos: this.paddles.p1y, ...state});
+	}
+
+	private sendOwnPos() {
+		this.socketP1.emit("ownPos", this.paddles.p1y);
+		this.socketP2.emit("ownPos", this.paddles.p2y);
 	}
 
 	public input(id: number, input: string) {
