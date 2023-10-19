@@ -64,7 +64,7 @@ function Profile({ member, isDm}: ProfileProps) {
 				<div className="absolute top-[100px] left-[100px]"><UserStatus userId={member.id} /></div>
 			</div>
 			<div className="tooltip tooltip-bottom" data-tip="go to profile"> 
-				<NavLink to={'/profile/' + member.login}>
+				<NavLink to={'/profile/' + member.username}>
 					<Paper className="everyone_username">{member.username}</Paper>
 				</NavLink>
 			</div>

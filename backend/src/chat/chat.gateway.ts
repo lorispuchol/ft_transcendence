@@ -46,6 +46,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		//value[0]: channel name
 		//value[1]: message content
 
+		if (value[1].length >= 20000)
+			return ;
+
 		const channel: Channel = await this.chatService.findChanByName(value[0])
 		const members: Participant[] = await this.chatService.getAllMembers(value[0])
 		const sender: User =  await this.userService.findOneByLogin(decoded.login);
@@ -74,9 +77,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			loginsToEvent.map((id) => {
 				if(id !== sender.id) {
 					if (channel.name.includes("+"))
-						this.eventService.newEvent(id, {type: "message", sender: channel.name, senderId: channel.id})
+						this.eventService.newEvent(id, {type: "message", sender: sender.username, senderId: channel.name})
 					else
-						this.eventService.newEvent(id, {type: "message", sender: "#" + channel.name, senderId: channel.id})
+						this.eventService.newEvent(id, {type: "message", sender: "#" + channel.name, senderId: "#" + channel.name})
 				}
 			})
 		})
