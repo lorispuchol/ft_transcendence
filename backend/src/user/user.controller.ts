@@ -40,9 +40,9 @@ export class UserController {
 
 	@Get('all')
 	async getAllUsers(@Request() req: any,) {
+		const userId = req.user.id;
 		const users = await this.userService.getAllUsers();
-		const usersId: number[] = users.map((user: User)  => (user.id));
-		usersId.splice(users.indexOf(req.user.id), 1);
+		const usersId: number[] = users.map((user: User)  => (user.id)).filter((id) => (id !== userId));
 		return (usersId);
 	}
 

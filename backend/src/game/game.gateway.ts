@@ -44,6 +44,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			this.lobby.delete(offId);
 			this.lobby.delete(otherPlayer);
 		}
+		this.gameService.updateUserInGame([...this.lobby.keys()]);
 	}
 
 	@SubscribeMessage("search")
@@ -80,6 +81,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		this.lobby.set(userId, instance);
 		this.lobby.set(opponentId, instance);
 		setTimeout(() => instance.start(), 100);
+		this.gameService.updateUserInGame([...this.lobby.keys()]);
 	}
 
 	@SubscribeMessage("defy")
@@ -108,6 +110,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		this.lobby.set(userId, instance);
 		this.lobby.set(defyId, instance);
 		setTimeout(() => instance.start(), 100);
+		this.gameService.updateUserInGame([...this.lobby.keys()]);
 	}
 
 	@SubscribeMessage("input")
