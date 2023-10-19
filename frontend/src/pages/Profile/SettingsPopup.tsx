@@ -54,7 +54,6 @@ export default function SettingsPopup({ close, login }: {close: any, login: stri
 		let toLogin = "";
 		if (newUsername === login)
 			toLogin = "ToLogin";
-		console.log(newUsername)
 		PatchRequest("/user/username" + toLogin, {username: newUsername})
 		.then ((response:any) => {
 			if (response.status === "OK")

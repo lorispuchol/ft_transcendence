@@ -169,11 +169,11 @@ export default class Splatong {
 		switch(id) {
 			case this.p1:
 				if (!this.gameEnded)
-					this.socketP2.emit("end", this.p2);
+					this.sendWinner(this.p2);
 				return this.p2;
 			case this.p2:
 				if (!this.gameEnded)
-					this.socketP1.emit("end", this.p1);
+					this.sendWinner(this.p1);
 				return this.p1;
 			default:
 				return 0;
@@ -191,7 +191,7 @@ export default class Splatong {
 		}
 	}
 
-	private sendWinner() {
+	private sendWinner(winnerByDeco?: number) {
 		let p1Score: number = 0;
 		let p2Score: number = 0;
 		let color: number = 0;
@@ -213,7 +213,9 @@ export default class Splatong {
 			x++;
 		}
 
-		if (p1Score > p2Score)
+		if (winnerByDeco)
+			this.winner = winnerByDeco;
+		else if (p1Score > p2Score)
 			this.winner = this.p1;
 		else if (p2Score > p1Score)
 			this.winner = this.p2;
@@ -221,7 +223,7 @@ export default class Splatong {
 			this.winner = this.coinflipLoser;
 
 		this.scoreP1 = Math.floor(p1Score / (this.cell * this.cell / 100));
-		this.scoreP2 = Math.floor(p2Score / (this.cell * this.cell / 100))
+		this.scoreP2 = Math.floor(p2Score / (this.cell * this.cell / 100));
 		const result = {winner: this.winner, p1Score: this.scoreP1, p2Score: this.scoreP2}
 	
 		this.socketP1.emit("end", result);
