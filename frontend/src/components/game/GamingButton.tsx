@@ -3,13 +3,8 @@ import { Button } from "@mui/material"
 import { primaryColor, secondaryColor } from "../../style/color"
 import { useContext, useEffect, useState } from "react";
 import { GetRequest } from "../../utils/Request";
-import ErrorHandling from "../../utils/Error";
 import { useNavigate } from "react-router-dom";
 import { EventContext } from "../../utils/Context";
-
-interface GamingButtonProps {
-	login: string
-}
 
 interface FriendshipData {
 	status: string,
@@ -23,7 +18,7 @@ interface Response {
 	error?: string,
 }
 
-export default function GamingButton({ login }: GamingButtonProps) {
+export default function GamingButton({ login }: {login: string}) {
 	const [response, setResponse]: [Response, Function] = useState({status: "loading"});
 	const [block, setBlock]: [boolean, Function] = useState(false);
 	const socket = useContext(EventContext)!;
@@ -33,13 +28,11 @@ export default function GamingButton({ login }: GamingButtonProps) {
 		GetRequest("/relationship/user/" + login).then((response) => {
 			setResponse(response);
 			if (response.data)
-				setBlock(response.data!.statuss === "blocked" || response.data!.status === "blockedYou");
+				setBlock(response.data!.status === "blocked" || response.data!.status === "blockedYou");
 		});
-	}, [login, setBlock]);
+	}, [login]);
 	if (response.status === "loading")
-		return (<Button sx={{backgroundColor: primaryColor}} color="inherit" variant="outlined" startIcon={<VideogameAsset />}>challenge</Button>);
-	if (response.status !== "OK")
-		return (<ErrorHandling status={response.status} message={response.error} />);
+		return (<Button sx={{backgroundColor: primaryColor}} color="inherit" variant="outlined" startIcon={<VideogameAsset />}>defy</Button>);
 
 	function handleClick() {
 		socket.emit("defyButton", response.data?.userId);
@@ -47,9 +40,10 @@ export default function GamingButton({ login }: GamingButtonProps) {
 	}
 
 
-	if (block)
-		return (<Button disabled variant="outlined" startIcon={<VideogameAsset />}>challenge</Button>);
 	return (
-			<Button onClick={handleClick} sx={{backgroundColor: primaryColor, "&:hover": {backgroundColor: secondaryColor}}} color="inherit" variant="outlined" startIcon={<VideogameAsset />}>challenge</Button>
+		block ?
+			<Button disabled variant="outlined" startIcon={<VideogameAsset />}>defy</Button>
+		:
+			<Button onClick={handleClick} sx={{backgroundColor: primaryColor, "&:hover": {backgroundColor: secondaryColor}}} color="inherit" variant="outlined" startIcon={<VideogameAsset />}>defy</Button>
 	);
 }

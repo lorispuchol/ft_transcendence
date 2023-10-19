@@ -39,9 +39,11 @@ export class UserController {
 	}
 
 	@Get('all')
-	async getAllUsers() {
+	async getAllUsers(@Request() req: any,) {
 		const users = await this.userService.getAllUsers();
-		return (users);
+		const usersId: number[] = users.map((user: User)  => (user.id));
+		usersId.splice(users.indexOf(req.user.id), 1);
+		return (usersId);
 	}
 
 	@Patch('username')

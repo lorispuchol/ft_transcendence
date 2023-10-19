@@ -61,7 +61,6 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 			client.disconnect();
 			return ;
 		}
-		const newUser = {avatar: user.avatar, id: user.id, username: user.username, login: user.login};
 		this.users.set(client, newId);
 		
 		this.users.forEach(async (id, socket) => {
@@ -69,7 +68,7 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 				return ;
 			socket.emit("status/" + newId, "online");
 			if (newId !== id)
-				socket.emit("everyone", newUser);
+				socket.emit("everyone", newId);
 		});
 	}
 

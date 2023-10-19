@@ -117,7 +117,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		const userId = this.users.get(client);
 		const instance = this.lobby.get(userId);
 
-		instance.input(userId, input);
+		instance?.input(userId, input);
 	}
 
 	//dev
