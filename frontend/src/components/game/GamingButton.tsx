@@ -31,31 +31,43 @@ export default function GamingButton({ id }: {id: number}) {
 			if (response.data)
 			{
 				setBlock(response.data!.status === "blocked" || response.data!.status === "blockedYou");
-				GetRequest("/game/inGame/" + response.data.userId).then((response) => {
+				GetRequest("/game/inGame/" + id).then((response) => {
 					if (response.data)
 						setInGame(response.data);
 				});
 			}
 		});
-	}, [id]);
+		
+
+		function updateInGame(status: boolean) {
+			setInGame(status);
+		}
+		socket.on("inGame/" + id, updateInGame);
+
+		return (() => {socket.off("inGame/" + id, updateInGame)});
+	}, [id, socket]);
 	if (response.status === "loading" || block)
 		return (<Button disabled variant="outlined" startIcon={<VideogameAsset />}>defy</Button>);
 
-	function handleClick() {
+	function handleDefy() {
 		socket.emit("defyButton", response.data?.userId);
 		navigate("/game");
 	}
 
+	function handleSpec() {
+
+	}
+
 	if (inGame)
 		return (
-			<Button onClick={handleClick} sx={{
+			<Button onClick={handleSpec} sx={{
 				backgroundColor: primaryColor, 
 				"&:hover": {backgroundColor: secondaryColor}}} 
 			color="inherit" variant="outlined" startIcon={<VideogameAsset />}>spectate</Button>
 		);
 
 	return (
-			<Button onClick={handleClick} sx={{
+			<Button onClick={handleDefy} sx={{
 				backgroundColor: primaryColor, 
 				"&:hover": {backgroundColor: secondaryColor}}} 
 			color="inherit" variant="outlined" startIcon={<VideogameAsset />}>defy</Button>

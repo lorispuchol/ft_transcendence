@@ -6,6 +6,7 @@ import { client_url } from "src/auth/constants";
 import PongGame from "./game.classique";
 import Splatong from "./game.splatong";
 import { GameService } from "./game.service";
+import { EventService } from "src/event/event.service";
 
 @WebSocketGateway({
 	namespace: "game",
@@ -14,8 +15,8 @@ import { GameService } from "./game.service";
 export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 	constructor(
 		private jwtService: JwtService,
-		// @ts-ignore
-		private gameService: GameService
+		private gameService: GameService,
+		private eventService: EventService,
 	) {}
 		
 	private users: Map<Socket, number> = new Map();

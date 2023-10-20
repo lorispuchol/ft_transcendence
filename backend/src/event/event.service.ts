@@ -41,6 +41,10 @@ export class EventService {
 		this.eventGateway.deleteEvent(userId, event);
 	}
 
+	sendInGame(userId: number, statu: boolean) {
+		this.eventGateway.sendInGame(userId, statu);
+	}
+
 	async getUserData(id: number) {
 		return await this.userService.findOneById(id);
 	}

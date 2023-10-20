@@ -26,7 +26,7 @@ export default function BlockButton({ id, updateUser }: BlockProps) {
 	useEffect(() => {
 		GetRequest("/relationship/user/" + id).then((response: Response) => {
 			if (response.data)
-				setStatus(response.data.status);
+				setStatus(response.data!.status);
 		});
 	}, [status, id]);
 	

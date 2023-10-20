@@ -240,4 +240,10 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 		const userSocket: Socket = [...this.users.entries()].filter(({ 1: value}) => value === defyInfo.senderId).map(([key]) => key)[0];
 		userSocket.emit("defy", {opponentId: userId, response: "KO", mode: ""});
 	}
+
+	sendInGame(userId: number, statu: boolean) {
+		this.users.forEach((id, socket) => {
+			socket.emit("inGame/" + userId, statu);
+		});
+	} 
 }
