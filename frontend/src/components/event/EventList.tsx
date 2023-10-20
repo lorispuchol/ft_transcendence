@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 interface Event {
 	type: string,
 	sender: string,
-	senderId: number,
+	senderId: number | string,
 	gameMode?: string,
 }
 
@@ -37,7 +37,7 @@ function RenderIcon({e, setEvents}: RenderIconProps) {
 			prevEvents.splice(index, 1);
 			return [...prevEvents];
 		});
-		navigate("/chat", {replace: false, state: {to: e.sender.replace("#", "")}})
+		navigate("/chat", {replace: false, state: {to: (e.senderId as string).replace("#", "")}})
 	}
 
 	switch(e.type) {
@@ -93,7 +93,7 @@ function Events({ socket }: SocketProps) {
 					<div key={event.type + event.sender}>
 						<ListItem>
 							<ListItemAvatar><RenderIcon e={event} setEvents={setEvents}/></ListItemAvatar>
-							{event.type === 'channelInvitation' && '#'}{event.sender.replace("+", "").replace(user!, "")}
+							{event.type === 'channelInvitation' && '#'}{event.sender}
 						</ListItem>
 						<EventButton event={event}/>
 						{index + 1 !== events.length? <Divider /> : null}

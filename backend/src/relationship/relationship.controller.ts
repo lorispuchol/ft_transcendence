@@ -44,20 +44,20 @@ export class RelationshipController {
 	@Patch('accept/:user')
 	async acceptInvitation(
 		@Request() req: any,
-		@Param('user') user: string ) {
+		@Param('user') user: number ) {
 			return this.relationshipService.accept (
 				await this.userService.findOneById(req.user.id),
-				await this.userService.findOneByLogin(user)
+				await this.userService.findOneById(user)
 			)
 	}
 
 	@Delete('refuse/:user')
 	async refuseInvitation(
 		@Request() req: any,
-		@Param('user') user: string ) {
+		@Param('user') user: number ) {
 			return this.relationshipService.refuse (
 				await this.userService.findOneById(req.user.id),
-				await this.userService.findOneByLogin(user)
+				await this.userService.findOneById(user)
 			)
 	}
 

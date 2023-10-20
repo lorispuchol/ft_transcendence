@@ -10,7 +10,7 @@ import { MemberDistinc, Participant } from "src/chat/entities/participant_chan_x
 interface Event {
 	type: string,
 	sender: string,
-	senderId: number,
+	senderId: number | string,
 }
 
 interface Sender {
