@@ -55,10 +55,10 @@ function ProfileElement({ userId }: {userId: number}) {
 				</NavLink>
 			</div>
 			<div key={updateUser} className="button_group">
-				<div className="gaming_button"><GamingButton login={user.login}/></div>
-      			<div className="message_button"><MessageButton receiver={user.login}/></div>
-				<div className="friend_button"><Friendbutton login={user.login} /></div>
-				<div className="block_button"><BlockButton login={user.login} updateUser={handleUpdate} /></div>
+				<div className="gaming_button"><GamingButton id={user.id}/></div>
+      			<div className="message_button"><MessageButton receiverId={user.id}/></div>
+				<div className="friend_button"><Friendbutton id={user.id} /></div>
+				<div className="block_button"><BlockButton id={user.id} updateUser={handleUpdate} /></div>
 			</div>
 			<ToastContainer />
 		</Paper>

@@ -58,26 +58,26 @@ export function RelationButtonDelete({path, setStatus, icon}: RelationButtonProp
 	)
 }
 
-export default function Friendbutton ({ login}: { login: string}) {
+export default function Friendbutton ({ id }: { id: number}) {
 	const [status, setStatus]: [string, Function] = useState("");
 
 	useEffect(() => {
-		GetRequest("/relationship/user/" + login).then((response: Response) => {
+		GetRequest("/relationship/user/" + id).then((response: Response) => {
 			if (response.data)
 				setStatus(response.data.status);
 		});
-	}, [status, login]);
+	}, [status, id]);
 	if (!status)
 		return (<IconButton><PersonAddIcon /></IconButton>);
 	
 	switch(status) {
 		case 'invited':
-			return (<RelationButtonDelete path={"/removeInvitation/" + login} setStatus={setStatus} icon={<CancelScheduleSend />}/>);
+			return (<RelationButtonDelete path={"/removeInvitation/" + id} setStatus={setStatus} icon={<CancelScheduleSend />}/>);
 		case 'accepted':
-			return (<RelationButtonDelete path={"/removeFriend/" + login} setStatus={setStatus} icon={<PersonRemove />}/>);
+			return (<RelationButtonDelete path={"/removeFriend/" + id} setStatus={setStatus} icon={<PersonRemove />}/>);
 		case 'noRelation':
 		case 'blocked':
-			return (<RelationButtonGet path={"/invite/" + login} setStatus={setStatus} icon={<PersonAddIcon />}/>);
+			return (<RelationButtonGet path={"/invite/" + id} setStatus={setStatus} icon={<PersonAddIcon />}/>);
 		default:
 			return (<IconButton disabled><PersonAddIcon /></IconButton>);
 	}

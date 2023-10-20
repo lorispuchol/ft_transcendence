@@ -21,9 +21,6 @@ interface EventButtonProps {
 interface ButtonChannelProps {
 	channel: string
 }
-interface FriendProps {
-	id:  string | number
-}
 
 interface GameProps {
 	senderId: number | string,
@@ -74,7 +71,7 @@ function AcceptChannel({ channel }: ButtonChannelProps) {
 	)
 }
 
-function RefuseFriend({ id }: FriendProps) {
+function RefuseFriend({ id }: {id: number}) {
 	const [response, setResponse]: [Response, Function] = useState({status: "inactive"});
 
 	function handleClick() {
@@ -90,7 +87,7 @@ function RefuseFriend({ id }: FriendProps) {
 	)
 }
 
-function AcceptFriend({ id }: FriendProps) {
+function AcceptFriend({ id }: {id: number}) {
 	const [response, setResponse]: [Response, Function] = useState({status: "inactive"});
 
 	function handleClick() {
@@ -137,8 +134,8 @@ export default function EventButton ({ event }: EventButtonProps) {
 	if (event.type === "friendRequest")
 		return (
 			<div className="grid grid-cols-2">
-				<AcceptFriend id={event.senderId} />
-				<RefuseFriend id={event.senderId} />
+				<AcceptFriend id={event.senderId as number} />
+				<RefuseFriend id={event.senderId as number} />
 			
 			</div>
 		)

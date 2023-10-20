@@ -18,7 +18,7 @@ interface Response {
 	error?: string,
 }
 
-export default function GamingButton({ login }: {login: string}) {
+export default function GamingButton({ id }: {id: number}) {
 	const [response, setResponse]: [Response, Function] = useState({status: "loading"});
 	const [block, setBlock]: [boolean, Function] = useState(true);
 	const [inGame, setInGame]: [boolean, Function] = useState(false);
@@ -26,7 +26,7 @@ export default function GamingButton({ login }: {login: string}) {
 	const navigate = useNavigate();
 
 	useEffect(() => {
-		GetRequest("/relationship/user/" + login).then((response) => {
+		GetRequest("/relationship/user/" + id).then((response) => {
 			setResponse(response);
 			if (response.data)
 			{
@@ -37,7 +37,7 @@ export default function GamingButton({ login }: {login: string}) {
 				});
 			}
 		});
-	}, [login]);
+	}, [id]);
 	if (response.status === "loading" || block)
 		return (<Button disabled variant="outlined" startIcon={<VideogameAsset />}>defy</Button>);
 

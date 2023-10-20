@@ -64,11 +64,11 @@ function Profile({ member, isDm}: ProfileProps) {
 				</NavLink>
 			</div>
 			<div className="button_group flex flex-row items-center justify-center">
-				{!isDm && <div className="message_button"><MessageButton receiver={member.login}/></div>}
-				<div className="friend_button"><Friendbutton login={member.login} /></div>
-				<div className="block_button"><BlockButton login={member.login} /></div>
+				{!isDm && <div className="message_button"><MessageButton receiverId={member.id}/></div>}
+				<div className="friend_button"><Friendbutton id={member.id} /></div>
+				<div className="block_button"><BlockButton id={member.id} /></div>
 			</div>
-			<div className="gaming_button"><GamingButton login={member.login}/></div>
+			<div className="gaming_button"><GamingButton id={member.id}/></div>
 		</div>
 	)
 }
