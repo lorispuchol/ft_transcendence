@@ -201,6 +201,7 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 	waitDef(@MessageBody() defyId: number, @ConnectedSocket() client: Socket) {
 		const userId = this.users.get(client);
 
+		this.clearUserInterval(userId);
 		const intervalId = setInterval(() => {client.emit("waitDefy", defyId), console.log("interval button")}, 200);
 		this.userInterval.push({userId, intervalId});
 		setTimeout(() => {this.clearUserInterval(userId)}, 2000);
@@ -219,6 +220,7 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 	
 		const userSocket: Socket = [...this.users.entries()].filter(({ 1: value}) => value === defyInfo.senderId).map(([key]) => key)[0];
 		userSocket.emit("defy", {opponentId: userId, mode: mode,response: "OK"});
+		this.clearUserInterval(userId);
 		const intervalId = setInterval(() => {client.emit("goDefy", defyInfo), console.log("interval menu")}, 200);
 		this.userInterval.push({userId, intervalId});
 		setTimeout(() => {this.clearUserInterval(userId)}, 2000);
