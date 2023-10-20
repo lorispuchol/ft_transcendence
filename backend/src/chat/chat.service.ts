@@ -454,7 +454,7 @@ export class ChatService {
 			}
 		})
 		if (!channel)
-			return null;
+			return [];
 		
 		const messages: Message[] = await this.messagesRepository.find({
 			where: {

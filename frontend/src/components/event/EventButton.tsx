@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 interface Event {
 	type: string,
 	sender: string,
-	senderId: number,
+	senderId: number | string,
 	gameMode?: string,
 }
 
@@ -22,11 +22,11 @@ interface ButtonChannelProps {
 	channel: string
 }
 interface FriendProps {
-	login: string
+	id:  string | number
 }
 
 interface GameProps {
-	senderId: number,
+	senderId: number | string,
 	mode?: string
 }
 
@@ -74,11 +74,11 @@ function AcceptChannel({ channel }: ButtonChannelProps) {
 	)
 }
 
-function RefuseFriend({ login }: FriendProps) {
+function RefuseFriend({ id }: FriendProps) {
 	const [response, setResponse]: [Response, Function] = useState({status: "inactive"});
 
 	function handleClick() {
-		DeleteRequest("/relationship/refuse/" + login).then((response) => {setResponse(response)});
+		DeleteRequest("/relationship/refuse/" + id).then((response) => {setResponse(response)});
 	}
 	if (response.status === "KO")
 		return (<ErrorHandling status={response.status} message={response.error} />);
@@ -90,11 +90,11 @@ function RefuseFriend({ login }: FriendProps) {
 	)
 }
 
-function AcceptFriend({ login }: FriendProps) {
+function AcceptFriend({ id }: FriendProps) {
 	const [response, setResponse]: [Response, Function] = useState({status: "inactive"});
 
 	function handleClick() {
-		PatchRequest("/relationship/accept/" + login, {}).then((response) => {setResponse(response)});
+		PatchRequest("/relationship/accept/" + id, {}).then((response) => {setResponse(response)});
 	}
 	if (response.status === "KO")
 			return (<ErrorHandling status={response.status} message={response.error} />);
@@ -137,8 +137,8 @@ export default function EventButton ({ event }: EventButtonProps) {
 	if (event.type === "friendRequest")
 		return (
 			<div className="grid grid-cols-2">
-				<AcceptFriend login={event.sender} />
-				<RefuseFriend login={event.sender} />
+				<AcceptFriend id={event.senderId} />
+				<RefuseFriend id={event.senderId} />
 			
 			</div>
 		)

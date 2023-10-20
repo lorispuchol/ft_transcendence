@@ -36,7 +36,11 @@ function Messages({chan}: MessagesProps) {
 	const userName = useContext(UserContext);
 
 	useEffect(() => {
-		GetRequest("/chat/getMessages/" + chan).then((res) => {setResponse(res); setMessages(res.data)})
+		GetRequest("/chat/getMessages/" + chan).then((res) => {
+			setResponse(res);
+			setMessages((res.data as MessageData[]).sort((a: any, b: any) => 
+				(new Date(a.date) as any) - (new Date(b.date) as any)
+		))})
 		function messageListener(message: MessagesListenerProps) {
 			if (chan === message.chan) {
 				setMessages((prevMessages: MessageData[]) => {
@@ -59,9 +63,6 @@ function Messages({chan}: MessagesProps) {
 	if (response.status !== "OK")
 		return (<ErrorHandling status={response.status} message={response.error} />);
 	
-	messages.sort((a, b) =>
-		(new Date(a.date) as any) - (new Date(b.date) as any)
-	)
 	return (
 		<div className="w-full flex flex-col overflow-hidden overflow-scroll px-5 mb-3">
 			{messages.map((message: MessageData) => (
@@ -75,7 +76,7 @@ function Messages({chan}: MessagesProps) {
 					{message.sender.username}
 					<time className="text-xs opacity-50 mx-1">{new Date(message.date).toLocaleTimeString()}</time>
 				</div>
-				<div className="chat-bubble break-words">{message.content}</div>
+				<div className="chat-bubble my-chat-bubble">{message.content}</div>
 			</div>
 			))}
 			<div ref={messageRef} />

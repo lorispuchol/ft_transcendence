@@ -10,7 +10,7 @@ import { User } from "src/user/user.entity";
 interface Event {
 	type: string,
 	sender: string,
-	senderId: number,
+	senderId: number | string,
 	gameMode?: string
 }
 

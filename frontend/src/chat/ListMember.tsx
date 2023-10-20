@@ -59,7 +59,7 @@ function Profile({ member, isDm}: ProfileProps) {
 				<div className="absolute top-[100px] left-[100px]"><UserStatus userId={member.id} /></div>
 			</div>
 			<div className="tooltip tooltip-bottom" data-tip="go to profile"> 
-				<NavLink to={'/profile/' + member.login}>
+				<NavLink to={'/profile/' + member.username}>
 					<Paper className="everyone_username">{member.username}</Paper>
 				</NavLink>
 			</div>
@@ -161,11 +161,14 @@ export default function ListMembers({ chan, settings, setSettings }: ListMembers
 		setRerenderList(reRenderList + 1);
 	}
 	
-	if (isDm)
+	if (isDm) {
+		if (!response.data[0] || !response.data[1])
+			return null
 		if (response.data[0].user.id !== userParticipant.user.id)
 			return <Profile member={response.data[0].user} isDm={true} />
 		else
 			return <Profile member={response.data[1].user} isDm={true} />
+	}
 	if (displayProfile) {
 		return (
 			<SetRerenderListContext.Provider value={setRerenderList}>

@@ -19,24 +19,6 @@ function renderColor(status: string) {
 			return "red"
 	}
 }
-
-export  function useStatusColor({ userId }: UserStatusprops) {
-	const socket: Socket = useContext(EventContext)!;
-	const [userStatus, setUserStatus]: [string, Function] = useState("loading");
-
-	useEffect(() => {
-		function getStatus(status: string) {
-			setUserStatus(status)
-		}
-
-		socket.on('status/' + userId, getStatus);
-		socket.emit('getStatus', userId);
-
-		return () => {socket.off('status/' + userId, getStatus)};
-	}, [socket, userId])
-
-	return (renderColor(userStatus));
-}
   
 export default function UserStatus({ userId }: UserStatusprops) {
 	const socket: Socket = useContext(EventContext)!;

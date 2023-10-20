@@ -121,6 +121,13 @@ hr {
 	border-color: rgb(241 245 249) !important;
 }
 
+.my-chat-bubble {
+	// firefox
+	word-break: break-all;
+	// chrome
+	overflow-wrap: break-word;
+}
+
 /* ////////////////////////////////  ListMember  //////////////////////////// */
 .list-member {
 	border-radius: 0 0.25rem 0.25rem 0;
