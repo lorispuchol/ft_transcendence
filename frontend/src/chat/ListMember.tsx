@@ -11,7 +11,6 @@ import GamingButton from "../components/game/GamingButton";
 import MessageButton from "./MessageButton";
 import Friendbutton from "../components/Relationship/Friendbutton";
 import BlockButton from "../components/Relationship/BlockButton";
-import { logInfo } from "./Chat";
 import { DisplayMemberContext, RerenderListContext, SetDisplayMemberContext, SetRerenderListContext, UserContext } from "../utils/Context";
 import './chat.scss'
 import '../components/user/user.scss'
@@ -49,10 +48,6 @@ interface ListMembersProps {
 	setSettings: Function,
 }
 
-function log(message: string) {
-	logInfo(message);
-}
-
 function Profile({ member, isDm}: ProfileProps) {
 
 	const avatar: any = member.avatar ? member.avatar : defaultAvatar;
@@ -69,11 +64,11 @@ function Profile({ member, isDm}: ProfileProps) {
 				</NavLink>
 			</div>
 			<div className="button_group flex flex-row items-center justify-center">
-				{!isDm && <div className="message_button"><MessageButton receiver={member.login}/></div>}
-				<div className="friend_button"><Friendbutton login={member.login} render={log} /></div>
-				<div className="block_button"><BlockButton login={member.login} render={log} /></div>
+				{!isDm && <div className="message_button"><MessageButton receiverId={member.id}/></div>}
+				<div className="friend_button"><Friendbutton id={member.id} /></div>
+				<div className="block_button"><BlockButton id={member.id} /></div>
 			</div>
-			<div className="gaming_button"><GamingButton login={member.login}/></div>
+			<div className="gaming_button"><GamingButton id={member.id}/></div>
 		</div>
 	)
 }

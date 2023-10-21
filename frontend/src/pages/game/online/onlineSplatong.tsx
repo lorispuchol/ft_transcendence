@@ -118,7 +118,6 @@ export default function OnlineSplatong( { socket, setScore, side }: any ) {
 		
 		function gameEnd(endData: {winner: number, p1Score: number, p2Score: number}) {
 			window.cancelAnimationFrame(animationFrameId);
-			console.log()
 			setClock(null);
 			setWinnerId(endData.winner);
 			setScore({p1: endData.p1Score, p2: endData.p2Score});
@@ -150,6 +149,8 @@ export default function OnlineSplatong( { socket, setScore, side }: any ) {
 			setClock(Math.round((endTime - Date.now()) * 0.001))
 			animationFrameId = window.requestAnimationFrame(render);
 		}
+
+		socket.emit("ready");
 	
 		return (() => {
 			socket.off("GameState", updateState);

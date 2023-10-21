@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpException, Param, Patch, Request, UploadedFile, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Get, HttpException, Param, ParseIntPipe, Patch, Request, UploadedFile, UseInterceptors } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { User } from "./user.entity";
 import { newUsername } from "./user.dto";
@@ -39,9 +39,11 @@ export class UserController {
 	}
 
 	@Get('all')
-	async getAllUsers() {
+	async getAllUsers(@Request() req: any,) {
+		const userId = req.user.id;
 		const users = await this.userService.getAllUsers();
-		return (users);
+		const usersId: number[] = users.map((user: User)  => (user.id)).filter((id) => (id !== userId));
+		return (usersId);
 	}
 
 	@Patch('username')
@@ -110,7 +112,7 @@ export class UserController {
 
 	@Get('profile/id/:id')
 	async getUserDataById(
-		@Param('id') userId: number
+		@Param('id', ParseIntPipe) userId: number
 	) {
 		const user: User = await this.userService.findOneById(userId);
 		if (!user)

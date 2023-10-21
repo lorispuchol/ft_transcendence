@@ -1,7 +1,7 @@
-import { Controller, Get, Param } from "@nestjs/common";
+import { Controller, Get, Param, ParseIntPipe } from "@nestjs/common";
 import { GameService } from "./game.service";
 import { Match } from "./match.entity";
-import { Public } from "src/auth/constants";
+
 
 @Controller('game')
 export class GameController {
@@ -9,11 +9,14 @@ export class GameController {
 		private gameService: GameService,
 	) {}
 
-	@Public()
 	@Get('history/:id')
-	async getMatchHistory(@Param('id') userId: number) {
+	async getMatchHistory(@Param('id', ParseIntPipe) userId: number) {
 		const matchs: Match[] = await this.gameService.getMatchHistory(userId);
-		//console.log(matchs);
 		return matchs;
+	}
+
+	@Get('inGame/:id')
+	getUserInGame(@Param('id', ParseIntPipe) userId: number) {
+		return (this.gameService.getUserInGame(userId));
 	}
 }

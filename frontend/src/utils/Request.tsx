@@ -19,7 +19,7 @@ export async function GetRequest(path: string) {
 		else if (error.code === "ERR_NETWORK")
 			res = { status: "ERR_NETWORK", error: error.message };
 		else
-			res = { status: error.response.status, error: error.message };
+			res = { status: "error", error: error.message };
 	}
 	return (res);
 }

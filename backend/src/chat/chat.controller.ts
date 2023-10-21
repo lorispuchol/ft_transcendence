@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Request } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Request } from "@nestjs/common";
 import { ChatService } from "./chat.service";
 import { UserService } from "src/user/user.service";
 import { AddPwChan, ChangeModeChan, Distinction, JoinChannelWithPassword, Mute, NewChannelWithPassword, NewChannelWithoutPassword, RemovePwChannel, SetPasswordChannel } from "./channel.dto";
@@ -184,10 +184,10 @@ export class ChatController {
 	@Get('getDm/:receiver')
 	async getDm(
 		@Request() req: any,
-		@Param('receiver') receiver: string) {
+		@Param('receiver', ParseIntPipe) receiverId: number) {
 			return this.chatService.getDm(
-				await this.userService.findOneByLogin(req.user.login),
-				await this.userService.findOneByLogin(receiver))
+				await this.userService.findOneById(req.user.id),
+				await this.userService.findOneById(receiverId))
 	}
 
 	@Get('getMessages/:chan')

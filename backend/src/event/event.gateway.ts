@@ -61,7 +61,6 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 			client.disconnect();
 			return ;
 		}
-		const newUser = {avatar: user.avatar, id: user.id, username: user.username, login: user.login};
 		this.users.set(client, newId);
 		
 		this.users.forEach(async (id, socket) => {
@@ -69,7 +68,7 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 				return ;
 			socket.emit("status/" + newId, "online");
 			if (newId !== id)
-				socket.emit("everyone", newUser);
+				socket.emit("everyone", newId);
 		});
 	}
 
@@ -198,11 +197,23 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 		this.clearUserInterval(userId);
 	}
 
+	@SubscribeMessage("spectateButton")
+	waitSpec(@MessageBody() specId: number, @ConnectedSocket() client: Socket) {
+		const userId = this.users.get(client);
+
+		this.clearUserInterval(userId);
+		const intervalId = setInterval(() => {client.emit("goSpectate", specId), console.log("interval spectate")}, 200);
+		this.userInterval.push({userId, intervalId});
+		setTimeout(() => {this.clearUserInterval(userId)}, 2000);
+	}
+
+
 	@SubscribeMessage("defyButton")
 	waitDef(@MessageBody() defyId: number, @ConnectedSocket() client: Socket) {
 		const userId = this.users.get(client);
 
-		const intervalId = setInterval(() => {client.emit("waitDefy", defyId), console.log("interval button")}, 200);
+		this.clearUserInterval(userId);
+		const intervalId = setInterval(() => {client.emit("waitDefy", defyId), console.log("interval defy")}, 200);
 		this.userInterval.push({userId, intervalId});
 		setTimeout(() => {this.clearUserInterval(userId)}, 2000);
 	}
@@ -220,6 +231,7 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 	
 		const userSocket: Socket = [...this.users.entries()].filter(({ 1: value}) => value === defyInfo.senderId).map(([key]) => key)[0];
 		userSocket.emit("defy", {opponentId: userId, mode: mode,response: "OK"});
+		this.clearUserInterval(userId);
 		const intervalId = setInterval(() => {client.emit("goDefy", defyInfo), console.log("interval menu")}, 200);
 		this.userInterval.push({userId, intervalId});
 		setTimeout(() => {this.clearUserInterval(userId)}, 2000);
@@ -239,4 +251,10 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 		const userSocket: Socket = [...this.users.entries()].filter(({ 1: value}) => value === defyInfo.senderId).map(([key]) => key)[0];
 		userSocket.emit("defy", {opponentId: userId, response: "KO", mode: ""});
 	}
+
+	sendInGame(userId: number, statu: boolean) {
+		this.users.forEach((id, socket) => {
+			socket.emit("inGame/" + userId, statu);
+		});
+	} 
 }

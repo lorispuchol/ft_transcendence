@@ -24,7 +24,7 @@ export function init_paddle(screen: ScreenSize, side: number) {
 	let ownX: number;
 	let opX: number;
 
-	if (side === 1)
+	if (side === 1 || side === 0) //0 for spectator
 	{
 		ownX = screen.w * 0.1 - w * 0.5;
 		opX = screen.w * 0.9 - w * 0.5;
@@ -52,7 +52,7 @@ export function drawPaddle (ctx: CanvasRenderingContext2D, pad: Pad) {
 }
 
 export function clearBehind(ctx: CanvasRenderingContext2D, pad: Pad, side: number) {
-	if (side === 1)
+	if (side === 1 || side === 0)
 	{
 		ctx.clearRect(pad.ownX - pad.w , pad.ownY, pad.w, pad.h);
 		ctx.clearRect(pad.opX + 2 * pad.w , pad.opY, pad.w, pad.h);

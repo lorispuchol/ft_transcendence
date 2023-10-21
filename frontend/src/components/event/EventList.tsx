@@ -3,7 +3,7 @@ import { Socket } from "socket.io-client";
 import { Badge, Button, ClickAwayListener, Divider, IconButton, List, ListItem, ListItemAvatar, Paper, Popper } from "@mui/material";
 import { EmojiPeople, GroupAdd, MarkChatUnread, Notifications, VideogameAsset } from "@mui/icons-material";
 import EventButton from "./EventButton";
-import { EventContext, UserContext } from "../../utils/Context";
+import { EventContext } from "../../utils/Context";
 import { useNavigate } from "react-router-dom";
 
 interface Event {
@@ -55,7 +55,6 @@ function RenderIcon({e, setEvents}: RenderIconProps) {
 }
 
 function Events({ socket }: SocketProps) {
-	const user = useContext(UserContext);
 	const [events, setEvents]: [Event[], Function] = useState([]);
 
 	useEffect(() => {

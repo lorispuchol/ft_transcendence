@@ -21,6 +21,18 @@ export class GameService {
 		private userService: UserService,
 	) {}
 
+	private userInGame: number[] = [];
+
+	updateUserInGame(newUserInGame: number[]) {
+		this.userInGame = newUserInGame;
+	}
+
+	getUserInGame(userId: number) {
+		if (this.userInGame.indexOf(userId) !== -1)
+			return true;
+		return false;
+	}
+
 	async getMatchHistory(userId: number): Promise<any> {
 		const match: Match[] | null = await this.userService.findUserMatches(userId);
 		if (!match)
