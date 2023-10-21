@@ -197,12 +197,23 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 		this.clearUserInterval(userId);
 	}
 
+	@SubscribeMessage("spectateButton")
+	waitSpec(@MessageBody() specId: number, @ConnectedSocket() client: Socket) {
+		const userId = this.users.get(client);
+
+		this.clearUserInterval(userId);
+		const intervalId = setInterval(() => {client.emit("goSpectate", specId), console.log("interval spectate")}, 200);
+		this.userInterval.push({userId, intervalId});
+		setTimeout(() => {this.clearUserInterval(userId)}, 2000);
+	}
+
+
 	@SubscribeMessage("defyButton")
 	waitDef(@MessageBody() defyId: number, @ConnectedSocket() client: Socket) {
 		const userId = this.users.get(client);
 
 		this.clearUserInterval(userId);
-		const intervalId = setInterval(() => {client.emit("waitDefy", defyId), console.log("interval button")}, 200);
+		const intervalId = setInterval(() => {client.emit("waitDefy", defyId), console.log("interval defy")}, 200);
 		this.userInterval.push({userId, intervalId});
 		setTimeout(() => {this.clearUserInterval(userId)}, 2000);
 	}

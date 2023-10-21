@@ -1,28 +1,27 @@
 import { Socket, io } from "socket.io-client";
-import Loading from "../../../utils/Loading";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { server_url } from "../../../utils/Request";
 import { Players } from "../Game";
 import { CircularProgress } from "@mui/material";
 import OnlineGame from "./OnlineGame";
-import { UserContext } from "../../../utils/Context";
 import OnlineSplatong from "./onlineSplatong";
 import '../Game.scss';
+import { useNavigate } from "react-router-dom";
 
 interface Props {
 	mode: string,
-	setSetting: Function,
 	setPlayers: Function,
 	defy: number | null,
 	setDefy: Function,
 	setScore: Function
 }
 
-export default function MatchMaking({ mode, setPlayers, setSetting, defy, setDefy, setScore }: Props) {
-	const [socket, setSocket]: [Socket | null, Function] = useState(null);
-	const [opponent, setopponent]: [boolean, Function] = useState(false);
+export default function MatchMaking({ mode, setPlayers, defy, setDefy, setScore }: Props) {
+	const [socket, setSocket]: [Socket | null, Function] = useState<Socket | null>(null);
+	const [specMode, setSpecMode]: [string, Function] = useState("");
+	const [opponent, setOpponent]: [boolean, Function] = useState(false);
 	const [side, setSide]: [number, Function] = useState(1);
-	const username = useContext(UserContext);
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		const token = localStorage.getItem("token");
@@ -30,34 +29,60 @@ export default function MatchMaking({ mode, setPlayers, setSetting, defy, setDef
 		const newSocket: Socket = io(server_url + "/game", option);
 		setSocket(newSocket);
 		
+		function notConnected () {
+			navigate("/");
+		}
+		newSocket.on("disconnect", notConnected);
+
 		function handleSearch(players: Players) {
 			setPlayers(players);
 			//left=1  right=-1
 			setSide(players.side);
-			setopponent(true);
+			setOpponent(true);
 		}
 		newSocket.on("matchmaking", handleSearch);
-		if (defy)
-		{
-			newSocket.emit("defy", {defyId: defy, mode});
-			setDefy(null);
+
+		function handleSpectate(specInfo: {players: Players, mode: string}) {
+			setPlayers(specInfo.players);
+			setSide(0);
+			setSpecMode(specInfo.mode);
+			setOpponent(true);
 		}
-		else
-			newSocket.emit("search", mode);
+		newSocket.on("goSpectate", handleSpectate);
 
 		return () => {
 			newSocket.off("matchmaking", handleSearch);
+			newSocket.off("goSpectate", handleSpectate);
 			newSocket.close();
 		};
-	}, [setSocket, defy, setPlayers, setSetting, setSide, username, mode, setDefy]);
+	}, [navigate, setPlayers, setSide]);
+
+	useEffect(() => {
+		if (!socket)
+			return ;
+		if (mode === "spectate")
+		{
+			if (defy)
+			{
+				socket.emit("waitSpectate", defy);
+				setDefy(null);
+			}
+		}
+		else if (defy)
+		{
+			socket.emit("defy", {defyId: defy, mode});
+			setDefy(null);
+		}
+		else
+			socket.emit("search", mode);
+	}, [socket, setDefy, defy, mode])
+
 	// function getState() {
 	// 	socket?.emit("getState");
 	// }
 	// function flush() {
 	// 	socket?.emit("flush");
 	// }
-	if (!socket)
-		return (<Loading />);
 	
 	if (!opponent)
 		return (
@@ -74,7 +99,7 @@ export default function MatchMaking({ mode, setPlayers, setSetting, defy, setDef
 	
 	return (
 		<div>
-			{ mode === "classic" ?
+			{ mode === "classic" || specMode === "classic" ?
 				<OnlineGame socket={socket} setScore={setScore} side={side} />
 			:
 				<OnlineSplatong socket={socket} setScore={setScore} side={side} />

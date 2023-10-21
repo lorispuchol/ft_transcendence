@@ -1,4 +1,4 @@
-import { VideogameAsset } from "@mui/icons-material"
+import { VideogameAsset, Visibility } from "@mui/icons-material"
 import { Button } from "@mui/material"
 import { primaryColor, secondaryColor } from "../../style/color"
 import { useContext, useEffect, useState } from "react";
@@ -50,26 +50,25 @@ export default function GamingButton({ id }: {id: number}) {
 		return (<Button disabled variant="outlined" startIcon={<VideogameAsset />}>defy</Button>);
 
 	function handleDefy() {
-		socket.emit("defyButton", response.data?.userId);
+		socket.emit("defyButton", id);
 		navigate("/game");
 	}
 
 	function handleSpec() {
-
+		socket.emit("spectateButton", id);
+		navigate("/game");
 	}
 
 	if (inGame)
 		return (
-			<Button onClick={handleSpec} sx={{
-				backgroundColor: primaryColor, 
-				"&:hover": {backgroundColor: secondaryColor}}} 
-			color="inherit" variant="outlined" startIcon={<VideogameAsset />}>spectate</Button>
+			<Button onClick={handleSpec} 
+				sx={{backgroundColor: primaryColor, "&:hover": {backgroundColor: secondaryColor}}} 
+				color="inherit" variant="outlined" startIcon={<Visibility />}>spectate</Button>
 		);
 
 	return (
-			<Button onClick={handleDefy} sx={{
-				backgroundColor: primaryColor, 
-				"&:hover": {backgroundColor: secondaryColor}}} 
+		<Button onClick={handleDefy}
+			sx={{backgroundColor: primaryColor, "&:hover": {backgroundColor: secondaryColor}}} 
 			color="inherit" variant="outlined" startIcon={<VideogameAsset />}>defy</Button>
 	);
 }

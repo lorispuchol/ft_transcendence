@@ -38,13 +38,14 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		this.defyQueue= this.defyQueue.filter((id) => id !== offId);
 		this.users.delete(client);
 		const instance: PongGame | Splatong = this.lobby.get(offId);
-		if (instance) {
-			const otherPlayer = instance.handleDisconnect(offId);
-			instance.clear();
-			this.gameService.addNewMatch(instance.matchInfo());
-			this.lobby.delete(offId);
-			this.lobby.delete(otherPlayer);
-		}
+		if (!instance)
+			return ;
+		const otherPlayer = instance.handleDisconnect(offId);
+		instance.clear();
+		this.gameService.addNewMatch(instance.matchInfo());
+		this.lobby.delete(offId);
+		this.lobby.delete(otherPlayer);
+		this.eventService.sendInGame(offId, otherPlayer, false);
 		this.gameService.updateUserInGame([...this.lobby.keys()]);
 	}
 
@@ -70,8 +71,12 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 		const opponentId: number = this.users.get(opponentSock);
 
-		client.emit("matchmaking", {side: -1, p1: {score:0, id: opponentId, username: null}, p2: {score:0, id: userId, username: null}});
-		opponentSock.emit("matchmaking", {side: 1, p1: {score:0, id: opponentId, username: null}, p2: {score:0, id: userId, username: null}});
+		client.emit("matchmaking", {side: -1, p1: {score:0, id: opponentId, username: null},
+			p2: {score:0, id: userId, username: null}
+		});
+		opponentSock.emit("matchmaking", {side: 1, p1: {score:0, id: opponentId, username: null},
+			p2: {score:0, id: userId, username: null}
+		});
 
 		//create game with opponent
 		let instance: PongGame | Splatong;
@@ -81,8 +86,24 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			instance = new Splatong(opponentId, opponentSock, userId, client);
 		this.lobby.set(userId, instance);
 		this.lobby.set(opponentId, instance);
-		setTimeout(() => instance.start(), 100);
+		this.eventService.sendInGame(opponentId, userId, true);
 		this.gameService.updateUserInGame([...this.lobby.keys()]);
+	}
+
+	@SubscribeMessage("waitSpectate")
+	WaitSpectate(@MessageBody() specId: number, @ConnectedSocket() client: Socket) {
+		console.log("waitSpectate");
+		// const userId: number = this.users.get(client);
+		const instance = this.lobby.get(specId);
+		if (!instance)
+		{
+			client.disconnect();
+			return ;
+		}
+		instance.spectator.push(client);
+		const info = instance.getInfo();
+		client.emit("goSpectate", {players: {side: 0, p1: {score: info.scoreP1, id: info.p1, username: null},
+			p2: {score: info.scoreP2, id: info.p2, username: null}}, mode: info.mode});
 	}
 
 	@SubscribeMessage("defy")
@@ -110,8 +131,15 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			instance = new Splatong(defyId, defySocket, userId, client);
 		this.lobby.set(userId, instance);
 		this.lobby.set(defyId, instance);
-		setTimeout(() => instance.start(), 100);
+		this.eventService.sendInGame(defyId, userId, true);
 		this.gameService.updateUserInGame([...this.lobby.keys()]);
+	}
+
+	@SubscribeMessage("ready")
+	handleReady(@ConnectedSocket() client: Socket) {
+		const userId = this.users.get(client);
+		const instance = this.lobby.get(userId);
+		instance?.ready(userId);
 	}
 
 	@SubscribeMessage("input")

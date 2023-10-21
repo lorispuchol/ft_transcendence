@@ -87,8 +87,16 @@ export default function Game() {
 		}
 		socket.on("goDefy", goToDefy)
 
+		function goSpectate(specId: number) {
+			socket.emit("clear");
+			setDefy(specId);
+			setSetting({type: "online", mode: "spectate"});
+		}
+		socket.on("goSpectate", goSpectate);
+
 		return (() => {
 			socket.off("goDefy", goToDefy)
+			socket.off("goSpectate", goSpectate);
 		})
 	}, [socket, setDefy, setSetting])
 
@@ -106,8 +114,8 @@ export default function Game() {
 					return (<LocalGame setPlayers={setPlayers} setScore={setScore}/>)
 				return (<LocalSplatong setPlayers={setPlayers} setScore={setScore}/>);
 			case "online":
-				return (<MatchMaking mode={setting.mode} setSetting={setSetting}
-					setPlayers={setPlayers} defy={defy} setDefy={setDefy} setScore={setScore}/>);
+				return (<MatchMaking mode={setting.mode} setPlayers={setPlayers}
+					defy={defy} setDefy={setDefy} setScore={setScore}/>);
 		}
 	}
 

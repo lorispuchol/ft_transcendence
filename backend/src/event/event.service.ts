@@ -41,8 +41,9 @@ export class EventService {
 		this.eventGateway.deleteEvent(userId, event);
 	}
 
-	sendInGame(userId: number, statu: boolean) {
-		this.eventGateway.sendInGame(userId, statu);
+	sendInGame(p1Id: number, p2Id: number, statu: boolean) {
+		this.eventGateway.sendInGame(p1Id, statu);
+		this.eventGateway.sendInGame(p2Id, statu);
 	}
 
 	async getUserData(id: number) {

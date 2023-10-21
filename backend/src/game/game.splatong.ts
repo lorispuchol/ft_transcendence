@@ -50,6 +50,11 @@ export default class Splatong {
 		private socketP2: Socket,
 	) {}
 
+	public spectator: Socket[] = [];
+
+	private p1Ready: boolean = false;
+	private p2Ready: boolean = false;
+
 	private intervalId: NodeJS.Timer;
 	private ownPosIntervalId: NodeJS.Timer;
 	private endIntervalId: NodeJS.Timer;
@@ -80,7 +85,21 @@ export default class Splatong {
 	private paddles: Pad = this.init_paddle();
 	private ball: Ball = this.init_ball(this.screen);
 
-	public start() {
+	public ready(userId: number) {
+		if (userId === this.p1)
+			this.p1Ready = true;
+		else if (userId === this.p2)
+			this.p2Ready = true;
+
+		if (this.p1Ready && this.p2Ready)
+		{
+			this.p1Ready = this.p2Ready = false;
+			this.start();
+		}
+	}
+
+
+	private start() {
 		const perSec = 1000 / 60;
 		const startDelay = 1000;
 		const startTime: number = Date.now() + startDelay;
@@ -90,7 +109,7 @@ export default class Splatong {
 		this.timeoutId = setTimeout(() => {
 			this.intervalId = setInterval(() => this.update(this), perSec);
 		}, startDelay);
-		this.ownPosIntervalId = setInterval(() => this.sendOwnPos(), 2000);
+		this.ownPosIntervalId = setInterval(() => this.sendOwnPos(), 1000);
 		this.endIntervalId = setInterval(() => {this.checkEnd()}, 1000)
 	}
 
@@ -178,6 +197,10 @@ export default class Splatong {
 			default:
 				return 0;
 		}
+	}
+
+	public getInfo() {
+		return {p1: this.p1, scoreP1: this.scoreP1, p2: this.p2, scoreP2: this.scoreP2, mode: "splatong"};
 	}
 
 	//////////////GAME LOGIC//////////////

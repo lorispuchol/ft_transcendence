@@ -25,7 +25,6 @@ export class GameService {
 
 	updateUserInGame(newUserInGame: number[]) {
 		this.userInGame = newUserInGame;
-		console.log(this.userInGame);
 	}
 
 	getUserInGame(userId: number) {

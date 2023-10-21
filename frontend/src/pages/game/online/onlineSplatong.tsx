@@ -149,6 +149,8 @@ export default function OnlineSplatong( { socket, setScore, side }: any ) {
 			setClock(Math.round((endTime - Date.now()) * 0.001))
 			animationFrameId = window.requestAnimationFrame(render);
 		}
+
+		socket.emit("ready");
 	
 		return (() => {
 			socket.off("GameState", updateState);
