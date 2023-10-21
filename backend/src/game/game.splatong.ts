@@ -164,6 +164,10 @@ export default class Splatong {
 		}
 		this.socketP1.emit("GameState", {opponentKey: this.inputP2, opponentPos: this.paddles.p2y, ...state});
 		this.socketP2.emit("GameState", {opponentKey: this.inputP1, opponentPos: this.paddles.p1y, ...state});
+		this.spectator.forEach((socket: Socket) => {
+			socket.emit("GameState", {ownPos: this.paddles.p1y,
+				 opponentKey: this.inputP2, opponentPos: this.paddles.p2y, ...state});
+		})
 	}
 
 	private sendOwnPos() {
@@ -197,6 +201,10 @@ export default class Splatong {
 			default:
 				return 0;
 		}
+	}
+
+	public sendBackground(socket: Socket) {
+		socket.emit("updateBackground", this.background);
 	}
 
 	public getInfo() {
@@ -251,6 +259,10 @@ export default class Splatong {
 	
 		this.socketP1.emit("end", result);
 		this.socketP2.emit("end", result);
+
+		this.spectator.forEach((socket: Socket) => {
+			socket.emit("end", result);
+		})
 
 		return 1;
 	}

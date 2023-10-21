@@ -46,7 +46,7 @@ export default function OnlineSplatong( { socket, setScore, side }: any ) {
 		const ball : Ball = init_ball(screen);
 		ball.speedCap = 45;
 		const paddle: Pad = init_paddle(screen, side);
-		if (side === 1)
+		if (side === 1 || side === 0)
 		{
 			paddle.ownColor = p1Color;
 			paddle.opColor = p2Color;
@@ -92,15 +92,32 @@ export default function OnlineSplatong( { socket, setScore, side }: any ) {
 		}
 
 		function updateState(state: any) {
-			ball.color = state.ballColor === 1 ? p1Color : p2Color;
+			switch (state.ballColor) {
+				case 0:
+					ball.color = "white";
+					break ;
+				case 1:
+					ball.color = p1Color;
+					break ;
+				case 2:
+					ball.color = p2Color;
+			}
 			opponentKey = state.opponentKey;
 			paddle.opY = state.opponentPos;
 			ball.x = state.ballX;
 			ball.y = state.ballY;
 			ball.dx = state.ballDx;
 			ball.dy = state.ballDy;
+
+			if (state.ownPos) //true for spectator
+				paddle.ownY = state.ownPos;
 		}
 		socket.on("GameState", updateState);
+
+		function updateBackground(newBack: number[][]) {
+			background.splice(0, background.length, ...newBack);
+		}
+		socket.on("updateBackground", updateBackground);
 
 		function updateOwnPos(ownPos: number) {
 			paddle.ownY = ownPos;
@@ -130,7 +147,7 @@ export default function OnlineSplatong( { socket, setScore, side }: any ) {
 			drawPaddle(ctx, paddle);
 			drawBall(ctx, ball);
 			if (nextRoundTime <= Date.now())
-				animationFrameId = window.requestAnimationFrame(render);
+					animationFrameId = window.requestAnimationFrame(render);
 			else
 				animationFrameId = window.requestAnimationFrame(renderStart);
 		}
@@ -150,7 +167,21 @@ export default function OnlineSplatong( { socket, setScore, side }: any ) {
 			animationFrameId = window.requestAnimationFrame(render);
 		}
 
-		socket.emit("ready");
+		function renderSpectate() {
+			drawBackground();
+			drawPaddle(ctx, paddle);
+			drawBall(ctx, ball);
+			background[yMatrix()][xMatrix()] = colorTomatrix(ball.color);
+			animationFrameId = window.requestAnimationFrame(renderSpectate);
+		}
+
+		if (side === 0)
+		{
+			socket.emit("getBackground");
+			animationFrameId = window.requestAnimationFrame(renderSpectate);
+		}
+		else
+			socket.emit("ready");
 	
 		return (() => {
 			socket.off("GameState", updateState);
