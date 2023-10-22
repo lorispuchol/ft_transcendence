@@ -2,6 +2,7 @@ import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query, Redirect, Req
 import { AuthService } from "./auth.service";
 import { Public, client_url, ftConstants } from "./constants";
 import { NewUserWithPassword, UserWithPassword } from "./auth.dto";
+import { User } from "src/user/user.entity";
 
 @Controller('auth')
 export class AuthController {
@@ -32,11 +33,15 @@ export class AuthController {
 		}
 		try {
 			const userData = await this.authService.getDataFtApi(code);
-			const token: string = await this.authService.logIn(userData.data.login);
+			const {token, user}: {token: string, user: User} = await this.authService.logIn(userData.data.login);
 			if (!token)
 			{
 				res.redirect(client_url + "/login?alreadyHere=" + userData.data.login);
 				return ;
+			}
+			if (user.otp_secret) //check fo 2FA
+			{
+				res.send;
 			}
 			res.redirect(client_url + "/login?token=" + token);
 		}
@@ -45,6 +50,16 @@ export class AuthController {
 		}
 	}
 
+	// let totp = new OTPAuth.TOTP({
+	// 	issuer: "codevoweb.com",
+	// 	label: "CodevoWeb",
+	// 	algorithm: "SHA1",
+	// 	digits: 6,
+	// 	secret: user.otp_base32!,
+	//   });
+  
+	//   let delta = totp.validate({ token, window: 1 });
+	
 	@Public()
 	@Post('login')
 	login(

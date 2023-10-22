@@ -2,10 +2,11 @@ import { ChangeEvent, FormEvent, useContext, useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { ClickAwayListener, Divider, Paper } from '@mui/material'
-import { PatchRequest, client_url } from "../../utils/Request";
+import { GetRequest, PatchRequest, client_url } from "../../utils/Request";
 import './SettingsPopup.scss'
 import { UserContext } from "../../utils/Context";
 import { Done } from "@mui/icons-material";
+import QRCode from "react-qr-code";
 
 
 function updateError(error: string[]) {
@@ -19,10 +20,11 @@ function updateError(error: string[]) {
 export default function SettingsPopup({ close, login }: {close: any, login: string}) {
 	const [newUsername, setNewUsername]: [string, Function] = useState('')
 	const [pp, setPp]: [File | null, Function] = useState(null);
+	const [qrCode, setQrCode]: [string, Function] = useState("");
 	const username = useContext(UserContext);
 
-	useEffect(() => {
-	}, []);
+	// useEffect(() => {
+	// }, []);
 
 	function usernameChange(event: ChangeEvent<HTMLInputElement>) {
 		setNewUsername(event.target.value);
@@ -88,6 +90,16 @@ export default function SettingsPopup({ close, login }: {close: any, login: stri
 		})
 	}
 
+
+	function activate2fa() {
+		GetRequest("/auth/setup2FA").then((response:any) => {
+			if (response.status === "OK")
+				setQrCode(response.data.otp_url);
+			else
+				updateError(response.error);
+		});
+	}
+
 	return (
 		<div className='flex justify-center items-center'>
 			<div className="settings_bg justify-center">
@@ -99,12 +111,18 @@ export default function SettingsPopup({ close, login }: {close: any, login: stri
 							<input type='text' className="username_input" value={newUsername} onChange={usernameChange} />
 							<button className='update_button ml-7' onClick={updateUsername}><Done/></button> 
 						</form>
-						<Divider />
+						<Divider/>
 						<form className='settings_option' onSubmit={updatePp}>
 							<div className="settings_text">Change avatar</div>
 							<input type='file' accept='/image/*' onChange={ppChange} />
 							<button className='update_button' onClick={updatePp}><Done/></button>
 						</form>
+						<Divider/>
+						<div className="settings_option flex justify-between">
+							<div className="settings_text">Activate 2FA</div>
+							<button className='update_button' onClick={activate2fa}><Done/></button>
+						</div>
+						{qrCode && <QRCode value={qrCode}/>}
 					</Paper>
 				</ClickAwayListener>
 				<ToastContainer />

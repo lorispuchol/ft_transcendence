@@ -31,15 +31,15 @@ export class AuthService {
 		}));
 	}
 
-	async logIn(login: string): Promise<string> {
+	async logIn(login: string): Promise<{token: string, user: User} | null> {
 		let user: User = await this.userService.findOneByLogin(login);
 		if (!user)
 			user = await this.userService.createOne(login);
 	
 		const payload = {id: user.id, login: user.login};
 		if (this.eventService.isAlreadyConnected(payload.id))
-			return "";
-		return await this.jwtService.signAsync(payload);
+			return null;
+		return {token: await this.jwtService.signAsync(payload), user};
 	}
 
 	async logInWithPassword(username: string): Promise<Object> {
@@ -74,11 +74,13 @@ export class AuthService {
 			issuer: server_url,
 			label: "el pongo",
 			algorithm: "SHA1",
-			digits: 4,
+			digits: 6,
 			secret: secret,
 		});
 		const otp_url = totp.toString();
 
-		return ({secret, otp_url});
+		this.userService.addOtpSecret(userId, secret);
+
+		return ({otp_url});
 	}
 }

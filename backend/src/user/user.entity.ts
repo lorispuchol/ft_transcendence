@@ -43,13 +43,6 @@ export class User extends BaseEntity {
 		nullable: true,
 		default: null,
 	})
-	otp_url: string;
-
-	@Column({
-		type: 'varchar',
-		nullable: true,
-		default: null,
-	})
 	avatar: string;
 
 	@Column({

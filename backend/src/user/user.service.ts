@@ -64,6 +64,10 @@ export class UserService {
 		this.userRepository.increment({id: userId}, "nb_defeat", 1);
 	}
 
+	addOtpSecret(userId: number, secret: string) {
+		this.userRepository.update({id: userId}, {otp_secret: secret});
+	}
+
 	changeUsername(userId: number, newUsername: string) {
 		this.userRepository.update({id: userId}, {username: newUsername});
 		return ("OK");
