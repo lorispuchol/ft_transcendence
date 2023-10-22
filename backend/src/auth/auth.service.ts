@@ -2,10 +2,12 @@ import { Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { User } from "src/user/user.entity";
 import { UserService } from "src/user/user.service";
-import { ftConstants } from "./constants";
+import { ftConstants, server_url } from "./constants";
 import axios, { AxiosResponse } from "axios";
 import * as bcrypt from 'bcrypt';
+import * as OTPAuth from "otpauth";
 import { EventService } from "src/event/event.service";
+import { encode } from "hi-base32";
 
 @Injectable()
 export class AuthService {
@@ -54,5 +56,29 @@ export class AuthService {
 		
 		const payload = {id: user.id, login: user.login};
 		return this.jwtService.signAsync(payload);
+	}
+
+	generateRandomBase32() {
+		const buffer = crypto.randomUUID();
+		const base32 = encode(buffer).replace(/=/g, "").substring(0, 24);
+		return base32;
+	  };
+
+	async setup2FA(userId: number) {
+		const user: User = await this.userService.findOneById(userId);
+		if (!user)
+			return ;
+		
+		const secret = this.generateRandomBase32();
+		const totp = new OTPAuth.TOTP({
+			issuer: server_url,
+			label: "el pongo",
+			algorithm: "SHA1",
+			digits: 4,
+			secret: secret,
+		});
+		const otp_url = totp.toString();
+
+		return ({secret, otp_url});
 	}
 }

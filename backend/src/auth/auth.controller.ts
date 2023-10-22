@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query, Redirect, Response } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query, Redirect, Request, Response } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { Public, client_url, ftConstants } from "./constants";
 import { NewUserWithPassword, UserWithPassword } from "./auth.dto";
@@ -47,17 +47,22 @@ export class AuthController {
 
 	@Public()
 	@Post('login')
-	async login(
+	login(
 		@Body() user: UserWithPassword
 	) {
-		return (await this.authService.logInWithPassword(user.username));
+		return (this.authService.logInWithPassword(user.username));
 	}
 
 	@Public()
 	@Post('signup')
-	async signUp(
+	signUp(
 		@Body() user: NewUserWithPassword
 	) {
-		return (await this.authService.createUserWithPassword(user.username, user.password));
+		return (this.authService.createUserWithPassword(user.username, user.password));
+	}
+
+	@Get('setup2FA')
+	setup2FA(@Request() req: any) {
+		return (this.authService.setup2FA(req.user.id));
 	}
 }

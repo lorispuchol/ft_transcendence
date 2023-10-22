@@ -1,10 +1,11 @@
 import { ChangeEvent, FormEvent, useContext, useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
-import { ClickAwayListener, Paper } from '@mui/material'
+import { ClickAwayListener, Divider, Paper } from '@mui/material'
 import { PatchRequest, client_url } from "../../utils/Request";
 import './SettingsPopup.scss'
 import { UserContext } from "../../utils/Context";
+import { Done } from "@mui/icons-material";
 
 
 function updateError(error: string[]) {
@@ -93,13 +94,16 @@ export default function SettingsPopup({ close, login }: {close: any, login: stri
 				<ClickAwayListener onClickAway={close}>
 					<Paper className='settings_box'>
 						<button className='close_button' onClick={close}>X</button>
-						<form className='settings_option mt-5' onSubmit={updateUsername}>
-							Username: <input type='text' className="username_input" value={newUsername} onChange={usernameChange} />
-							<button className='update_button' onClick={updateUsername}>UPDATE</button> 
+						<form className='settings_option' onSubmit={updateUsername}>
+							<div className="settings_text">Change username</div>
+							<input type='text' className="username_input" value={newUsername} onChange={usernameChange} />
+							<button className='update_button ml-7' onClick={updateUsername}><Done/></button> 
 						</form>
+						<Divider />
 						<form className='settings_option' onSubmit={updatePp}>
-							Modifier photo de profile: <input type='file' accept='/image/*' onChange={ppChange} />
-							<button className='update_button' onClick={updatePp}>UPDATE</button>
+							<div className="settings_text">Change avatar</div>
+							<input type='file' accept='/image/*' onChange={ppChange} />
+							<button className='update_button' onClick={updatePp}><Done/></button>
 						</form>
 					</Paper>
 				</ClickAwayListener>
