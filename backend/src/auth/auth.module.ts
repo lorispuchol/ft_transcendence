@@ -6,6 +6,7 @@ import { AuthService } from "./auth.service";
 import { jwtConstants } from "./constants";
 import { AlreadyHere, IsUsernameAvailable, PasswordMatch } from "./auth.decorator";
 import { EventModule } from "src/event/event.module";
+import { TwoFactorGard } from "./auth.guard";
 
 @Module({
 	imports : [
@@ -18,7 +19,7 @@ import { EventModule } from "src/event/event.module";
 		})
 	],
 	controllers: [AuthController],
-	providers: [AuthService, IsUsernameAvailable, PasswordMatch, AlreadyHere],
+	providers: [AuthService, IsUsernameAvailable, PasswordMatch, AlreadyHere, TwoFactorGard],
 	exports: [AuthService],
 })
 export class AuthModule {}

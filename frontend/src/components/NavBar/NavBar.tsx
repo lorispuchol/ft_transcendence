@@ -3,6 +3,7 @@ import './NavBar.scss'
 import { useContext, useEffect, useState } from 'react';
 import menu_btn from './img/menu_btn.png';
 import kirby from './img/kirby.jpeg';
+import title from './img/splatong.png';
 import Avatar from '@mui/material/Avatar';
 import EventList from '../event/EventList';
 import { Paper } from '@mui/material';
@@ -82,7 +83,8 @@ export const NavBar = () => {
 				<NavLink to={'/'} onClick={() => hanldeClick("home")}>
 					<img className='nav_bar_img' src={kirby} alt="oui img"/>
 				</NavLink>
-				<div className='title'>EL PONGO</div>
+				,<img src={title} alt="splatong" />
+				{/* <div className='title'>EL PONGO</div> */}
 				<nav className='nav_bar_link'>
 					{pages.map((page) => (
 						<NavLink key={page[0]} className={select === page[1] ? 'nav_bar_link_a' : 'nav_bar_link_p'} onClick={() => hanldeClick(page[1])} to={page[1]}>{page[0]}</NavLink>
