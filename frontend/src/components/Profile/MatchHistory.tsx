@@ -1,12 +1,13 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { GetRequest } from "../../utils/Request";
 import ErrorHandling from "../../utils/Error";
 import Loading from "../../utils/Loading";
-import { Avatar, Paper } from "@mui/material";
+import { Paper } from "@mui/material";
 
 import { defaultAvatar } from "../../pages/Profile/Profile";
 
 import './MatchHistory.scss'
+import { NavLink } from "react-router-dom";
 
 interface UserData {
 	id: number,
@@ -46,19 +47,23 @@ function MatchHistoryElem({ Match, userId }: MatchProps) {
 	if (Match.winner.id === userId)
 		return (
 			<Paper className="mh_card_w">
-				{Match.loser.avatar === null ?<Avatar src={defaultAvatar} alt="defaultAvatar"/> : <Avatar src={Match.loser.avatar} alt="loserAvatar"/>}
-				<div>{Match.loser.username}</div>
-				<div>{Match.winner_score} - {Match.loser_score}</div>
-				<div>{Match.mode}</div>
+				{Match.loser.avatar === null ?<img className="mh_card_avatar" src={defaultAvatar} alt="defaultAvatar" /> : <img className="mh_card_avatar" src={Match.loser.avatar} alt="loserAvatar" />}
+				<div className="mh_card_username"><NavLink to={'/profile/' + Match.loser.username}>{Match.loser.username}</NavLink></div>
+				<div className="mh_card_result">
+					<div>{Match.winner_score} - {Match.loser_score}</div>
+					<div>{Match.mode}</div>
+				</div>
 			</Paper>
 		)
 	else
 		return (
 			<Paper className="mh_card_l">
-				{Match.winner.avatar === null ?<Avatar src={defaultAvatar} alt="defaultAvatar"/> : <Avatar src={Match.winner.avatar} alt="winnerAvatar"/>}
-				<div>{Match.winner.username}</div>
-				<div>{Match.winner_score} - {Match.loser_score}</div>
-				<div>{Match.mode}</div>
+				{Match.winner.avatar === null ?<img className="mh_card_avatar" src={defaultAvatar} alt="defaultAvatar" /> : <img className="mh_card_avatar" src={Match.winner.avatar} alt="winnerAvatar" />}
+				<div className="mh_card_username"><NavLink to={'/profile/' + Match.winner.username}>{Match.winner.username}</NavLink></div>
+				<div className="mh_card_result">
+					<div>{Match.winner_score} - {Match.loser_score}</div>
+					<div>{Match.mode}</div>
+				</div>
 			</Paper>
 		)
 }

@@ -117,4 +117,11 @@ export class UserController {
 			return ;
 		return (this.userService.parseUser(user));
 	}
+
+	@Get('friendlist/:id')
+	async getFriendlist(
+		@Param('id') userId: number
+	) {
+		return (this.userService.getFriendlist(userId));
+	}
 }

@@ -1,0 +1,19 @@
+.friendlist_list {
+	display: flex;
+	justify-content: space-evenly;
+	justify-items: center;
+}
+
+.friend_elem {
+	display: flex;
+	justify-content: space-between;
+	justify-items: center;
+	align-items: center;
+	padding: 4px;
+}
+
+.friend_elem_avatar {
+	width: 48px;
+	height: 48px;
+	margin-right: 8px;
+}

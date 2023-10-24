@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { GetRequest } from "../../utils/Request";
+import { GetRequest, client_url } from "../../utils/Request";
 import { useContext, useEffect, useState } from "react";
 import ErrorHandling from "../../utils/Error";
 import NoRouteFound from "../Error/NoRouteFound";
@@ -11,8 +11,10 @@ import ProfileImg from "../../components/Profile/ProfileImg";
 
 import SettingsPopup from "./SettingsPopup";
 import { UserContext } from "../../utils/Context";
-import { Paper } from "@mui/material";
+import { IconButton, Paper } from "@mui/material";
 import MatchHistory from "../../components/Profile/MatchHistory";
+import { Logout } from "@mui/icons-material";
+import FriendList from "../../components/Profile/FriendList";
 
 interface UserData {
 	id: number,
@@ -58,12 +60,21 @@ export default function Profile() {
 		nb_defeat: response.data.nb_defeat,
 	}
 
+	function disconnect() {
+		localStorage.clear();
+		window.location.replace(client_url);
+	}
+
 	return (
 		<div className="profile_page">
-			<div className='profile_top items-center grid grid-cols-3 py-4 px-4 relative flex flex-wrap'>
+			<div className='profile_top items-center grid grid-cols-3 py-4 px-4 relative flex'>
 				<div className="profile_image"><ProfileImg userId={profile.id} userAvatar={profile.avatar}/></div>
-				<Paper className='profile_username col-span-2 flex'><div className="pr-3">{profile.username}</div></Paper>
-				{profile.username === me && <button className="absolute top-0 end-0 pt-4 pr-4" onClick={handleShow}><IoSettingsSharp size={32}/></button>}
+				<Paper className='profile_username col-span-2 flex'><div>{profile.username}</div></Paper>
+				{profile.username === me && 
+				<button className="absolute top-0 end-0 flex items-center">
+					<IoSettingsSharp onClick={handleShow} className="mr-4" size={32}/>
+					<div><Paper className="!w-min"><IconButton onClick={disconnect}><Logout color="error"/></IconButton></Paper></div>
+					</button>}
 			</div>
 			<Paper className='grid grid-cols-6 profile_score'>
 				<div className='col-span-2 victory_p'>VICTORY</div>
@@ -72,6 +83,7 @@ export default function Profile() {
 				<div className='score_p'>{profile.nb_defeat}</div>
 			</Paper>
 			<MatchHistory ProfileId={profile.id} />
+			<FriendList userId={profile.id} />
 			{show &&
 				<SettingsPopup close={closeSettings} login={profile.login}/>
 			}

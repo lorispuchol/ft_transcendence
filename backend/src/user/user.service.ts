@@ -4,6 +4,8 @@ import { User } from "./user.entity";
 import { Repository } from "typeorm";
 import { server_url } from "src/auth/constants";
 import { Match } from "src/game/match.entity";
+import { RelationshipStatus } from "src/relationship/relationship.entity";
+// import { Relationship } from "src/relationship/relationship.entity";
 
 @Injectable()
 export class UserService {
@@ -93,5 +95,22 @@ export class UserService {
 			nb_victory: user.nb_victory,
 			nb_defeat: user.nb_defeat
 		});
+	}
+
+	async getFriendlist(userId: number): Promise<any> {
+		const user : User = await this.userRepository.findOne({relations: ["sendRelationships", "recvRelationships"], where: {id: userId}});
+		if (!user)
+			return null;
+		const friend: any[] = [];
+
+		user.sendRelationships.forEach(Relation => {
+			if (Relation.status === RelationshipStatus.ACCEPTED)
+				friend.push(this.parseUser(Relation.recipient));
+		})
+		user.recvRelationships.forEach(Relation => {
+			if (Relation.status === RelationshipStatus.ACCEPTED)
+				friend.push(this.parseUser(Relation.requester));
+		})
+		return friend;
 	}
 }
