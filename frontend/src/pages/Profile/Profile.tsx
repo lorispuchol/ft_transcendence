@@ -71,10 +71,10 @@ export default function Profile() {
 				<div className="profile_image"><ProfileImg userId={profile.id} userAvatar={profile.avatar}/></div>
 				<Paper className='profile_username col-span-2 flex'><div>{profile.username}</div></Paper>
 				{profile.username === me && 
-				<button className="absolute top-0 end-0 flex items-center">
+				<div className="absolute top-0 end-0 flex items-center">
 					<IoSettingsSharp onClick={handleShow} className="mr-4" size={32}/>
 					<div><Paper className="!w-min"><IconButton onClick={disconnect}><Logout color="error"/></IconButton></Paper></div>
-					</button>}
+					</div>}
 			</div>
 			<Paper className='grid grid-cols-6 profile_score'>
 				<div className='col-span-2 victory_p'>VICTORY</div>
