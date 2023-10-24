@@ -12,11 +12,7 @@ interface Res {
 	error?: string,
 }
 
-interface MessageButtonProps {
-	receiver: string
-}
-
-export default function MessageButton({receiver}: MessageButtonProps) {
+export default function MessageButton({receiverId}: {receiverId: number}) {
 
 	const [res, setRes]: [Res, Function] = useState({status: "loading"});
 	
@@ -24,8 +20,8 @@ export default function MessageButton({receiver}: MessageButtonProps) {
 	const navigate = useNavigate();
 	
 	useEffect(() => {
-		GetRequest("/relationship/user/" + receiver).then((res) => setRes(res));
-	}, [receiver])
+		GetRequest("/relationship/user/" + receiverId).then((res) => setRes(res));
+	}, [receiverId])
 	if (res.status === "loading")
 		return (<IconButton><Message /></IconButton>);
 	if (res.status !== "OK")
@@ -37,7 +33,7 @@ export default function MessageButton({receiver}: MessageButtonProps) {
 
 	function handleClick() {
 
-		GetRequest("/chat/getDm/" + receiver)
+		GetRequest("/chat/getDm/" + receiverId)
 			.then((res) => navigate("/chat", {replace: true, state: {to: (res as any).data?.name}}))
 	}
 	

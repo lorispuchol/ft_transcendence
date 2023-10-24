@@ -18,7 +18,7 @@ export default function OnlineGame( { socket, setScore, side }: any ) {
 	useEffect(() => {
 		setWinnerId(-1);
 		const ctx = canvasRef!.current!.getContext('2d')!;
-		const screen = {w: 3200, h: 1800}
+		const screen = {w: 3200, h: 1800};
 		ctx.canvas.width = screen.w;
 		ctx.canvas.height = screen.h;
 		const [idKey] = handleKey();
@@ -38,6 +38,9 @@ export default function OnlineGame( { socket, setScore, side }: any ) {
 			ball.y = state.ballY;
 			ball.dx = state.ballDx;
 			ball.dy = state.ballDy;
+			
+			if (state.ownPos) //true for spectator
+				paddle.ownY = state.ownPos;
 		}
 		socket.on("GameState", updateState);
 
@@ -70,7 +73,10 @@ export default function OnlineGame( { socket, setScore, side }: any ) {
 			drawPaddle(ctx, paddle);
 			drawBall(ctx, ball);
 			if (nextRoundTime <= Date.now())
-				animationFrameId = window.requestAnimationFrame(render);
+				if (side === 0)
+					animationFrameId = window.requestAnimationFrame(renderSpectate);
+				else
+					animationFrameId = window.requestAnimationFrame(render);
 			else
 				animationFrameId = window.requestAnimationFrame(renderStart);
 		}
@@ -83,7 +89,20 @@ export default function OnlineGame( { socket, setScore, side }: any ) {
 			clearBehind(ctx, paddle, side);
 			animationFrameId = window.requestAnimationFrame(render);
 		}
-	
+		
+		function renderSpectate() {
+			ctx.clearRect(0,0, screen.w, screen.h);
+			drawPaddle(ctx, paddle);
+			drawBall(ctx, ball);
+			clearBehind(ctx, paddle, side);
+			animationFrameId = window.requestAnimationFrame(renderSpectate);
+		}
+
+		if (side === 0)
+			animationFrameId = window.requestAnimationFrame(renderSpectate);
+		else
+			socket.emit("ready");
+
 		return (() => {
 			socket.off("GameState", updateState);
 			socket.off("ownPos", updateOwnPos);

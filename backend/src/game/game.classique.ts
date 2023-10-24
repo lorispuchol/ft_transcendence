@@ -49,6 +49,11 @@ export default class PongGame {
 		private socketP2: Socket,
 	) {}
 
+	public spectator: Socket[] = [];
+
+	private p1Ready: boolean = false;
+	private p2Ready: boolean = false;
+
 	private intervalId: NodeJS.Timer;
 	private ownPosIntervalId: NodeJS.Timer;
 	private timeoutId: NodeJS.Timeout;
@@ -68,16 +73,32 @@ export default class PongGame {
 	private paddles: Pad = this.init_paddle();
 	private ball: Ball = this.init_ball(this.screen);
 
-	public start() {
+	public ready(userId: number) {
+		if (userId === this.p1)
+			this.p1Ready = true;
+		else if (userId === this.p2)
+			this.p2Ready = true;
+
+		if (this.p1Ready && this.p2Ready)
+		{
+			this.p1Ready = this.p2Ready = false;
+			this.start();
+		}
+	}
+
+	private start() {
 		this.clear();
 		const perSec = 1000 / 60;
 		const startDelay = 1000;
 		const startTime: number = Date.now() + startDelay;
 		this.socketP1.emit("roundReset", {scoreP1: this.scoreP1, scoreP2: this.scoreP2, nextRound: startTime});
 		this.socketP2.emit("roundReset", {scoreP1: this.scoreP1, scoreP2: this.scoreP2, nextRound: startTime});
+		this.spectator.forEach((socket: Socket) => {
+			socket.emit("roundReset", {scoreP1: this.scoreP1, scoreP2: this.scoreP2, nextRound: startTime});
+		})
 		if (this.checkWinner())
 			return ;
-		this.ownPosIntervalId = setInterval(() => this.sendOwnPos(), 2000);
+		this.ownPosIntervalId = setInterval(() => this.sendOwnPos(), 1000);
 		this.timeoutId = setTimeout(() => {
 			this.intervalId = setInterval(() => this.update(this), perSec);
 		}, startDelay);
@@ -128,6 +149,10 @@ export default class PongGame {
 		}
 		this.socketP1.emit("GameState", {opponentKey: this.inputP2, opponentPos: this.paddles.p2y, ...state});
 		this.socketP2.emit("GameState", {opponentKey: this.inputP1, opponentPos: this.paddles.p1y, ...state});
+		this.spectator.forEach((socket: Socket) => {
+			socket.emit("GameState", {ownPos: this.paddles.p1y,
+				 opponentKey: this.inputP2, opponentPos: this.paddles.p2y, ...state});
+		})
 	}
 
 	private sendOwnPos() {
@@ -163,6 +188,10 @@ export default class PongGame {
 		}
 	}
 
+	public getInfo() {
+		return {p1: this.p1, scoreP1: this.scoreP1, p2: this.p2, scoreP2: this.scoreP2, mode: "classic"};
+	}
+
 	//////////////GAME LOGIC//////////////
 	
 	private checkWinner() {
@@ -178,6 +207,10 @@ export default class PongGame {
 		this.socketP1.emit("end", this.winner);
 		this.socketP2.emit("end", this.winner);
 		
+		this.spectator.forEach((socket: Socket) => {
+			socket.emit("end", this.winner);
+		})
+
 		return 1;
 	}
 

@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
 import { GetRequest } from "../../utils/Request";
-import ErrorHandling from "../../utils/Error";
 import { DoDisturbOff, DoDisturbOn } from "@mui/icons-material";
 import { RelationButtonDelete, RelationButtonGet } from "./Friendbutton";
 import { IconButton } from "@mui/material";
 
 interface BlockProps {
-	login: string,
-	render?: Function
+	id: number,
+	updateUser?: Function
 }
 
 interface FriendshipData {
@@ -21,24 +20,22 @@ interface Response {
 	error?: string,
 }
 
-export default function BlockButton({ login, render }: BlockProps) {
-	const [response, setResponse]: [Response, Function] = useState({status: "loading"});
-	const [update, setUpdate]: [number, Function] = useState(0);
+export default function BlockButton({ id, updateUser }: BlockProps) {
+	const [status, setStatus]: [string, Function] = useState("");
 
 	useEffect(() => {
-		GetRequest("/relationship/user/" + login).then((response) => setResponse(response));
-	}, [update, login]);
-	if (response.status === "loading")
-		return (<IconButton><DoDisturbOn /></IconButton>);
-	if (response.status !== "OK")
-		return (<ErrorHandling status={response.status} message={response.error} />);
-
-	function handleUpdate(message: string) {
-		setUpdate(update + 1);
-		if (render) {render(message);}
-	}
+		GetRequest("/relationship/user/" + id).then((response: Response) => {
+			if (response.data)
+				setStatus(response.data!.status);
+		});
+	}, [status, id]);
 	
-	if (response.data!.status === "blocked")
-		return (<RelationButtonDelete path={"/unblock/" + login} update={handleUpdate} icon={<DoDisturbOff />}/>);
-	return (<RelationButtonGet path={"/block/" + login} update={handleUpdate} icon={<DoDisturbOn />}/>);
+	if (!status)
+		return (<IconButton><DoDisturbOn /></IconButton>);
+
+	const update = updateUser ? updateUser : setStatus;
+	
+	if (status === "blocked")
+		return (<RelationButtonDelete path={"/unblock/" + id} setStatus={update} icon={<DoDisturbOff />}/>);
+	return (<RelationButtonGet path={"/block/" + id} setStatus={update} icon={<DoDisturbOn />}/>);
 }

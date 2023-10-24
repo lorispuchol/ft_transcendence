@@ -10,7 +10,7 @@ import { MemberDistinc, Participant } from "src/chat/entities/participant_chan_x
 interface Event {
 	type: string,
 	sender: string,
-	senderId: number,
+	senderId: number | string,
 }
 
 interface Sender {
@@ -39,6 +39,11 @@ export class EventService {
 
 	deleteEvent(userId: number, event: Event) {
 		this.eventGateway.deleteEvent(userId, event);
+	}
+
+	sendInGame(p1Id: number, p2Id: number, statu: boolean) {
+		this.eventGateway.sendInGame(p1Id, statu);
+		this.eventGateway.sendInGame(p2Id, statu);
 	}
 
 	async getUserData(id: number) {
