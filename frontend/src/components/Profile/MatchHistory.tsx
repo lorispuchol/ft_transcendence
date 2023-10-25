@@ -47,7 +47,8 @@ function MatchHistoryElem({ Match, userId }: MatchProps) {
 	if (Match.winner.id === userId)
 		return (
 			<Paper className="mh_card_w">
-				{Match.loser.avatar === null ?<img className="mh_card_avatar" src={defaultAvatar} alt="defaultAvatar" /> : <img className="mh_card_avatar" src={Match.loser.avatar} alt="loserAvatar" />}
+				{Match.loser.avatar === null ? <NavLink className="mh_card_navlink" to={'/profile/' + Match.loser.username}><img className="mh_card_avatar" src={defaultAvatar} alt="defaultAvatar" /></NavLink> 
+				: <NavLink className="mh_card_navlink" to={'/profile/' + Match.loser.username}><img className="mh_card_avatar" src={Match.loser.avatar} alt="loserAvatar" /></NavLink>}
 				<div className="mh_card_username"><NavLink to={'/profile/' + Match.loser.username}>{Match.loser.username}</NavLink></div>
 				<div className="mh_card_result">
 					<div>{Match.winner_score} - {Match.loser_score}</div>
@@ -58,7 +59,8 @@ function MatchHistoryElem({ Match, userId }: MatchProps) {
 	else
 		return (
 			<Paper className="mh_card_l">
-				{Match.winner.avatar === null ?<img className="mh_card_avatar" src={defaultAvatar} alt="defaultAvatar" /> : <img className="mh_card_avatar" src={Match.winner.avatar} alt="winnerAvatar" />}
+				{Match.winner.avatar === null ?<NavLink className="mh_card_navlink" to={'/profile/' + Match.winner.username}><img className="mh_card_avatar" src={defaultAvatar} alt="defaultAvatar" /></NavLink>
+				: <NavLink to={'/profile/' + Match.winner.username}><img className="mh_card_avatar" src={Match.winner.avatar} alt="winnerAvatar" /></NavLink>}
 				<div className="mh_card_username"><NavLink to={'/profile/' + Match.winner.username}>{Match.winner.username}</NavLink></div>
 				<div className="mh_card_result">
 					<div>{Match.winner_score} - {Match.loser_score}</div>
