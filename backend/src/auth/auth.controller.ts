@@ -23,7 +23,7 @@ export class AuthController {
 	@HttpCode(HttpStatus.OK)
 	@Get('login')
 	async signInBy42(
-		@Query('code') code: string,
+		@Query('code', new DefaultValuePipe("")) code: string,
 		@Response() res: any,
 	) {
 		if (!code)
@@ -80,7 +80,10 @@ export class AuthController {
 	@Public()
 	@UseGuards(TwoFactorGard)
 	@Get('2FaCode/:code')
-	async checkFaCode(@Request() req: any, @Param('code', new DefaultValuePipe("")) code: string) {
+	async checkFaCode(
+		@Request() req: any,
+		@Param('code', new DefaultValuePipe("")) code: string
+	) {
 		const token = await this.authService.checkFaCode(req.user.id, code);
 		return {token};
 	}

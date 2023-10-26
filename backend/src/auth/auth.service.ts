@@ -36,9 +36,10 @@ export class AuthService {
 		if (!user)
 			user = await this.userService.createOne(login);
 	
-		const payload = {id: user.id};
-		if (this.eventService.isAlreadyConnected(payload.id))
+		if (this.eventService.isAlreadyConnected(user.id))
 			return null;
+		
+		const payload = {id: user.id, login: user.login};
 		if (user.otp_secret)
 			return ({token: await this.jwtService.signAsync(payload, {secret: jwtConstants.two_factor_secret}),
 				otp_secret: user.otp_secret
