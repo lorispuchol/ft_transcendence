@@ -3,6 +3,7 @@ import { Paper } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import GameMenu from "./GameMenu";
 import bird from "./bird.png";
+import logo from "./pongo.png"
 import MatchMaking from "./online/MatchMaking";
 import LocalGame from './local/LocalGame';
 import { GetRequest } from '../../utils/Request';
@@ -123,10 +124,38 @@ export default function Game() {
 		<>
 			<div className="canvas_wrap">
 				{players.p1? <PlayerCard player={players.p1} score={score.p1}/> 
-					: <Paper className="player_card"><div className="el_pongo">PONGO</div></Paper>}
+					:	<Paper className="player_card">
+							<img src={logo} alt="oui img"/>
+							<div className="pb-[7vw]">
+								<div className="card_text pb-[2vw]">Local :</div>
+								<div className="local_key">
+									<div className="key_group">
+										<kbd className="kbd card_key">W</kbd>
+										+
+										<kbd className="kbd card_key">S</kbd>
+									</div>
+									&
+									<div className="key_group">
+										<kbd className="kbd card_key">▲</kbd>
+										+
+										<kbd className="kbd card_key">▼</kbd>
+									</div>
+								</div>
+							</div>
+						</Paper>}
 				{modeSelect()}
 				{players.p2? <PlayerCard player={players.p2} score={score.p2}/>
-					: <Paper className="player_card"><div className="el_pongo">PONGO</div></Paper>}
+					:	<Paper className="player_card">
+							<div className="pt-[6vw]">
+								<div className="card_text pb-[2vw]">Online :</div>
+								<div className="key_group">
+									<kbd className="kbd card_key">▲</kbd>
+									+
+									<kbd className="kbd card_key">▼</kbd>
+								</div>
+							</div>
+							<img className="scale-x-[-1]" src={logo} alt="oui img"/>
+						</Paper>}
 			</div>
 			{setting.type !== "menu" &&
 				<div className="flex justify-center"><button onClick={returnToMenu}>
