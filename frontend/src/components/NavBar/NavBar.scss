@@ -97,7 +97,7 @@
 	.menu_btn {
 		display: block;
 		filter: blur(0);
-		z-index: 2;
+		z-index: 1001;
 	}
 	.mobile_notif {
 		display: block;
@@ -157,7 +157,7 @@
 	transition-property: visible;
 	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 	transition-duration: 500ms;
-	z-index: 1;
+	z-index: 1000;
 }
 
 .mobile_notif_off {

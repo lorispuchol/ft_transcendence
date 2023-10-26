@@ -1,4 +1,3 @@
-import { Avatar } from "@mui/material"
 import { useContext, useEffect, useState } from "react";
 import { Socket } from "socket.io-client";
 import { EventContext } from "../../utils/Context";
@@ -40,14 +39,14 @@ export default function ProfileImg(props: UserData) {
 
 	if (renderColor(userStatus) === "green")
 		return (
-			<Avatar className="Av_border_green" src={(props.userAvatar)} sx={{ width: 256, height: 256 }}></Avatar>
+			<img className="Av_border_green" src={(props.userAvatar)} alt="profileImg" />
 		);
 	else if (renderColor(userStatus) === "orange")
 		return (
-			<Avatar className="Av_border_orange" src={(props.userAvatar)} sx={{ width: 256, height: 256 }}></Avatar>
+			<img className="Av_border_orange" src={(props.userAvatar)} alt="profileImg" />
 		);
 	else
 			return (
-			<Avatar className="Av_border_red" src={(props.userAvatar)} sx={{ width: 256, height: 256 }}></Avatar>
+			<img className="Av_border_red" src={(props.userAvatar)} alt="profileImg" />
 		);
 }
