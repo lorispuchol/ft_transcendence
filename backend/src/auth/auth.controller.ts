@@ -1,7 +1,8 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query, Redirect, Response } from "@nestjs/common";
+import { Body, Controller, DefaultValuePipe, Get, HttpCode, HttpStatus, Param, Post, Query, Redirect, Request, Response, UseGuards } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { Public, client_url, ftConstants } from "./constants";
 import { NewUserWithPassword, UserWithPassword } from "./auth.dto";
+import { TwoFactorGard } from "./auth.guard";
 
 @Controller('auth')
 export class AuthController {
@@ -32,10 +33,15 @@ export class AuthController {
 		}
 		try {
 			const userData = await this.authService.getDataFtApi(code);
-			const token: string = await this.authService.logIn(userData.data.login);
+			const {token, otp_secret}: {token: string, otp_secret: string} = await this.authService.logIn(userData.data.login);
 			if (!token)
 			{
 				res.redirect(client_url + "/login?alreadyHere=" + userData.data.login);
+				return ;
+			}
+			if (otp_secret) //check fo 2FA
+			{
+				res.redirect(client_url + "/login?authtoken=" + token);
 				return ;
 			}
 			res.redirect(client_url + "/login?token=" + token);
@@ -44,20 +50,39 @@ export class AuthController {
 			res.send("something went wrong with 42 api");
 		}
 	}
-
+	
 	@Public()
 	@Post('login')
-	async login(
+	login(
 		@Body() user: UserWithPassword
 	) {
-		return (await this.authService.logInWithPassword(user.username));
+		return (this.authService.logInWithPassword(user.username));
 	}
 
 	@Public()
 	@Post('signup')
-	async signUp(
+	signUp(
 		@Body() user: NewUserWithPassword
 	) {
-		return (await this.authService.createUserWithPassword(user.username, user.password));
+		return (this.authService.createUserWithPassword(user.username, user.password));
 	}
+
+	@Get('setup2FA')
+	setup2FA(@Request() req: any) {
+		return (this.authService.setup2FA(req.user.id));
+	}
+
+	@Get('rm2FA')
+	rm2FA(@Request() req: any) {
+		return (this.authService.rm2FA(req.user.id));
+	}
+
+	@Public()
+	@UseGuards(TwoFactorGard)
+	@Get('2FaCode/:code')
+	async checkFaCode(@Request() req: any, @Param('code', new DefaultValuePipe("")) code: string) {
+		const token = await this.authService.checkFaCode(req.user.id, code);
+		return {token};
+	}
+
 }

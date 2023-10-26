@@ -188,6 +188,10 @@ export default class PongGame {
 		}
 	}
 
+	public sendBackground(socket: Socket) {
+		socket.emit("updateBackground", []);
+	}
+
 	public getInfo() {
 		return {p1: this.p1, scoreP1: this.scoreP1, p2: this.p2, scoreP2: this.scoreP2, mode: "classic"};
 	}

@@ -202,7 +202,7 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 		const userId = this.users.get(client);
 
 		this.clearUserInterval(userId);
-		const intervalId = setInterval(() => {client.emit("goSpectate", specId), console.log("interval spectate")}, 200);
+		const intervalId = setInterval(() => {client.emit("goSpectate", specId)}, 200);
 		this.userInterval.push({userId, intervalId});
 		setTimeout(() => {this.clearUserInterval(userId)}, 2000);
 	}
@@ -213,7 +213,7 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 		const userId = this.users.get(client);
 
 		this.clearUserInterval(userId);
-		const intervalId = setInterval(() => {client.emit("waitDefy", defyId), console.log("interval defy")}, 200);
+		const intervalId = setInterval(() => {client.emit("waitDefy", defyId)}, 200);
 		this.userInterval.push({userId, intervalId});
 		setTimeout(() => {this.clearUserInterval(userId)}, 2000);
 	}
@@ -232,7 +232,7 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 		const userSocket: Socket = [...this.users.entries()].filter(({ 1: value}) => value === defyInfo.senderId).map(([key]) => key)[0];
 		userSocket.emit("defy", {opponentId: userId, mode: mode,response: "OK"});
 		this.clearUserInterval(userId);
-		const intervalId = setInterval(() => {client.emit("goDefy", defyInfo), console.log("interval menu")}, 200);
+		const intervalId = setInterval(() => {client.emit("goDefy", defyInfo)}, 200);
 		this.userInterval.push({userId, intervalId});
 		setTimeout(() => {this.clearUserInterval(userId)}, 2000);
 	}

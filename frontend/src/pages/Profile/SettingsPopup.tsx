@@ -1,10 +1,11 @@
-import { ChangeEvent, FormEvent, useContext, useEffect, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
-import { ClickAwayListener, Paper } from '@mui/material'
-import { PatchRequest, client_url } from "../../utils/Request";
+import { ClickAwayListener, Divider, Paper } from '@mui/material'
+import { GetRequest, PatchRequest, client_url } from "../../utils/Request";
 import './SettingsPopup.scss'
-import { UserContext } from "../../utils/Context";
+import { Done } from "@mui/icons-material";
+import QRCode from "react-qr-code";
 
 
 function updateError(error: string[]) {
@@ -18,9 +19,14 @@ function updateError(error: string[]) {
 export default function SettingsPopup({ close, login }: {close: any, login: string}) {
 	const [newUsername, setNewUsername]: [string, Function] = useState('')
 	const [pp, setPp]: [File | null, Function] = useState(null);
-	const username = useContext(UserContext);
+	const [faActived, setFaActived]: [boolean, Function] = useState(false);
+	const [qrCode, setQrCode]: [string, Function] = useState("");
 
 	useEffect(() => {
+		GetRequest("/user/on2fa").then((response) => {
+			if (response.status === "OK")
+				setFaActived(response.data);
+		})
 	}, []);
 
 	function usernameChange(event: ChangeEvent<HTMLInputElement>) {
@@ -81,10 +87,33 @@ export default function SettingsPopup({ close, login }: {close: any, login: stri
 		PatchRequest("/user/avatar", formData)
 		.then ((response:any) => {
 			if (response.status === "OK")
-				window.location.href = client_url + "/profile/" + username;
+				window.location.reload();
 			else
 				updateError(response.error);
 		})
+	}
+
+
+	function activate2fa() {
+		GetRequest("/auth/setup2FA").then((response:any) => {
+			if (response.status === "OK")
+			{
+				setQrCode(response.data.otp_url);
+				setFaActived(true);
+			}
+			else
+				updateError(response.error);
+		});
+	}
+
+	function desactivate2fa() {
+		GetRequest("/auth/rm2FA").then((response:any) => {
+			if (response.status === "OK")
+			{
+				setFaActived(false);
+				setQrCode("");
+			}
+		});
 	}
 
 	return (
@@ -93,14 +122,37 @@ export default function SettingsPopup({ close, login }: {close: any, login: stri
 				<ClickAwayListener onClickAway={close}>
 					<Paper className='settings_box'>
 						<button className='close_button' onClick={close}>X</button>
-						<form className='settings_option mt-5' onSubmit={updateUsername}>
-							Username: <input type='text' className="username_input" value={newUsername} onChange={usernameChange} />
-							<button className='update_button' onClick={updateUsername}>UPDATE</button> 
+						<form className='settings_option' onSubmit={updateUsername}>
+							<div className="settings_text">Change username</div>
+							<input type='text' className="username_input" value={newUsername} onChange={usernameChange} />
+							<button className='update_button ml-7' onClick={updateUsername}><Done/></button> 
 						</form>
+						<Divider/>
 						<form className='settings_option' onSubmit={updatePp}>
-							Modifier photo de profile: <input type='file' accept='/image/*' onChange={ppChange} />
-							<button className='update_button' onClick={updatePp}>UPDATE</button>
+							<div className="settings_text">Change avatar</div>
+							<input type='file' accept='/image/*' onChange={ppChange} />
+							<button className='update_button' onClick={updatePp}><Done/></button>
 						</form>
+						<Divider/>
+						<div className="settings_option flex justify-between">
+							{
+								faActived ?
+								<>
+									<div className="settings_text">Desactivate 2FA</div>
+									<button className='update_button' onClick={desactivate2fa}><Done/></button>
+								</>
+								:
+								<>
+									<div className="settings_text">Activate 2FA</div>
+									<button className='update_button' onClick={activate2fa}><Done/></button>
+								</>
+							}
+						</div>
+						{qrCode &&
+							<div className="qr_code">
+								<QRCode value={qrCode}/>
+							</div>
+						}
 					</Paper>
 				</ClickAwayListener>
 				<ToastContainer />

@@ -7,6 +7,10 @@
 }
 
 .player_card {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	align-items: center;
 	color: white;
 	background-color: white;
 	width: 12vw;
@@ -21,18 +25,32 @@
 .in_game_card {
 	display: flex;
 	flex-direction: column;
+	align-items: center;
+}
+
+.card_key {
+	background: none;
+	border: 3px solid;
+	color: c.$secondary;
+	height: 3vw;
+	width: 3vw;
+}
+
+.card_text {
+	color: c.$secondary;
+	font-size: 3vw;
+}
+
+.local_key {
+	display: flex;
 	justify-content: space-between;
 	align-items: center;
 }
 
-.el_pongo {
-	padding: 0.8vw;
-	padding-left: 3vw;
-	overflow-wrap: break-word;
-	//font-size: 6rem;
-	font-size: 7.4vw;
-	line-height: 1;
-	color: c.$secondary;
+.key_group {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
 }
 
 .demo {

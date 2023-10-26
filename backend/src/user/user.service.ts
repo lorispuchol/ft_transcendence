@@ -14,22 +14,22 @@ export class UserService {
 			private userRepository: Repository<User>
 	){}
 
-	async createOne(login: string, password?: string): Promise<User | undefined> {
+	createOne(login: string, password?: string): Promise<User | undefined> {
 		const username: string = login;
 		const newUser: User = this.userRepository.create({login, username});
 		newUser.password = password;
-		return await this.userRepository.save(newUser);
+		return this.userRepository.save(newUser);
 	}
 	
-	async findOneById(id: number): Promise<User | undefined> {
+	findOneById(id: number): Promise<User | undefined> {
 		return this.userRepository.findOneBy({id: id});
 	}
 
-	async findOneByLogin(login: string): Promise<User | undefined> {
+	findOneByLogin(login: string): Promise<User | undefined> {
 		return this.userRepository.findOneBy({login});
 	}
 
-	async findOneByUsername(username: string): Promise<User | undefined> {
+	findOneByUsername(username: string): Promise<User | undefined> {
 		return this.userRepository.findOneBy({username});
 	}
 
@@ -66,12 +66,20 @@ export class UserService {
 		this.userRepository.increment({id: userId}, "nb_defeat", 1);
 	}
 
-	async changeUsername(userId: number, newUsername: string) {
+	addOtpSecret(userId: number, secret: string) {
+		this.userRepository.update({id: userId}, {otp_secret: secret});
+	}
+
+	rmOtpSecret(userId: number) {
+		this.userRepository.update({id: userId}, {otp_secret: null});
+	}
+
+	changeUsername(userId: number, newUsername: string) {
 		this.userRepository.update({id: userId}, {username: newUsername});
 		return ("OK");
 	}
 
-	async changeAvatar(userId: number, newAvatar: string) {
+	changeAvatar(userId: number, newAvatar: string) {
 		this.userRepository.update({id: userId}, {avatar: server_url + '//' + newAvatar});
 		return ("OK");
 	}

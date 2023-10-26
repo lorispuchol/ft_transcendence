@@ -1,9 +1,9 @@
 import { useSearchParams } from "react-router-dom";
-import { PostRequest, client_url, server_url } from "../../utils/Request";
+import { GetRequest, PostRequest, client_url, server_url } from "../../utils/Request";
 import Loading from "../../utils/Loading";
 import './LogIn.scss'
 import '../../style/fonts/Poppins/Poppins-Regular.ttf';
-import { ChangeEvent, FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -13,6 +13,38 @@ function logError(error: string[]) {
 		autoClose: 2000,
 		hideProgressBar: true,
 	});
+}
+
+function TwoFactor() {
+	const [code, setCode]: [string, Function] = useState("");
+
+	useEffect(() => {
+		if (code.length !== 6)
+			return ;
+		GetRequest("/auth/2FaCode/" + code).then((response) => {
+			if (response.status !== "OK" || !response.data.token)
+			{
+				logError(["wrong code"]);
+				setCode("");
+			}
+			else
+				window.location.href= client_url + "/login?token=" + response.data.token;
+		})
+	}, [code]);
+
+	function codeChange(event: ChangeEvent<HTMLInputElement>) {
+		setCode(event.target.value);
+	}
+
+	return (
+		<div className="box_login background_box_login">
+			<div className="title_box">enter 2FA code</div>
+			<form className="form_box">
+				<input className="input_box input_code" type="text"  value={code} onChange={codeChange} />
+			</form>
+			<ToastContainer />
+		</div>
+	);
 }
 
 function LogInput() {
@@ -31,20 +63,22 @@ function LogInput() {
 		e.preventDefault();
 		PostRequest("/auth/login", {username, password})
 			.then((response: any) =>{
-				if (response.status === "OK")
-					window.location.href= client_url + "/login?token=" + response.data.token;
-				else
+				if (response.status !== "OK")
 					logError(response.error);
+				else if (response.data.token)
+					window.location.href= client_url + "/login?token=" + response.data.token;
+				else //if 2FA is actived
+					window.location.href= client_url + "/login?authtoken=" + response.data.authToken;
 			}); 
 	}
 
 	function signup() {
 		PostRequest("/auth/signup", {username, password})
 			.then((response: any) =>{
-				if (response.status === "OK")
-					window.location.href= client_url + "/login?token=" + response.data;
-				else
+				if (response.status !== "OK")
 					logError(response.error);
+				else
+					window.location.href= client_url + "/login?token=" + response.data;
 			});
 	}
 
@@ -69,8 +103,15 @@ function LogInput() {
 
 export default function LogIn() {
 	const [searchParams] = useSearchParams();
+	const authTokenParam = searchParams.get("authtoken");
 	const tokenParam = searchParams.get("token");
 	const hereParam = searchParams.get("alreadyHere");
+
+	if (authTokenParam)
+	{
+		localStorage.setItem("token", authTokenParam);
+		return (<TwoFactor />);
+	}
 	if (tokenParam)
 	{
 		localStorage.setItem("token", tokenParam);

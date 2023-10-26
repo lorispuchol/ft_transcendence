@@ -21,6 +21,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		
 	private users: Map<Socket, number> = new Map();
 	private lobby: Map<number, PongGame | Splatong> = new Map();
+	private spectator: Map<Socket, PongGame | Splatong> = new Map();
 	private queue: {socket: Socket, mode: string}[] = [];
 	private defyQueue: number[] = [];
 
@@ -34,9 +35,18 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	handleDisconnect(client: Socket) {
 		const offId: number = this.users.get(client);
+
 		this.queue = this.queue.filter((elem) => elem.socket.id !== client.id);
 		this.defyQueue= this.defyQueue.filter((id) => id !== offId);
 		this.users.delete(client);
+
+		const specInstance = this.spectator.get(client);
+		if (specInstance)
+		{
+			specInstance.spectator = specInstance.spectator.filter((socket: Socket) => (socket.id != client.id));
+			this.spectator.delete(client);
+		}
+
 		const instance: PongGame | Splatong = this.lobby.get(offId);
 		if (!instance)
 			return ;
@@ -92,18 +102,25 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	@SubscribeMessage("waitSpectate")
 	WaitSpectate(@MessageBody() specId: number, @ConnectedSocket() client: Socket) {
-		console.log("waitSpectate");
-		// const userId: number = this.users.get(client);
 		const instance = this.lobby.get(specId);
 		if (!instance)
 		{
 			client.disconnect();
 			return ;
 		}
+
+		this.spectator.set(client, instance);
 		instance.spectator.push(client);
+
 		const info = instance.getInfo();
 		client.emit("goSpectate", {players: {side: 0, p1: {score: info.scoreP1, id: info.p1, username: null},
 			p2: {score: info.scoreP2, id: info.p2, username: null}}, mode: info.mode});
+	}
+
+	@SubscribeMessage("getBackground")
+	sendBackground(@ConnectedSocket() client: Socket) {
+		const instance = this.spectator.get(client);
+		instance?.sendBackground(client);
 	}
 
 	@SubscribeMessage("defy")

@@ -8,6 +8,7 @@ export const server_url = "http://" + configService.get('SERVER_HOST') + ":" + c
 
 export const jwtConstants = {
 	secret: configService.get('JWT_SECRET'),
+	two_factor_secret: configService.get('JWT_2FASECRET'),
 	expire: configService.get('JWT_EXPIRE'),
 };
 

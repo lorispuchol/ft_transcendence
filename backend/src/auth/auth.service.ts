@@ -2,10 +2,12 @@ import { Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { User } from "src/user/user.entity";
 import { UserService } from "src/user/user.service";
-import { ftConstants } from "./constants";
+import { ftConstants, jwtConstants } from "./constants";
 import axios, { AxiosResponse } from "axios";
 import * as bcrypt from 'bcrypt';
+import * as OTPAuth from "otpauth";
 import { EventService } from "src/event/event.service";
+import { encode } from "hi-base32";
 
 @Injectable()
 export class AuthService {
@@ -29,22 +31,29 @@ export class AuthService {
 		}));
 	}
 
-	async logIn(login: string): Promise<string> {
+	async logIn(login: string): Promise<{token: string, otp_secret: string} | null> {
 		let user: User = await this.userService.findOneByLogin(login);
 		if (!user)
 			user = await this.userService.createOne(login);
 	
-		const payload = {id: user.id, login: user.login};
+		const payload = {id: user.id};
 		if (this.eventService.isAlreadyConnected(payload.id))
-			return "";
-		return await this.jwtService.signAsync(payload);
+			return null;
+		if (user.otp_secret)
+			return ({token: await this.jwtService.signAsync(payload, {secret: jwtConstants.two_factor_secret}),
+				otp_secret: user.otp_secret
+			});
+		return {token: await this.jwtService.signAsync(payload), otp_secret: user.otp_secret};
 	}
 
 	async logInWithPassword(username: string): Promise<Object> {
 		const user: User = await this.userService.findOneByUsername(username);
+		
+		if (user.otp_secret)
+			return {authToken: await this.jwtService.signAsync({id: user.id}, {secret: jwtConstants.two_factor_secret})};
 
 		const payload = {id: user.id, login: user.login};
-		return {status: "OK", token: await this.jwtService.signAsync(payload)};
+		return {token: await this.jwtService.signAsync(payload)};
 	}
 
 	async createUserWithPassword(username: string, password: string): Promise<string> {
@@ -55,4 +64,56 @@ export class AuthService {
 		const payload = {id: user.id, login: user.login};
 		return this.jwtService.signAsync(payload);
 	}
+
+	generateRandomBase32() {
+		const buffer = crypto.randomUUID();
+		const base32 = encode(buffer).replace(/=/g, "").substring(0, 24);
+		return base32;
+	  };
+
+	async setup2FA(userId: number) {
+		const user: User = await this.userService.findOneById(userId);
+		if (!user)
+			return ;
+		
+		const secret = this.generateRandomBase32();
+		const totp = new OTPAuth.TOTP({
+			issuer: "elpongo.fr",
+			label: "el pongo",
+			algorithm: "SHA1",
+			digits: 6,
+			secret: secret,
+		});
+		const otp_url = totp.toString();
+
+		this.userService.addOtpSecret(userId, secret);
+
+		return ({otp_url});
+	}
+
+	rm2FA(userId: number) {
+		this.userService.rmOtpSecret(userId);
+		return true;
+	}
+
+	async checkFaCode(userId: number, code: string) {
+		const user = await this.userService.findOneById(userId);
+		if (!user)
+			return "";
+
+		const totp = new OTPAuth.TOTP({
+			issuer: "elpongo.fr",
+			label: "el pongo",
+			algorithm: "SHA1",
+			digits: 6,
+			secret: user.otp_secret
+		});
+		const delta = totp.validate({token: code, window: 1});
+		if (delta === null)
+			return "";
+
+		const payload = {id: user.id, login: user.login};
+		return (this.jwtService.signAsync(payload));
+	}
+
 }
