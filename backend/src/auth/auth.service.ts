@@ -87,4 +87,25 @@ export class AuthService {
 
 		return ({otp_url});
 	}
+
+	async checkFaCode(userId: number, code: string) {
+		const user = await this.userService.findOneById(userId);
+		if (!user)
+			return "";
+
+		const totp = new OTPAuth.TOTP({
+			issuer: "elpongo.fr",
+			label: "el pongo",
+			algorithm: "SHA1",
+			digits: 6,
+			secret: user.otp_secret
+		});
+		const delta = totp.validate({token: code, window: 1});
+		if (!delta)
+			return "";
+
+		const payload = {id: user.id, login: user.login};
+		return (this.jwtService.signAsync(payload));
+	}
+
 }

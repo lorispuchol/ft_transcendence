@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post, Query, Redirect, Request, Response, UseGuards } from "@nestjs/common";
+import { Body, Controller, DefaultValuePipe, Get, HttpCode, HttpStatus, Param, Post, Query, Redirect, Request, Response, UseGuards } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { Public, client_url, ftConstants } from "./constants";
 import { NewUserWithPassword, UserWithPassword } from "./auth.dto";
@@ -80,8 +80,8 @@ export class AuthController {
 	@Public()
 	@UseGuards(TwoFactorGard)
 	@Get('2FaCode')
-	checkFaCode(@Param('code', ParseIntPipe) code: number) {
-
+	checkFaCode(@Request() req: any, @Param('code', DefaultValuePipe) code: number) {
+		// const token = this.authService.checkFaCode(req.user.id, code);
 	}
 
 
