@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpException, Param, ParseIntPipe, Patch, Request, UploadedFile, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Get, HttpException, Param, ParseFilePipe, ParseIntPipe, Patch, Request, UploadedFile, UseInterceptors } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { User } from "./user.entity";
 import { newUsername } from "./user.dto";
@@ -29,9 +29,7 @@ export class UserController {
 	
 
 	@Get('me')
-	async getMeData(
-		@Request() req: any
-	) {
+	async getMeData(@Request() req: any) {
 		const user: User = await this.userService.findOneByLogin(req.user.login);
 		if (!user)
 			throw new HttpException('unauthorized', HttpStatusCode.Unauthorized);
@@ -59,9 +57,7 @@ export class UserController {
 	}
 
 	@Patch('usernameToLogin')
-	async changeUsernameToLogin(
-		@Request() req: any
-	) {
+	async changeUsernameToLogin(@Request() req: any) {
 		const user: User = await this.userService.findOneById(req.user.id);
 		if (!user)
 			return ;
@@ -73,12 +69,13 @@ export class UserController {
 	@UseInterceptors(FileInterceptor('file', storage))
 	async changeAvatar(
 		@Request() req: any,
-		@UploadedFile() file: any,
+		@UploadedFile(ParseFilePipe) file: Express.Multer.File,
 	) {
 		const user = await this.userService.findOneByLogin(req.user.login);
-		if (!user)
+		if (!user || !file)
 			return ;
-		var filename = user.avatar;
+
+		let filename = user.avatar;
 		if (filename)
 		{
 			const i = filename.indexOf('m');
@@ -90,7 +87,7 @@ export class UserController {
 			}})
 		}
 		this.userService.changeAvatar(req.user.id, file.filename);
-		return {file};
+		return ;
 	}
 
 	@Get('on2fa')
