@@ -15,6 +15,14 @@ function logError(error: string[]) {
 	});
 }
 
+function TwoFactor() {
+	return (
+		<div className="box_login background_box_login">
+			2fa
+		</div>
+	);
+}
+
 function LogInput() {
 	const [username, setUsername] = useState('')
 	const [password, setPassword] = useState('');
@@ -69,8 +77,15 @@ function LogInput() {
 
 export default function LogIn() {
 	const [searchParams] = useSearchParams();
+	const authTokenParam = searchParams.get("authtoken");
 	const tokenParam = searchParams.get("token");
 	const hereParam = searchParams.get("alreadyHere");
+
+	if (authTokenParam)
+	{
+		localStorage.setItem("token", authTokenParam);
+		return (<TwoFactor />);
+	}
 	if (tokenParam)
 	{
 		localStorage.setItem("token", tokenParam);

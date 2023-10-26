@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { User } from "src/user/user.entity";
 import { UserService } from "src/user/user.service";
-import { ftConstants, server_url } from "./constants";
+import { ftConstants, jwtConstants } from "./constants";
 import axios, { AxiosResponse } from "axios";
 import * as bcrypt from 'bcrypt';
 import * as OTPAuth from "otpauth";
@@ -31,15 +31,19 @@ export class AuthService {
 		}));
 	}
 
-	async logIn(login: string): Promise<{token: string, user: User} | null> {
+	async logIn(login: string): Promise<{token: string, otp_secret: string} | null> {
 		let user: User = await this.userService.findOneByLogin(login);
 		if (!user)
 			user = await this.userService.createOne(login);
 	
-		const payload = {id: user.id, login: user.login};
+		const payload = {id: user.id};
 		if (this.eventService.isAlreadyConnected(payload.id))
 			return null;
-		return {token: await this.jwtService.signAsync(payload), user};
+		if (user.otp_secret)
+			return ({token: await this.jwtService.signAsync(payload, {secret: jwtConstants.two_factor_secret}),
+				otp_secret: user.otp_secret
+			});
+		return {token: await this.jwtService.signAsync(payload), otp_secret: user.otp_secret};
 	}
 
 	async logInWithPassword(username: string): Promise<Object> {
@@ -71,7 +75,7 @@ export class AuthService {
 		
 		const secret = this.generateRandomBase32();
 		const totp = new OTPAuth.TOTP({
-			issuer: server_url,
+			issuer: "elpongo.fr",
 			label: "el pongo",
 			algorithm: "SHA1",
 			digits: 6,

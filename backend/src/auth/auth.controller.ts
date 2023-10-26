@@ -1,8 +1,8 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query, Redirect, Request, Response } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post, Query, Redirect, Request, Response, UseGuards } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { Public, client_url, ftConstants } from "./constants";
 import { NewUserWithPassword, UserWithPassword } from "./auth.dto";
-import { User } from "src/user/user.entity";
+import { TwoFactorGard } from "./auth.guard";
 
 @Controller('auth')
 export class AuthController {
@@ -33,15 +33,16 @@ export class AuthController {
 		}
 		try {
 			const userData = await this.authService.getDataFtApi(code);
-			const {token, user}: {token: string, user: User} = await this.authService.logIn(userData.data.login);
+			const {token, otp_secret}: {token: string, otp_secret: string} = await this.authService.logIn(userData.data.login);
 			if (!token)
 			{
 				res.redirect(client_url + "/login?alreadyHere=" + userData.data.login);
 				return ;
 			}
-			if (user.otp_secret) //check fo 2FA
+			if (otp_secret) //check fo 2FA
 			{
-				res.send;
+				res.redirect(client_url + "/login?authtoken=" + token);
+				return ;
 			}
 			res.redirect(client_url + "/login?token=" + token);
 		}
@@ -75,6 +76,14 @@ export class AuthController {
 	) {
 		return (this.authService.createUserWithPassword(user.username, user.password));
 	}
+
+	@Public()
+	@UseGuards(TwoFactorGard)
+	@Get('2FaCode')
+	checkFaCode(@Param('code', ParseIntPipe) code: number) {
+
+	}
+
 
 	@Get('setup2FA')
 	setup2FA(@Request() req: any) {
