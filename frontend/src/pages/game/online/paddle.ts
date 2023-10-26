@@ -70,12 +70,14 @@ let key: string = "idle";
 export function handleKey(): any[] {
 
 	function onKeyDown(e: any) {
+		e.preventDefault();
 		if (e.repeat)
 			return ;
 		if (allowedKey.includes(e.key) && key !== e.key)
 			key = e.key;
 	}
 	function onKeyUp(e: any) {
+		e.preventDefault();
 		if (e.repeat)
 			return;
 		if (allowedKey.includes(e.key) && key === e.key)

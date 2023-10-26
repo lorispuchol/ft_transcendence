@@ -31,8 +31,9 @@ export class AuthService {
 		}));
 	}
 
-	async logIn(login: string): Promise<{token: string, otp_secret: string} | null> {
+	async logIn(login: string): Promise<{token: string, otp_secret: string, firstLog: boolean} | null> {
 		let user: User = await this.userService.findOneByLogin(login);
+		const firstLog = user ? false : true;
 		if (!user)
 			user = await this.userService.createOne(login);
 	
@@ -41,10 +42,12 @@ export class AuthService {
 		
 		const payload = {id: user.id, login: user.login};
 		if (user.otp_secret)
-			return ({token: await this.jwtService.signAsync(payload, {secret: jwtConstants.two_factor_secret}),
-				otp_secret: user.otp_secret
+			return ({
+				token: await this.jwtService.signAsync(payload, {secret: jwtConstants.two_factor_secret}),
+				otp_secret: user.otp_secret,
+				firstLog,
 			});
-		return {token: await this.jwtService.signAsync(payload), otp_secret: user.otp_secret};
+		return {token: await this.jwtService.signAsync(payload), otp_secret: user.otp_secret, firstLog};
 	}
 
 	async logInWithPassword(username: string): Promise<Object> {

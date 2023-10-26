@@ -36,7 +36,7 @@ export const defaultAvatar: string = defaultPp;
 export default function Profile() {
 	const [show, setShow] = useState(false);
 	const handleShow = () => setShow(true);
-	const closeSettings = () =>setShow(false);
+	const closeSettings = () => setShow(false);
 
 	const me = useContext(UserContext);
 	const param = useParams();
@@ -72,7 +72,7 @@ export default function Profile() {
 				<Paper className='profile_username col-span-2 flex'><div>{profile.username}</div></Paper>
 				{profile.username === me && 
 				<div className="absolute top-0 end-0 flex items-center">
-					<IoSettingsSharp onClick={handleShow} className="mr-4" size={32}/>
+					<IoSettingsSharp onClick={handleShow} className="mr-4 hover:cursor-pointer" size={32}/>
 					<div><Paper className="!w-min"><IconButton onClick={disconnect}><Logout color="error"/></IconButton></Paper></div>
 					</div>}
 			</div>

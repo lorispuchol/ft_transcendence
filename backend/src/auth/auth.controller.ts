@@ -33,7 +33,8 @@ export class AuthController {
 		}
 		try {
 			const userData = await this.authService.getDataFtApi(code);
-			const {token, otp_secret}: {token: string, otp_secret: string} = await this.authService.logIn(userData.data.login);
+			const {token, otp_secret, firstLog}: {token: string, otp_secret: string, firstLog: boolean} 
+				= await this.authService.logIn(userData.data.login);
 			if (!token)
 			{
 				res.redirect(client_url + "/login?alreadyHere=" + userData.data.login);
@@ -44,7 +45,11 @@ export class AuthController {
 				res.redirect(client_url + "/login?authtoken=" + token);
 				return ;
 			}
-			res.redirect(client_url + "/login?token=" + token);
+			if (firstLog)
+				res.redirect(client_url + "/login?token=" + token + "&firstLog=true");
+			else
+				res.redirect(client_url + "/login?token=" + token);
+			
 		}
 		catch (error) {
 			res.send("something went wrong with 42 api");

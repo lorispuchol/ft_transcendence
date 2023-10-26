@@ -6,6 +6,7 @@ import '../../style/fonts/Poppins/Poppins-Regular.ttf';
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import SettingsPopup from "../Profile/SettingsPopup";
 
 function logError(error: string[]) {
 	toast.error(error[0], {
@@ -47,6 +48,23 @@ function TwoFactor() {
 	);
 }
 
+function FirstLog() {
+	const [login, setLogin]: [string, Function] = useState("");
+
+	useEffect(() => {
+		GetRequest("/user/me").then((response) => {
+			if (response.status === "OK")
+				setLogin(response.data.login);
+		})
+	}, [])
+
+	function close() {
+		window.location.replace(client_url);
+	}
+
+	return (<SettingsPopup login={login} close={close} />);
+}
+
 function LogInput() {
 	const [username, setUsername] = useState('')
 	const [password, setPassword] = useState('');
@@ -78,7 +96,7 @@ function LogInput() {
 				if (response.status !== "OK")
 					logError(response.error);
 				else
-					window.location.href= client_url + "/login?token=" + response.data;
+					window.location.href= client_url + "/login?token=" + response.data + "&firstLog=true";
 			});
 	}
 
@@ -106,6 +124,7 @@ export default function LogIn() {
 	const authTokenParam = searchParams.get("authtoken");
 	const tokenParam = searchParams.get("token");
 	const hereParam = searchParams.get("alreadyHere");
+	const firstLogParam = searchParams.get("firstLog");
 
 	if (authTokenParam)
 	{
@@ -115,6 +134,8 @@ export default function LogIn() {
 	if (tokenParam)
 	{
 		localStorage.setItem("token", tokenParam);
+		if (firstLogParam)
+			return (<FirstLog />)
 		window.location.replace(client_url);
 		return (<Loading />);
 	}

@@ -39,7 +39,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
   
 	@SubscribeMessage('message')
-	async handleMessage(@ConnectedSocket() client: Socket, value: string[2]) {
+	async handleMessage(client: Socket, value: string[2]) {
 
 		const decoded: any = this.jwtService.decode(<string>client.handshake.headers.token)
 
@@ -86,7 +86,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 	@SubscribeMessage('invite')
-	async handleInvitation(@ConnectedSocket() client: Socket, value: string[2]) {
+	async handleInvitation(client: Socket, value: string[2]) {
 
 		//value[0]: channel name
 		//value[1]: guest Username
