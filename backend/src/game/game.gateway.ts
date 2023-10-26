@@ -7,6 +7,7 @@ import PongGame from "./game.classique";
 import Splatong from "./game.splatong";
 import { GameService } from "./game.service";
 import { EventService } from "src/event/event.service";
+import { DefaultValuePipe, ParseIntPipe } from "@nestjs/common";
 
 @WebSocketGateway({
 	namespace: "game",
@@ -27,13 +28,13 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	afterInit(server: Server) {}
 
-	async handleConnection(client: Socket, ...args: any[]) {
+	async handleConnection(@ConnectedSocket() client: Socket) {
 		const decoded: any = this.jwtService.decode(<string>client.handshake.headers.token);
 		const newId: number = decoded.id;;
 		this.users.set(client, newId);
 	}
 
-	handleDisconnect(client: Socket) {
+	handleDisconnect(@ConnectedSocket() client: Socket) {
 		const offId: number = this.users.get(client);
 
 		this.queue = this.queue.filter((elem) => elem.socket.id !== client.id);
@@ -60,7 +61,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 	@SubscribeMessage("search")
-	async matchmaking(@MessageBody() mode: string, @ConnectedSocket() client: Socket) {
+	async matchmaking(@MessageBody(new DefaultValuePipe("")) mode: string, @ConnectedSocket() client: Socket) {
 		const userId = this.users.get(client);
 		
 		let opponentSock: Socket;
@@ -101,7 +102,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 	@SubscribeMessage("waitSpectate")
-	WaitSpectate(@MessageBody() specId: number, @ConnectedSocket() client: Socket) {
+	WaitSpectate(@MessageBody(ParseIntPipe) specId: number, @ConnectedSocket() client: Socket) {
 		const instance = this.lobby.get(specId);
 		if (!instance)
 		{
@@ -124,7 +125,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 	@SubscribeMessage("defy")
-	async defy(@MessageBody() defyInfo: {defyId: number, mode: string}, @ConnectedSocket() client: Socket) {
+	async defy(@MessageBody(new DefaultValuePipe({defyId: 0, mode: ""})) defyInfo: {defyId: number, mode: string}, @ConnectedSocket() client: Socket) {
 		const defyId = defyInfo.defyId;
 		const userId = this.users.get(client);
 		const i = this.defyQueue.indexOf(defyId);
@@ -160,8 +161,8 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 	@SubscribeMessage("input")
-	handleGameInput(@MessageBody() input: string | undefined, @ConnectedSocket() client: Socket) {
-		if (input == null)
+	handleGameInput(@MessageBody(new DefaultValuePipe("")) input: string, @ConnectedSocket() client: Socket) {
+		if (!input)
 			return ;
 		const userId = this.users.get(client);
 		const instance = this.lobby.get(userId);
@@ -169,23 +170,4 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		instance?.input(userId, input);
 	}
 
-	//dev
-	@SubscribeMessage("getState")
-	getState(client: Socket) {
-		console.log(
-			"users->", this.users.values(),
-			"lobby->", this.lobby.keys(), 
-			"queue->", this.queue.length, 
-			"defy->", this.defyQueue
-		);
-	}
-
-	//dev
-	@SubscribeMessage("flush")
-	flush(client: Socket) {
-		this.users = new Map();
-		this.lobby = new Map();
-		this.queue = [];
-		this.defyQueue = []
-	}
 }

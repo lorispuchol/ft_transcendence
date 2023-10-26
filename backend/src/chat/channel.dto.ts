@@ -13,6 +13,7 @@ export class NewChannelWithoutPassword {
 	@Validate(IsChannelNameAvailable)
 	channelName: string;
 	
+	@IsNotEmpty()
 	@IsEnum(ChanMode)
 	mode: ChanMode;
 }
@@ -29,10 +30,11 @@ export class NewChannelWithPassword {
 
 	@IsNotEmpty()
 	@IsString()
-	@IsStrongPassword({minLength: 8, minLowercase: 1, minNumbers: 1, minUppercase: 1, minSymbols: 0})
 	@MaxLength(30)
+	@IsStrongPassword({minLength: 8, minLowercase: 1, minNumbers: 1, minUppercase: 1, minSymbols: 0})
 	password: string;
 
+	@IsNotEmpty()
 	@IsEnum(ChanMode)
 	mode: ChanMode;
 }
@@ -52,8 +54,8 @@ export class SetPasswordChannel {
 
 	@IsNotEmpty()
 	@IsString()
-	@IsStrongPassword({minLength: 8, minLowercase: 1, minNumbers: 1, minUppercase: 1, minSymbols: 0})
 	@MaxLength(30)
+	@IsStrongPassword({minLength: 8, minLowercase: 1, minNumbers: 1, minUppercase: 1, minSymbols: 0})
 	newPw: string;
 }
 
@@ -61,8 +63,8 @@ export class AddPwChan {
 
 	@IsNotEmpty()
 	@IsString()
-	@IsStrongPassword({minLength: 8, minLowercase: 1, minNumbers: 1, minUppercase: 1, minSymbols: 0})
 	@MaxLength(30)
+	@IsStrongPassword({minLength: 8, minLowercase: 1, minNumbers: 1, minUppercase: 1, minSymbols: 0})
 	newPw: string;
 }
 
@@ -77,15 +79,18 @@ export class RemovePwChannel {
 
 	@IsNotEmpty()
 	@IsString()
+	@MaxLength(30)
 	@Validate(PasswordChannelMatch)
 	password: string;
 
+	@IsNotEmpty()
 	@IsEnum(ChanMode)
 	mode: ChanMode;
 }
 
 export class ChangeModeChan {
 
+	@IsNotEmpty()
 	@IsEnum(ChanMode)
 	mode: ChanMode;
 }
@@ -101,6 +106,7 @@ export class JoinChannelWithPassword {
 
 	@IsNotEmpty()
 	@IsString()
+	@MaxLength(30)
 	@Validate(PasswordChannelMatch)
 	password: string;
 }
@@ -113,11 +119,13 @@ export class Distinction {
 	@MinLength(2)
 	login: string;
 
+	@IsNotEmpty()
 	@IsEnum(MemberDistinc)
 	distinction: MemberDistinc;
 }
 
 export class Mute {
+
 	@IsString()
 	@IsNotEmpty()
 	@MaxLength(16)
