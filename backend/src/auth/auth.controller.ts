@@ -77,16 +77,22 @@ export class AuthController {
 		return (this.authService.createUserWithPassword(user.username, user.password));
 	}
 
-	@Public()
-	@UseGuards(TwoFactorGard)
-	@Get('2FaCode')
-	checkFaCode(@Request() req: any, @Param('code', DefaultValuePipe) code: number) {
-		// const token = this.authService.checkFaCode(req.user.id, code);
-	}
-
-
 	@Get('setup2FA')
 	setup2FA(@Request() req: any) {
 		return (this.authService.setup2FA(req.user.id));
 	}
+
+	@Get('rm2FA')
+	rm2FA(@Request() req: any) {
+		return (this.authService.rm2FA(req.user.id));
+	}
+
+	@Public()
+	@UseGuards(TwoFactorGard)
+	@Get('2FaCode/:code')
+	async checkFaCode(@Request() req: any, @Param('code', new DefaultValuePipe("")) code: string) {
+		const token = await this.authService.checkFaCode(req.user.id, code);
+		return {token};
+	}
+
 }

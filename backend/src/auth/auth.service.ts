@@ -48,9 +48,12 @@ export class AuthService {
 
 	async logInWithPassword(username: string): Promise<Object> {
 		const user: User = await this.userService.findOneByUsername(username);
+		
+		if (user.otp_secret)
+			return {authToken: await this.jwtService.signAsync({id: user.id}, {secret: jwtConstants.two_factor_secret})};
 
 		const payload = {id: user.id, login: user.login};
-		return {status: "OK", token: await this.jwtService.signAsync(payload)};
+		return {token: await this.jwtService.signAsync(payload)};
 	}
 
 	async createUserWithPassword(username: string, password: string): Promise<string> {
@@ -88,6 +91,11 @@ export class AuthService {
 		return ({otp_url});
 	}
 
+	rm2FA(userId: number) {
+		this.userService.rmOtpSecret(userId);
+		return true;
+	}
+
 	async checkFaCode(userId: number, code: string) {
 		const user = await this.userService.findOneById(userId);
 		if (!user)
@@ -101,7 +109,7 @@ export class AuthService {
 			secret: user.otp_secret
 		});
 		const delta = totp.validate({token: code, window: 1});
-		if (!delta)
+		if (delta === null)
 			return "";
 
 		const payload = {id: user.id, login: user.login};

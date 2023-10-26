@@ -68,6 +68,10 @@ export class UserService {
 		this.userRepository.update({id: userId}, {otp_secret: secret});
 	}
 
+	rmOtpSecret(userId: number) {
+		this.userRepository.update({id: userId}, {otp_secret: null});
+	}
+
 	changeUsername(userId: number, newUsername: string) {
 		this.userRepository.update({id: userId}, {username: newUsername});
 		return ("OK");

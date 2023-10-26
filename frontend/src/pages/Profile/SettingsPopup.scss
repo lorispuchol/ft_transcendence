@@ -75,3 +75,9 @@ input[type=file]::file-selector-button {
 	background-color: c.$primary;
 	filter: brightness(1.3) !important;
 }
+
+.qr_code {
+	display: flex;
+	justify-content: center;
+	margin-bottom: 2rem;
+}

@@ -93,6 +93,14 @@ export class UserController {
 		return {file};
 	}
 
+	@Get('on2fa')
+	async userOn2fa(@Request() req: any) {
+		const user: User = await this.userService.findOneById(req.user.id);
+		if (!user || !user.otp_secret)
+			return false;
+		return true;
+	}
+
 	@Get('avatar/:username')
 	async getAvatar(
 		@Param('username') username: string

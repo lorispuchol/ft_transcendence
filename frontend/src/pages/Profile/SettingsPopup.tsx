@@ -1,10 +1,9 @@
-import { ChangeEvent, FormEvent, useContext, useEffect, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { ClickAwayListener, Divider, Paper } from '@mui/material'
 import { GetRequest, PatchRequest, client_url } from "../../utils/Request";
 import './SettingsPopup.scss'
-import { UserContext } from "../../utils/Context";
 import { Done } from "@mui/icons-material";
 import QRCode from "react-qr-code";
 
@@ -20,11 +19,15 @@ function updateError(error: string[]) {
 export default function SettingsPopup({ close, login }: {close: any, login: string}) {
 	const [newUsername, setNewUsername]: [string, Function] = useState('')
 	const [pp, setPp]: [File | null, Function] = useState(null);
+	const [faActived, setFaActived]: [boolean, Function] = useState(false);
 	const [qrCode, setQrCode]: [string, Function] = useState("");
-	const username = useContext(UserContext);
 
-	// useEffect(() => {
-	// }, []);
+	useEffect(() => {
+		GetRequest("/user/on2fa").then((response) => {
+			if (response.status === "OK")
+				setFaActived(response.data);
+		})
+	}, []);
 
 	function usernameChange(event: ChangeEvent<HTMLInputElement>) {
 		setNewUsername(event.target.value);
@@ -84,7 +87,7 @@ export default function SettingsPopup({ close, login }: {close: any, login: stri
 		PatchRequest("/user/avatar", formData)
 		.then ((response:any) => {
 			if (response.status === "OK")
-				window.location.href = client_url + "/profile/" + username;
+				window.location.reload();
 			else
 				updateError(response.error);
 		})
@@ -94,9 +97,22 @@ export default function SettingsPopup({ close, login }: {close: any, login: stri
 	function activate2fa() {
 		GetRequest("/auth/setup2FA").then((response:any) => {
 			if (response.status === "OK")
+			{
 				setQrCode(response.data.otp_url);
+				setFaActived(true);
+			}
 			else
 				updateError(response.error);
+		});
+	}
+
+	function desactivate2fa() {
+		GetRequest("/auth/rm2FA").then((response:any) => {
+			if (response.status === "OK")
+			{
+				setFaActived(false);
+				setQrCode("");
+			}
 		});
 	}
 
@@ -119,10 +135,24 @@ export default function SettingsPopup({ close, login }: {close: any, login: stri
 						</form>
 						<Divider/>
 						<div className="settings_option flex justify-between">
-							<div className="settings_text">Activate 2FA</div>
-							<button className='update_button' onClick={activate2fa}><Done/></button>
+							{
+								faActived ?
+								<>
+									<div className="settings_text">Desactivate 2FA</div>
+									<button className='update_button' onClick={desactivate2fa}><Done/></button>
+								</>
+								:
+								<>
+									<div className="settings_text">Activate 2FA</div>
+									<button className='update_button' onClick={activate2fa}><Done/></button>
+								</>
+							}
 						</div>
-						{qrCode && <QRCode value={qrCode}/>}
+						{qrCode &&
+							<div className="qr_code">
+								<QRCode value={qrCode}/>
+							</div>
+						}
 					</Paper>
 				</ClickAwayListener>
 				<ToastContainer />

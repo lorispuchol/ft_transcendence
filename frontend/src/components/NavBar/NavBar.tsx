@@ -83,7 +83,7 @@ export const NavBar = () => {
 				<NavLink to={'/'} onClick={() => hanldeClick("home")}>
 					<img className='nav_bar_img' src={kirby} alt="oui img"/>
 				</NavLink>
-				,<img src={title} alt="splatong" />
+				<img className='nav_bar_img' src={title} alt="splatong" />
 				{/* <div className='title'>EL PONGO</div> */}
 				<nav className='nav_bar_link'>
 					{pages.map((page) => (
