@@ -1,5 +1,5 @@
 import { JwtService } from "@nestjs/jwt";
-import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway} from "@nestjs/websockets";
+import { ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway} from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 import { client_url } from "src/auth/constants";
 import { ChatService } from "./chat.service";
@@ -28,25 +28,25 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	afterInit(server: Server) {}
 
-	handleConnection(client: Socket, ...args: any[]) {
+	handleConnection(@ConnectedSocket() client: Socket) {
 		const decoded: any = this.jwtService.decode(<string>client.handshake.headers.token);
 		this.users.set(decoded.login, client);
 	}
 
-	handleDisconnect(client: Socket) {
+	handleDisconnect(@ConnectedSocket() client: Socket) {
 		const decoded: any = this.jwtService.decode(<string>client.handshake.headers.token)
 		this.users.delete(decoded.login);
 	}
   
 	@SubscribeMessage('message')
-	async handleMessage(client: Socket, value: string[2]) {
+	async handleMessage(@ConnectedSocket() client: Socket, value: string[2]) {
 
 		const decoded: any = this.jwtService.decode(<string>client.handshake.headers.token)
 
 		//value[0]: channel name
 		//value[1]: message content
 
-		if (value[1].length >= 20000)
+		if (!value || value[1].length >= 20000)
 			return ;
 
 		const channel: Channel = await this.chatService.findChanByName(value[0])
@@ -86,10 +86,13 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 	@SubscribeMessage('invite')
-	async handleInvitation(client: Socket, value: string[2]) {
+	async handleInvitation(@ConnectedSocket() client: Socket, value: string[2]) {
 
 		//value[0]: channel name
 		//value[1]: guest Username
+
+		if (!value)
+			return ;
 
 		const decoded: any = this.jwtService.decode(<string>client.handshake.headers.token)
 		const reqUser: User = await this.userService.findOneByLogin(decoded.login);
