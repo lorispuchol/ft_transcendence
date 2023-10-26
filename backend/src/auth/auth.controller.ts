@@ -50,16 +50,6 @@ export class AuthController {
 			res.send("something went wrong with 42 api");
 		}
 	}
-
-	// let totp = new OTPAuth.TOTP({
-	// 	issuer: "codevoweb.com",
-	// 	label: "CodevoWeb",
-	// 	algorithm: "SHA1",
-	// 	digits: 6,
-	// 	secret: user.otp_base32!,
-	//   });
-  
-	//   let delta = totp.validate({ token, window: 1 });
 	
 	@Public()
 	@Post('login')

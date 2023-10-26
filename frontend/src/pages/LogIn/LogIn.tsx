@@ -19,17 +19,9 @@ function TwoFactor() {
 	const [code, setCode]: [string, Function] = useState("");
 
 	useEffect(() => {
-		if (code.length === 6)
-			sendCode();
-	}, [code]);
-
-	function codeChange(event: ChangeEvent<HTMLInputElement>) {
-		setCode(event.target.value);
-	}
-	
-	function sendCode() {
+		if (code.length !== 6)
+			return ;
 		GetRequest("/auth/2FaCode/" + code).then((response) => {
-			console.log(response.data);
 			if (response.status !== "OK" || !response.data.token)
 			{
 				logError(["wrong code"]);
@@ -38,6 +30,10 @@ function TwoFactor() {
 			else
 				window.location.href= client_url + "/login?token=" + response.data.token;
 		})
+	}, [code]);
+
+	function codeChange(event: ChangeEvent<HTMLInputElement>) {
+		setCode(event.target.value);
 	}
 
 	return (
