@@ -93,7 +93,7 @@ export default function MatchHistory(props: UserProps) {
 					<MatchHistoryElem key={match.id} Match={match} userId={props.ProfileId}/>
 				))
 			:
-			<div>NUUUUL</div>
+			<Paper className="mh_card_l"><div>NO GAME</div><div>NO MATCH HISTORY</div></Paper>
 		}
 		</div>
 	);
