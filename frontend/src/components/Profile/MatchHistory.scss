@@ -9,8 +9,7 @@
 	display: flex;
 	flex-direction: row;
 	justify-content: space-evenly;
-	margin-bottom: 16px;
-	// height: 40vh;
+	margin-bottom: 32px;
 }
 
 .mh_card_w {
@@ -33,10 +32,14 @@
 	padding: 2%;
 }
 
+.mh_card_navlink {
+	border-radius: 100%;
+}
+
 .mh_card_avatar {
 	border-radius: 100%;
 	width: fit-content;
-	height: 50%;
+	height: 100%;
 }
 
 .mh_card_username {

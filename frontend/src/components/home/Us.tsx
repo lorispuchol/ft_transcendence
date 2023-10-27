@@ -11,17 +11,17 @@ export default function Us() {
 			<div className='flex justify-center container_m mr-4'>
 					<div className='avatar'><Avatar src={lsuau} sx={{ width: 128, height: 128 }}></Avatar></div>
 					<p className='font'>Lucas Suau</p>
-					<p className='font'>bla bla bla bla bla bla bla</p>
+					<p className='font'>Aime trop jouer a Smash</p>
 			</div>
 			<div className='flex justify-center container_m'>
 					<div className='avatar'><Avatar src={lpuchol} sx={{ width: 128, height: 128 }}></Avatar></div>
 					<p className='font'>Loris Puchol</p>
-					<p className='font'>bla bla bla bla</p>
+					<p className='font'>Aime trop perdre au babyfoot</p>
 			</div>
 			<div className='flex justify-center container_m ml-4'>
 					<div className='avatar'><Avatar src={mapontil} sx={{ width: 128, height: 128 }}></Avatar></div>
 					<p className='font'>Maxime Pontille</p>
-					<p className='font'>blablabla fssdfj</p>
+					<p className='font'>Aime pas jouer au babyfoot</p>
 			</div>
 		</div>
 	);

@@ -44,7 +44,7 @@ export default function FriendList( {userId}: {userId: number} ) {
 						<FriendListElem key={user.id} user={user} />
 					))
 					:
-					<div>NO FRIEND :d</div>
+					<Paper className="p-1">NO FRIEND</Paper>
 				}
 			</div>
 		</div>
