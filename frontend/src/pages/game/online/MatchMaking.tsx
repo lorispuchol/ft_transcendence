@@ -30,7 +30,7 @@ export default function MatchMaking({ mode, setPlayers, defy, setDefy, setScore 
 		setSocket(newSocket);
 		
 		function notConnected () {
-			navigate("/");
+			// navigate("/");
 		}
 		newSocket.on("disconnect", notConnected);
 

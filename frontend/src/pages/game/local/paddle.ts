@@ -53,6 +53,7 @@ let rightKey: string[] = [];
 export function handleKey(): any[] {
 
 	function onKeyDown(e: any) {
+		e.preventDefault();
 		if (e.repeat)
 			return ;
 		if (allowedRightKey.includes(e.key) && !rightKey.includes(e.key))
@@ -61,6 +62,7 @@ export function handleKey(): any[] {
 			leftKey.push(e.key);
 	}
 	function onKeyUp(e: any) {
+		e.preventDefault();
 		if (e.repeat)
 			return;
 		if (allowedRightKey.includes(e.key))

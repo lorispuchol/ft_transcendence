@@ -4,7 +4,7 @@ import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect,
 import { Server, Socket } from "socket.io";
 import { client_url } from "src/auth/constants";
 import { EventService } from "./event.service";
-import { Inject, forwardRef } from "@nestjs/common";
+import { DefaultValuePipe, Inject, ParseIntPipe, forwardRef } from "@nestjs/common";
 import { User } from "src/user/user.entity";
 
 interface Event {
@@ -50,7 +50,7 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 
 	afterInit(server: Server) {}
 
-	async handleConnection(client: Socket) {
+	async handleConnection(@ConnectedSocket() client: Socket) {
 		const decoded: any = this.jwtService.decode(<string>client.handshake.headers.token);
 		const newId: number = decoded?.id;
 
@@ -72,7 +72,7 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 		});
 	}
 
-	async handleDisconnect(client: Socket) {
+	async handleDisconnect(@ConnectedSocket() client: Socket) {
 		const offId: number = this.users.get(client);
 		const user: User = await this.eventService.getUserData(offId);
 		if (!user)
@@ -96,7 +96,7 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 	}
 
 	@SubscribeMessage('getConnected')
-	getConnected(client: Socket) {
+	getConnected(@ConnectedSocket() client: Socket) {
 		const userId: number = this.users.get(client);
 
 		this.users.forEach(async (id) => {
@@ -112,7 +112,7 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 	}
 
 	@SubscribeMessage('getEvents')
-	async getEvents(client: Socket) {
+	async getEvents(@ConnectedSocket() client: Socket) {
 		const userId: number = this.users.get(client);
 		const events: Event[] = [];
 		
@@ -136,7 +136,7 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 	}
 
 	@SubscribeMessage('getStatus')
-	async getStatus(@MessageBody() statuId: number, @ConnectedSocket() client: Socket) {
+	async getStatus(@MessageBody(ParseIntPipe) statuId: number, @ConnectedSocket() client: Socket) {
 		const userId: number = this.users.get(client);
 		let userOnline: boolean = false;
 		this.users.forEach((id) => id === statuId ? userOnline = true : null);
@@ -152,7 +152,9 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 	private defyReq: DefyReq[] = [];
 
 	@SubscribeMessage('challenge')
-	async challenge (@MessageBody() data: Challenge, @ConnectedSocket() client: Socket) {
+	async challenge (@MessageBody(new DefaultValuePipe(null)) data: Challenge | null, @ConnectedSocket() client: Socket) {
+		if (!data)
+			return ;
 		const userId: number = this.users.get(client);
 		const user = await this.eventService.getUserData(userId);
 
@@ -198,7 +200,7 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 	}
 
 	@SubscribeMessage("spectateButton")
-	waitSpec(@MessageBody() specId: number, @ConnectedSocket() client: Socket) {
+	waitSpec(@MessageBody(ParseIntPipe) specId: number, @ConnectedSocket() client: Socket) {
 		const userId = this.users.get(client);
 
 		this.clearUserInterval(userId);
@@ -209,7 +211,7 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 
 
 	@SubscribeMessage("defyButton")
-	waitDef(@MessageBody() defyId: number, @ConnectedSocket() client: Socket) {
+	waitDef(@MessageBody(ParseIntPipe) defyId: number, @ConnectedSocket() client: Socket) {
 		const userId = this.users.get(client);
 
 		this.clearUserInterval(userId);
@@ -219,7 +221,7 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 	}
 
 	@SubscribeMessage('acceptGame')
-	async acceptGame(@MessageBody() defyInfo: any, @ConnectedSocket() client: Socket) {
+	async acceptGame(@MessageBody(new DefaultValuePipe({senderId: 0, mode: ""})) defyInfo: {senderId: number, mode: string}, @ConnectedSocket() client: Socket) {
 		const userId: number = this.users.get(client);
 		
 		client.emit("deleteEvent", {type: "gameRequest", senderId: defyInfo.senderId, sender: ""});
@@ -238,7 +240,7 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 	}
 
 	@SubscribeMessage('refuseGame')
-	async refuseGame(@MessageBody() defyInfo: any, @ConnectedSocket() client: Socket) {
+	async refuseGame(@MessageBody(new DefaultValuePipe({senderId: 0, mode: ""})) defyInfo: {senderId: number, mode: string}, @ConnectedSocket() client: Socket) {
 		const userId: number = this.users.get(client);
 
 		client.emit("deleteEvent", {type: "gameRequest", senderId: defyInfo.senderId, sender: ""});

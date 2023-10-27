@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpException, Param, ParseFilePipe, ParseIntPipe, Patch, Request, UploadedFile, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, DefaultValuePipe, Get, HttpException, Param, ParseFilePipe, ParseIntPipe, Patch, Request, UploadedFile, UseInterceptors } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { User } from "./user.entity";
 import { newUsername } from "./user.dto";
@@ -99,16 +99,12 @@ export class UserController {
 	}
 
 	@Get('avatar/:username')
-	async getAvatar(
-		@Param('username') username: string
-	) {
+	async getAvatar(@Param('username', new DefaultValuePipe("")) username: string) {
 		return await this.userService.getAvatar(username);
 	}
 
 	@Get('profile/username/:username')
-	async getUserDataByUsername(
-		@Param('username') username: string
-	) {
+	async getUserDataByUsername(@Param('username', new DefaultValuePipe("")) username: string) {
 		const user: User = await this.userService.findOneByUsername(username);
 		if (!user)
 			return ;
@@ -116,9 +112,7 @@ export class UserController {
 	}
 
 	@Get('profile/id/:id')
-	async getUserDataById(
-		@Param('id', ParseIntPipe) userId: number
-	) {
+	async getUserDataById(@Param('id', ParseIntPipe) userId: number) {
 		const user: User = await this.userService.findOneById(userId);
 		if (!user)
 			return ;
@@ -126,9 +120,7 @@ export class UserController {
 	}
 
 	@Get('friendlist/:id')
-	async getFriendlist(
-		@Param('id') userId: number
-	) {
+	async getFriendlist(@Param('id', ParseIntPipe) userId: number) {
 		return (this.userService.getFriendlist(userId));
 	}
 }
