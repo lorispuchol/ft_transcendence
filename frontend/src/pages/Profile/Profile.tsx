@@ -16,6 +16,7 @@ import MatchHistory from "../../components/Profile/MatchHistory";
 import { Logout } from "@mui/icons-material";
 import FriendList from "../../components/Profile/FriendList";
 import Friendbutton from "../../components/Relationship/Friendbutton";
+import MessageButton from "../../chat/MessageButton";
 
 interface UserData {
 	id: number,
@@ -77,7 +78,8 @@ export default function Profile() {
 					<div><Paper className="!w-min"><IconButton onClick={disconnect}><Logout color="error"/></IconButton></Paper></div>
 					</div>}
 				{profile.username !== me &&
-				<div className="absolute top-0 end-0 flex items-center"><Friendbutton id={profile.id} /></div>}
+				<div className="absolute top-0 end-0 flex items-center"><Friendbutton id={profile.id} />
+				<div className="message_button"><MessageButton receiverId={profile.id}/></div></div>}
 			</div>
 			<Paper className='grid grid-cols-6 profile_score'>
 				<div className='col-span-2 victory_p'>VICTORY</div>

@@ -7,7 +7,10 @@ export default function DisplayWinner({ winnerId }: { winnerId: number }) {
 	
 	useEffect(() => {
 		if (winnerId === -1)
+		{
+			setWinner("");
 			return ;
+		}
 		GetRequest("/user/profile/id/" + winnerId).then((response: any) => {
 			if (response.data)
 				setWinner(response.data.username);

@@ -61,15 +61,16 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 			client.disconnect();
 			return ;
 		}
-		this.users.set(client, newId);
 		
+		const toSend = {avatar: user.avatar, id: user.id, username: user.username};
 		this.users.forEach(async (id, socket) => {
 			if (await this.eventService.isBlocked(id, newId))
 				return ;
 			socket.emit("status/" + newId, "online");
-			if (newId !== id)
-				socket.emit("everyone", newId);
+			socket.emit("everyone", toSend);
 		});
+	
+		this.users.set(client, newId);
 	}
 
 	async handleDisconnect(@ConnectedSocket() client: Socket) {
@@ -223,6 +224,8 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 	@SubscribeMessage('acceptGame')
 	async acceptGame(@MessageBody(new DefaultValuePipe({senderId: 0, mode: ""})) defyInfo: {senderId: number, mode: string}, @ConnectedSocket() client: Socket) {
 		const userId: number = this.users.get(client);
+		console.log(defyInfo);
+		console.log(this.defyReq);
 		
 		client.emit("deleteEvent", {type: "gameRequest", senderId: defyInfo.senderId, sender: ""});
 	
@@ -233,6 +236,7 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 	
 		const userSocket: Socket = [...this.users.entries()].filter(({ 1: value}) => value === defyInfo.senderId).map(([key]) => key)[0];
 		userSocket.emit("defy", {opponentId: userId, mode: mode,response: "OK"});
+
 		this.clearUserInterval(userId);
 		const intervalId = setInterval(() => {client.emit("goDefy", defyInfo)}, 200);
 		this.userInterval.push({userId, intervalId});

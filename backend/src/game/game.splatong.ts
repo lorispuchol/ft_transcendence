@@ -136,7 +136,7 @@ export default class Splatong {
 	public matchInfo(): MatchInfo {
 		if (this.winner === this.p1)
 			return ({
-				mode: "classic",
+				mode: "splatong",
 				winnerId: this.p1,
 				loserId: this.p2,
 				winnerScore: this.scoreP1,
@@ -144,7 +144,7 @@ export default class Splatong {
 			});
 		
 		return ({
-			mode: "classic",
+			mode: "splatong",
 			winnerId: this.p2,
 			loserId: this.p1,
 			winnerScore: this.scoreP2,

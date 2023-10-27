@@ -42,7 +42,7 @@ export default function OnlineSplatong( { socket, setScore, side }: any ) {
 		ctx.canvas.width = screen.w;
 		ctx.canvas.height = screen.h;
 
-		const [idKey] = handleKey();
+		const idKey = handleKey();
 		const ball : Ball = init_ball(screen);
 		ball.speedCap = 45;
 		const paddle: Pad = init_paddle(screen, side);

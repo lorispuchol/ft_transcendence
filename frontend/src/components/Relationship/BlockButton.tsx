@@ -4,11 +4,6 @@ import { DoDisturbOff, DoDisturbOn } from "@mui/icons-material";
 import { RelationButtonDelete, RelationButtonGet } from "./Friendbutton";
 import { IconButton } from "@mui/material";
 
-interface BlockProps {
-	id: number,
-	updateUser?: Function
-}
-
 interface FriendshipData {
 	status: string,
 	description: string
@@ -20,7 +15,7 @@ interface Response {
 	error?: string,
 }
 
-export default function BlockButton({ id, updateUser }: BlockProps) {
+export default function BlockButton({ id }: {id: number}) {
 	const [status, setStatus]: [string, Function] = useState("");
 
 	useEffect(() => {
@@ -32,10 +27,8 @@ export default function BlockButton({ id, updateUser }: BlockProps) {
 	
 	if (!status)
 		return (<IconButton><DoDisturbOn /></IconButton>);
-
-	const update = updateUser ? updateUser : setStatus;
 	
 	if (status === "blocked")
-		return (<RelationButtonDelete path={"/unblock/" + id} setStatus={update} icon={<DoDisturbOff />}/>);
-	return (<RelationButtonGet path={"/block/" + id} setStatus={update} icon={<DoDisturbOn />}/>);
+		return (<RelationButtonDelete path={"/unblock/" + id} setStatus={setStatus} icon={<DoDisturbOff />}/>);
+	return (<RelationButtonGet path={"/block/" + id} setStatus={setStatus} icon={<DoDisturbOn />}/>);
 }

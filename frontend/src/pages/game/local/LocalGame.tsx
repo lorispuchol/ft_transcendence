@@ -45,7 +45,7 @@ export default function LocalGame( { setPlayers, setScore }: any ) {
 		const screen = {w: 3200, h: 1800}
 		ctx.canvas.width = screen.w;
 		ctx.canvas.height = screen.h;
-		const [idKey] = handleKey();
+		const idKey: any[] = handleKey();
 		const ball : Ball = init_ball(screen);
 		const paddle: Pad = init_paddle(screen);
 		

@@ -1,5 +1,6 @@
 .friendlist_list {
 	display: flex;
+	flex-wrap: wrap;
 	justify-content: space-evenly;
 	justify-items: center;
 }

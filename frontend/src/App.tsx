@@ -5,7 +5,7 @@ import Profile from './pages/Profile/Profile';
 import LogIn from './pages/LogIn/LogIn';
 import NoRouteFound from './pages/Error/NoRouteFound';
 import { ReactElement, useEffect, useState } from 'react';
-import { GetRequest, server_url } from './utils/Request';
+import { GetRequest, client_url, server_url } from './utils/Request';
 import ErrorHandling from './utils/Error';
 import Chat from './chat/Chat';
 import Game from './pages/game/Game';
@@ -33,19 +33,26 @@ function WebSocket({ children }: {children: ReactElement}) {
 	const [connected, setConnected]: [boolean, Function] = useState(false);
 
 	useEffect(() => {
-		//const id = setTimeout(() => {setConnected(true)}, 500);
-		setConnected(true);
+		let id = setTimeout(() => {setConnected(true)}, 500);
 		const token = localStorage.getItem("token");
 		const option = { transportOptions: { polling: { extraHeaders: { token: token }}}};
 		const newSocket = io(server_url + "/event", option);
 
-		//dev remettre pour prod
-		// function notConnected () {
-		// 	clearTimeout(id);
-		// 	localStorage.clear();
-		// 	window.location.replace(client_url);
-		// }
-		// newSocket.on("disconnect", notConnected);
+		function notConnected() {
+			clearTimeout(id);
+			id = setTimeout(() => {
+				localStorage.clear();
+				window.location.replace(client_url);
+			}, 500);
+		}
+		newSocket.on("disconnect", notConnected);
+
+		function connected() {
+			clearTimeout(id);
+			setConnected(true);
+		}
+		newSocket.on("connect", connected);
+
 		setSocket(newSocket);
 		return () => {newSocket.close()};
 	}, [setSocket, setConnected]);

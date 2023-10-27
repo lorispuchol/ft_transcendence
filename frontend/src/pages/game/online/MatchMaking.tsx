@@ -76,13 +76,6 @@ export default function MatchMaking({ mode, setPlayers, defy, setDefy, setScore 
 		else
 			socket.emit("search", mode);
 	}, [socket, setDefy, defy, mode])
-
-	// function getState() {
-	// 	socket?.emit("getState");
-	// }
-	// function flush() {
-	// 	socket?.emit("flush");
-	// }
 	
 	if (!opponent)
 		return (
