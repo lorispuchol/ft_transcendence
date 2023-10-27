@@ -57,7 +57,6 @@ export const NavBar = () => {
 		}
 	}
 
-	// A optimiser
 	function handleResize() {
 		const nav_links = document.querySelector(".nav_bar_link");
 		const mobile_menu = document.querySelector(".mobile_menu");
@@ -84,7 +83,6 @@ export const NavBar = () => {
 					<img className='nav_bar_img' src={kirby} alt="oui img"/>
 				</NavLink>
 				<img className='nav_bar_img' src={title} alt="splatong" />
-				{/* <div className='title'>EL PONGO</div> */}
 				<nav className='nav_bar_link'>
 					{pages.map((page) => (
 						<NavLink key={page[0]} className={select === page[1] ? 'nav_bar_link_a' : 'nav_bar_link_p'} onClick={() => hanldeClick(page[1])} to={page[1]}>{page[0]}</NavLink>
