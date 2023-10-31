@@ -184,11 +184,6 @@ export class RelationshipService{
 		}
 		return ({status: "KO", description: `impossible: You are not friend with ${recipient.username}` })
 	}
-	
-	/// dev
-	async getAllRelationship() {
-		return this.relationshipRepository.find();
-	}
 
 	async deleteRelationship(user1: User, user2: User) {
 		await this.relationshipRepository.delete({

@@ -14,16 +14,13 @@ services:
     restart: unless-stopped
     env_file:
       - .env                      # pass environment variables to container
-      - .env.credential
     build:
-      context: ./backend/.         # context for dockerfile build (building can't copy files outside of context)
+      context: ./backend/.        # context for dockerfile build (building can't copy files outside of context)
       dockerfile: Dockerfile      # use custom dockerfile
       args:                       # pass arguments to dockerfile
         - name=value
     ports:                        # map port 8080 on host to port 8080 on container "host:container"
       - 8080:8080
-    volumes:                      # !!!!!!!!!!!!!!!!!!!  only for dev, remove for production
-      - ./backend/.:/app/          # use to update containers files which have been copied from local directory ./server/
     networks:
       - db_net
 
@@ -38,23 +35,17 @@ services:
       dockerfile: Dockerfile
     ports:
       - 8585:8585
-    env_file:
-      - .env.credential                # dev
     environment:
       PORT: ${CLIENT_PORT}                # Change default port of React (3000 by default)
       REACT_APP_SERVER_PORT: ${SERVER_PORT}
       REACT_APP_CLIENT_PORT: ${CLIENT_PORT}
-      #REACT_APP_SERVER_HOST: ${SERVER_HOST}
-    volumes:
-      - ./frontend/.:/app/
+      REACT_APP_SERVER_HOST: ${SERVER_HOST}
   
   db:
     container_name: db
     init: true
     restart: unless-stopped
     image: postgres:latest
-    ports:                               # only for dev: to connect to db from outside container
-      - 5432:5432
     environment:                         # pass environnement variables to container
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
