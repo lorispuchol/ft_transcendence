@@ -31,14 +31,14 @@ export class AuthService {
 		}));
 	}
 
-	async logIn(login: string): Promise<{token: string, otp_secret: string, firstLog: boolean} | null> {
+	async logIn(login: string): Promise<{token: string, otp_secret: string, firstLog: boolean}> {
 		let user: User = await this.userService.findOneByLogin(login);
 		const firstLog = user ? false : true;
 		if (!user)
 			user = await this.userService.createOne(login);
 	
 		if (this.eventService.isAlreadyConnected(user.id))
-			return null;
+			return {token: null, otp_secret: "", firstLog};
 		
 		const payload = {id: user.id, login: user.login};
 		if (user.otp_secret)

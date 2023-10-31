@@ -16,4 +16,8 @@ ENV TZ=Europe/Paris
 RUN apk add tzdata
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
+# RUN npm install serve
+# RUN npm run build
+
+# CMD ["serve", "-s", "build"]
 CMD ["npm", "run", "start"]
