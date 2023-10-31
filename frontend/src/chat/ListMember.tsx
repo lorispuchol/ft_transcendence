@@ -6,7 +6,7 @@ import { ChanMode, MemberDistinc, ParticipantData, UserData } from "./interfaceD
 import { defaultAvatar } from "../pages/Profile/Profile";
 import { Avatar, Paper } from "@mui/material";
 import UserStatus from "../components/user/UserStatus";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import GamingButton from "../components/game/GamingButton";
 import MessageButton from "./MessageButton";
 import Friendbutton from "../components/Relationship/Friendbutton";
@@ -136,6 +136,7 @@ export default function ListMembers({ chan, settings, setSettings }: ListMembers
 
 	const user = useContext(UserContext);
 	const isDm: boolean = chan.includes("+");
+	const navigate = useNavigate();
 
 	const setDisplayProfile = useContext(SetDisplayMemberContext);
 	const displayProfile: UserData | null = useContext(DisplayMemberContext);
@@ -182,7 +183,12 @@ export default function ListMembers({ chan, settings, setSettings }: ListMembers
 			</SetRerenderListContext.Provider>
 		)
 	}
-	if (settings) {
+	if (!owner[0] || !owner[0].channel)
+	{
+		navigate("/chat", {replace: true, state: {to: null}})
+		return (null);
+	}
+	else if (settings) {
 		return (
 			<div className="profile-module">
 				<button onClick={closeSettings}><ArrowForward /></button>

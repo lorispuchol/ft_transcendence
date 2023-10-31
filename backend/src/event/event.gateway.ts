@@ -43,7 +43,7 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 	constructor(
 		@Inject(forwardRef(() => EventService))
 			private eventService: EventService,
-		private jwtService: JwtService,
+		private jwtService: JwtService
 	) {}
 	
 	private users: Map<Socket, number> = new Map();
@@ -159,8 +159,11 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 		const userId: number = this.users.get(client);
 		const user = await this.eventService.getUserData(userId);
 
-		if (await this.eventService.isBlocked(userId, data.to))
+		if (await this.eventService.isBlocked(userId, data.to) || this.eventService.getUserInGame(data.to))
+		{
 			client.emit("defy", {id: data.to, response: "KO"});
+			return ;
+		}
 		
 		this.defyReq.push({reqId: userId, opId: data.to, mode: data.mode});
 		const event: Event = {type: "gameRequest", sender: user.username, senderId: user.id, gameMode: data.mode};
@@ -233,7 +236,7 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 		const mode = this.defyReq.splice(index, 1)[0].mode;
 	
 		const userSocket: Socket = [...this.users.entries()].filter(({ 1: value}) => value === defyInfo.senderId).map(([key]) => key)[0];
-		userSocket.emit("defy", {opponentId: userId, mode: mode,response: "OK"});
+		userSocket.emit("defy", {id: userId, mode: mode,response: "OK"});
 
 		this.clearUserInterval(userId);
 		const intervalId = setInterval(() => {client.emit("goDefy", defyInfo)}, 200);
@@ -253,7 +256,7 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 		this.defyReq.splice(index, 1);
 	 
 		const userSocket: Socket = [...this.users.entries()].filter(({ 1: value}) => value === defyInfo.senderId).map(([key]) => key)[0];
-		userSocket.emit("defy", {opponentId: userId, response: "KO", mode: ""});
+		userSocket.emit("defy", {id: userId, response: "KO", mode: ""});
 	}
 
 	sendInGame(userId: number, statu: boolean) {
