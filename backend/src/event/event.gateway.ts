@@ -224,8 +224,6 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 	@SubscribeMessage('acceptGame')
 	async acceptGame(@MessageBody(new DefaultValuePipe({senderId: 0, mode: ""})) defyInfo: {senderId: number, mode: string}, @ConnectedSocket() client: Socket) {
 		const userId: number = this.users.get(client);
-		console.log(defyInfo);
-		console.log(this.defyReq);
 		
 		client.emit("deleteEvent", {type: "gameRequest", senderId: defyInfo.senderId, sender: ""});
 	

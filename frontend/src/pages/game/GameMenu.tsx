@@ -54,7 +54,7 @@ export default function GameMenu({ setSetting, setDefy }: MenuProps) {
 			if (data.response === "OK")
 			{
 				setDefy(select);
-				setSetting({type: "online", mode: data.mode})
+				setSetting({type: "online", mode: data.mode});
 			}
 			else
 				setWaitResponse(false);
@@ -77,7 +77,7 @@ export default function GameMenu({ setSetting, setDefy }: MenuProps) {
 			socket.off("defy", handleDefy);
 			socket.off("waitDefy", waitDefy);
 		};
-	})
+	}, [select, waitResponse, socket, setDefy, setSetting]);
 	
 	useEffect(() => {
 		socket.emit("getConnected");
