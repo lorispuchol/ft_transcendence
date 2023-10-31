@@ -5,15 +5,23 @@ import { Ball, drawBall, init_ball } from "../local/ball";
 import { countDown } from "./countDown";
 import collision from "./collision";
 import DisplayWinner from "./winner";
+import { Socket } from "socket.io-client";
 
 export interface ScreenSize {
 	w: number,
 	h: number
 }
 
-export default function OnlineGame( { socket, setScore, side }: any ) {
+interface gameProps {
+	socket: Socket,
+	setScore: Function,
+	side: number,
+	specWinner: number
+}
+
+export default function OnlineGame( { socket, setScore, side, specWinner }: gameProps ) {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
-	const [winnerId, setWinnerId]: [number, Function] = useState(-1);
+	const [winnerId, setWinnerId]: [number, Function] = useState(specWinner);
 	
 	useEffect(() => {
 		setWinnerId(-1);
