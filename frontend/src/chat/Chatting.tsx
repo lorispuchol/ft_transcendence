@@ -88,6 +88,10 @@ function MessageInput({ chan }: MessagesProps) {
 	const [value, setValue] = useState('');
 	const socket = useContext(SocketChatContext);
 
+	useEffect(() => {
+		setValue("");
+	}, [chan, setValue])
+
 	function submitForm(e: FormEvent) {
 		e.preventDefault();
 		socket!.emit('message',chan, value);

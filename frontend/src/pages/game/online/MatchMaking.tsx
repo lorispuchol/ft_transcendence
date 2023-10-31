@@ -21,6 +21,7 @@ export default function MatchMaking({ mode, setPlayers, defy, setDefy, setScore 
 	const [specMode, setSpecMode]: [string, Function] = useState("");
 	const [opponent, setOpponent]: [boolean, Function] = useState(false);
 	const [side, setSide]: [number, Function] = useState(1);
+	const [specWinnner, setSpecwinner]: [number, Function] = useState(-1);
 	const navigate = useNavigate();
 
 	useEffect(() => {
@@ -30,7 +31,8 @@ export default function MatchMaking({ mode, setPlayers, defy, setDefy, setScore 
 		setSocket(newSocket);
 		
 		function notConnected () {
-			// navigate("/");
+			if (mode === "spectate")
+				navigate("/");
 		}
 		newSocket.on("disconnect", notConnected);
 
@@ -42,9 +44,10 @@ export default function MatchMaking({ mode, setPlayers, defy, setDefy, setScore 
 		}
 		newSocket.on("matchmaking", handleSearch);
 
-		function handleSpectate(specInfo: {players: Players, mode: string}) {
+		function handleSpectate(specInfo: {players: Players, mode: string, winner: number}) {
 			setPlayers(specInfo.players);
 			setSide(0);
+			setSpecwinner(specInfo.winner);
 			setSpecMode(specInfo.mode);
 			setOpponent(true);
 		}
@@ -55,7 +58,7 @@ export default function MatchMaking({ mode, setPlayers, defy, setDefy, setScore 
 			newSocket.off("goSpectate", handleSpectate);
 			newSocket.close();
 		};
-	}, [navigate, setPlayers, setSide]);
+	}, [navigate, setPlayers, setSide, mode]);
 
 	useEffect(() => {
 		if (!socket)
@@ -76,13 +79,6 @@ export default function MatchMaking({ mode, setPlayers, defy, setDefy, setScore 
 		else
 			socket.emit("search", mode);
 	}, [socket, setDefy, defy, mode])
-
-	// function getState() {
-	// 	socket?.emit("getState");
-	// }
-	// function flush() {
-	// 	socket?.emit("flush");
-	// }
 	
 	if (!opponent)
 		return (
@@ -91,8 +87,6 @@ export default function MatchMaking({ mode, setPlayers, defy, setDefy, setScore 
 					<div className="m-[1vw]"/>
 					<CircularProgress size={"5vw"}/>
 					<div>waiting for opponent</div>
-					{/* <Button color="error" onClick={getState}>get State</Button>
-					<Button color="error" onClick={flush}>flush</Button> */}
 				</div>
 			</div>
 		);
@@ -100,9 +94,9 @@ export default function MatchMaking({ mode, setPlayers, defy, setDefy, setScore 
 	return (
 		<div>
 			{ mode === "classic" || specMode === "classic" ?
-				<OnlineGame socket={socket} setScore={setScore} side={side} />
+				<OnlineGame socket={socket!} setScore={setScore} side={side} specWinner={specWinnner}/>
 			:
-				<OnlineSplatong socket={socket} setScore={setScore} side={side} />
+				<OnlineSplatong socket={socket!} setScore={setScore} side={side} specWinner={specWinnner}/>
 			}
 		</div>
 	)

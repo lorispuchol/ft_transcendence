@@ -5,7 +5,6 @@ import { Repository } from "typeorm";
 import { server_url } from "src/auth/constants";
 import { Match } from "src/game/match.entity";
 import { RelationshipStatus } from "src/relationship/relationship.entity";
-// import { Relationship } from "src/relationship/relationship.entity";
 
 @Injectable()
 export class UserService {
@@ -14,11 +13,15 @@ export class UserService {
 			private userRepository: Repository<User>
 	){}
 
-	createOne(login: string, password?: string): Promise<User | undefined> {
+	async createOne(login: string, password?: string): Promise<User | undefined> {
 		const username: string = login;
 		const newUser: User = this.userRepository.create({login, username});
 		newUser.password = password;
+		const user = await this.findOneByLogin(login);
+		if (user)
+			return user;
 		return this.userRepository.save(newUser);
+		
 	}
 	
 	findOneById(id: number): Promise<User | undefined> {

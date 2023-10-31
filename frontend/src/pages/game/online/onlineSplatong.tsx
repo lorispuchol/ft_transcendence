@@ -5,10 +5,18 @@ import { Ball, drawBall, init_ball } from "../local/ball";
 import { countDown } from "./countDown";
 import collision, { clamp } from "./collision";
 import DisplayWinner from "./winner";
+import { Socket } from "socket.io-client";
 
 export interface ScreenSize {
 	w: number,
 	h: number
+}
+
+interface gameProps {
+	socket: Socket,
+	setScore: Function,
+	side: number,
+	specWinner: number
 }
 
 export const p1Color = "orange";
@@ -26,9 +34,9 @@ function colorTomatrix(color: string) {
 	}
 }
 
-export default function OnlineSplatong( { socket, setScore, side }: any ) {
+export default function OnlineSplatong( { socket, setScore, side, specWinner }: gameProps ) {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
-	const [winnerId, setWinnerId]: [number, Function] = useState(-1);
+	const [winnerId, setWinnerId]: [number, Function] = useState(specWinner);
 	const [clock, setClock]: [number | null, Function] = useState(null);
 	
 	useEffect(() => {
@@ -42,7 +50,7 @@ export default function OnlineSplatong( { socket, setScore, side }: any ) {
 		ctx.canvas.width = screen.w;
 		ctx.canvas.height = screen.h;
 
-		const [idKey] = handleKey();
+		const idKey = handleKey();
 		const ball : Ball = init_ball(screen);
 		ball.speedCap = 45;
 		const paddle: Pad = init_paddle(screen, side);

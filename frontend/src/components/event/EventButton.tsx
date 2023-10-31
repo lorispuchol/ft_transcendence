@@ -5,6 +5,7 @@ import ErrorHandling from "../../utils/Error";
 import { useContext, useState } from "react";
 import { EventContext } from "../../utils/Context";
 import { useNavigate } from "react-router-dom";
+import { v4 as uuidv4 } from 'uuid';
 
 
 interface Event {
@@ -109,7 +110,7 @@ function AcceptGame({ senderId, mode }: GameProps) {
 
 	function handleClick() {
 		socket.emit("acceptGame", {senderId, mode});
-		navigate("/game");
+		navigate("/game", {state: uuidv4()});
 	}
 
 	return (

@@ -23,7 +23,7 @@ interface DefyInfo {
 }
 
 export default function GameMenu({ setSetting, setDefy }: MenuProps) {
-	const [type, setType]: [string, Function] = useState("local");
+	const [type, setType]: [string, Function] = useState("online");
 	const [mode, setMode]: [string, Function] = useState("classic");
 	const [users, setUsers]: [UserData[], Function] = useState([]);
 	const [waitResponse, setWaitResponse]: [boolean, Function] = useState(false);
@@ -32,27 +32,35 @@ export default function GameMenu({ setSetting, setDefy }: MenuProps) {
 
 	useEffect(() => {
 		function addUser(newUser: UserData) {
-			setUsers((prev: UserData[]) => [...prev, newUser])
+			setUsers((prev: UserData[]) => {
+				const index = prev.findIndex((elem) => elem.id === newUser.id);
+				if (index === -1)
+					return ([...prev, newUser])
+				return ([...prev]);
+			})
 		}
 		socket.on('everyone', addUser);
+
 		function delUser(oldUser: UserData) {
 			setUsers((prev: UserData[]) => prev.filter((user) => user.id !== oldUser.id));
 			if (select === oldUser.id)
 				setSelect(null);
 		}
 		socket.on('userDisconnect', delUser);
+
 		function handleDefy(data: DefyInfo) {
 			if (data.opponentId !== select || !waitResponse)
 				return ;
 			if (data.response === "OK")
 			{
 				setDefy(select);
-				setSetting({type: "online", mode: data.mode})
+				setSetting({type: "online", mode: data.mode});
 			}
 			else
 				setWaitResponse(false);
 		}
 		socket.on("defy", handleDefy);
+
 		function waitDefy(defyId: number) {
 			socket.emit("clear");
 			setSelect(defyId);
@@ -69,7 +77,7 @@ export default function GameMenu({ setSetting, setDefy }: MenuProps) {
 			socket.off("defy", handleDefy);
 			socket.off("waitDefy", waitDefy);
 		};
-	})
+	}, [select, waitResponse, socket, setDefy, setSetting]);
 	
 	useEffect(() => {
 		socket.emit("getConnected");
@@ -106,7 +114,7 @@ export default function GameMenu({ setSetting, setDefy }: MenuProps) {
 					<div className="border-t-2 border-inherit">
 						<ButtonGroup className="menu_select" orientation="vertical" variant="text">
 							<Button key="classic" className={focus("classic")} onClick={() => setMode("classic")}><SportsTennis />classic</Button>
-							<Button key="turbo" className={focus("turbo")} onClick={() => setMode("turbo")}><Brush />splatong</Button>
+							<Button key="splatong" className={focus("splatong")} onClick={() => setMode("splatong")}><Brush />splatong</Button>
 						</ButtonGroup>
 					</div>
 					{waitResponse ?

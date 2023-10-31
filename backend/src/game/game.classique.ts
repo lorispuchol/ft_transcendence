@@ -67,7 +67,7 @@ export default class PongGame {
 	private borderGap: number = this.screen.h * 0.006;
 	private winningScore: number = 3;
 
-	private winner: number = 0;
+	private winner: number = -1;
 	private gameEnded: boolean = false;
 
 	private paddles: Pad = this.init_paddle();
@@ -193,7 +193,7 @@ export default class PongGame {
 	}
 
 	public getInfo() {
-		return {p1: this.p1, scoreP1: this.scoreP1, p2: this.p2, scoreP2: this.scoreP2, mode: "classic"};
+		return {p1: this.p1, scoreP1: this.scoreP1, p2: this.p2, scoreP2: this.scoreP2, mode: "classic", winner: this.winner};
 	}
 
 	//////////////GAME LOGIC//////////////

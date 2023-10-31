@@ -9,6 +9,7 @@ import LocalGame from './local/LocalGame';
 import { GetRequest } from '../../utils/Request';
 import { EventContext } from '../../utils/Context';
 import LocalSplatong from './local/localSplatong';
+import { useLocation } from 'react-router-dom';
 
 interface UserData {
 	id: number,
@@ -78,6 +79,7 @@ export default function Game() {
 	const [score, setScore]: [{p1: number, p2: number}, Function] = useState({p1: 0, p2: 0});
 	const [defy, setDefy]: [number | null, Function] = useState(null);
 	const [setting, setSetting]: [Setting, Function] = useState({type: "menu", mode: "classic"});
+	const { state } = useLocation();
 
 	useEffect(() => {
 
@@ -100,6 +102,12 @@ export default function Game() {
 			socket.off("goSpectate", goSpectate);
 		})
 	}, [socket, setDefy, setSetting])
+
+
+	useEffect(() => {
+		if (state)
+			setSetting((prev: Setting) => ({type: "menu", mode: prev.mode}));
+	}, [state, setSetting])
 
 	function returnToMenu() {
 		setSetting({type: "menu", mode: setting.mode});

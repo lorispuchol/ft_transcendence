@@ -57,6 +57,8 @@ export default function SettingsPopup({ close, login }: {close: any, login: stri
 
 	function updateUsername(e: FormEvent) {
 		e.preventDefault();
+		if (!newUsername)
+			return ;
 		let toLogin = "";
 		if (newUsername === login)
 			toLogin = "ToLogin";

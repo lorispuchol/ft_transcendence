@@ -37,12 +37,24 @@ function TwoFactor() {
 		setCode(event.target.value);
 	}
 
+	function handleSubmit(e: FormEvent) {
+		e.preventDefault()
+	}
+
+	function cancel() {
+		localStorage.setItem("token", "");
+		window.location.href = client_url;
+	}
+
 	return (
 		<div className="box_login background_box_login">
 			<div className="title_box">enter 2FA code</div>
-			<form className="form_box">
+			<form className="form_box" onSubmit={handleSubmit}>
 				<input className="input_box input_code" type="text"  value={code} onChange={codeChange} />
 			</form>
+			<div className="button_box">
+				<button className="button_login active:scale-110" onClick={cancel}>CANCEL</button>
+			</div>
 			<ToastContainer />
 		</div>
 	);

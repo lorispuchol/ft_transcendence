@@ -68,7 +68,7 @@ export default class Splatong {
 	private screen: ScreenSize = {w: 3200, h:1800};
 	private borderGap: number = this.screen.h * 0.006;
 
-	private winner: number = 0;
+	private winner: number = -1;
 	private gameEnded: boolean = false;
 
 	private gameDuration: number = 30;
@@ -97,7 +97,6 @@ export default class Splatong {
 			this.start();
 		}
 	}
-
 
 	private start() {
 		const perSec = 1000 / 60;
@@ -136,7 +135,7 @@ export default class Splatong {
 	public matchInfo(): MatchInfo {
 		if (this.winner === this.p1)
 			return ({
-				mode: "classic",
+				mode: "splatong",
 				winnerId: this.p1,
 				loserId: this.p2,
 				winnerScore: this.scoreP1,
@@ -144,7 +143,7 @@ export default class Splatong {
 			});
 		
 		return ({
-			mode: "classic",
+			mode: "splatong",
 			winnerId: this.p2,
 			loserId: this.p1,
 			winnerScore: this.scoreP2,
@@ -208,7 +207,7 @@ export default class Splatong {
 	}
 
 	public getInfo() {
-		return {p1: this.p1, scoreP1: this.scoreP1, p2: this.p2, scoreP2: this.scoreP2, mode: "splatong"};
+		return {p1: this.p1, scoreP1: this.scoreP1, p2: this.p2, scoreP2: this.scoreP2, mode: "splatong", winner: this.winner};
 	}
 
 	//////////////GAME LOGIC//////////////

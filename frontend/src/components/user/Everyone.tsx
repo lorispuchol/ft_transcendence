@@ -29,7 +29,6 @@ interface Response {
 
 
 function ProfileElement({ userId }: {userId: number}) {
-	const [updateUser, setUpdateUser]: [number, Function] = useState(0);
 	const [user, setUser]: [UserData | null, Function] = useState<UserData | null>(null);
 
 	useEffect(() => {
@@ -41,10 +40,6 @@ function ProfileElement({ userId }: {userId: number}) {
 	if (!user)
 		return (<Loader />);
 
-	function handleUpdate(ph: string) {
-		setUpdateUser(updateUser + 1);
-	}
-
 	return (
 		<Paper className="profile_element">
 			<div className="status"><UserStatus userId={user.id} /></div>
@@ -54,13 +49,12 @@ function ProfileElement({ userId }: {userId: number}) {
 					<Paper className="everyone_username">{user.username}</Paper>
 				</NavLink>
 			</div>
-			<div key={updateUser} className="button_group">
+			<div className="button_group">
 				<div className="gaming_button"><GamingButton id={user.id}/></div>
       			<div className="message_button"><MessageButton receiverId={user.id}/></div>
 				<div className="friend_button"><Friendbutton id={user.id} /></div>
-				<div className="block_button"><BlockButton id={user.id} updateUser={handleUpdate} /></div>
+				<div className="block_button"><BlockButton id={user.id} /></div>
 			</div>
-			<ToastContainer />
 		</Paper>
 	)
 }
@@ -78,13 +72,16 @@ export default function Everyone() {
 		});
 	
 		function everyoneListener(newUser: number) {
-			if (users.indexOf(newUser) !== -1)
-				setUsers((prev: number[]) =>  [...prev, newUser]);
+			setUsers((prev: number[]) =>  {	
+				if (prev.indexOf(newUser) === -1)
+					return ([...prev, newUser]);
+				return [...prev];
+			});
 		}
 		socket.on('everyone', everyoneListener);
 		
 		return () => {socket.off('everyone', everyoneListener)};
-	}, [socket, users]);
+	}, [socket]);
 	if (response.status === "loading")
 		return (<Loader />);
 	if (response.status !== "OK")
@@ -92,13 +89,14 @@ export default function Everyone() {
 
 	return (
 			<List className="everyone_list">
-				{users.length ? 
+				{users?.length ?
 					users.map((userId: number) => (
 						<ProfileElement key={userId} userId={userId} />
 					))
 					:
 					<Paper className="nobody">nobody there</Paper>
 				}
+				<ToastContainer />
 			</List>
 	);
 }

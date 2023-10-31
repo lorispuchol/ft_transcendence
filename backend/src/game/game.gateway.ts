@@ -115,7 +115,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 		const info = instance.getInfo();
 		client.emit("goSpectate", {players: {side: 0, p1: {score: info.scoreP1, id: info.p1, username: null},
-			p2: {score: info.scoreP2, id: info.p2, username: null}}, mode: info.mode});
+			p2: {score: info.scoreP2, id: info.p2, username: null}}, mode: info.mode, winnerId: info.winner});
 	}
 
 	@SubscribeMessage("getBackground")
