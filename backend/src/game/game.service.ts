@@ -4,6 +4,7 @@ import { UserService } from "src/user/user.service";
 import { Match } from "./match.entity";
 import { Repository } from "typeorm";
 import { User } from "src/user/user.entity";
+import { EventService } from "src/event/event.service";
 
 export interface MatchInfo {
 	mode: string,
@@ -19,12 +20,19 @@ export class GameService {
 		@InjectRepository(Match, 'lorisforever')
 			private matchRepository: Repository<Match>,
 		private userService: UserService,
+		private eventService: EventService,
 	) {}
 
 	private userInGame: number[] = [];
 
 	updateUserInGame(newUserInGame: number[]) {
 		this.userInGame = newUserInGame;
+		this.eventService.updateUserInGame(newUserInGame);
+	}
+
+	rmUserInGame(userId: number) {
+		this.userInGame = this.userInGame.filter((elemId) => (elemId != userId));
+		this.eventService.rmUserInGame(userId);
 	}
 
 	getUserInGame(userId: number) {

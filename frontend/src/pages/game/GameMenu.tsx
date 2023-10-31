@@ -4,6 +4,8 @@ import './GameMenu.scss';
 import { Brush, Public, SportsTennis, Weekend } from "@mui/icons-material";
 import { useContext, useEffect, useState } from "react";
 import { EventContext } from "../../utils/Context";
+import { logInfo } from "../../chat/Chat";
+import { ToastContainer } from "react-toastify";
 
 interface MenuProps {
 	setSetting: Function,
@@ -17,7 +19,7 @@ interface UserData {
 }
 
 interface DefyInfo {
-	opponentId: number,
+	id: number,
 	mode: string,
 	response: string,
 }
@@ -49,7 +51,7 @@ export default function GameMenu({ setSetting, setDefy }: MenuProps) {
 		socket.on('userDisconnect', delUser);
 
 		function handleDefy(data: DefyInfo) {
-			if (data.opponentId !== select || !waitResponse)
+			if (data.id !== select || !waitResponse)
 				return ;
 			if (data.response === "OK")
 			{
@@ -57,7 +59,10 @@ export default function GameMenu({ setSetting, setDefy }: MenuProps) {
 				setSetting({type: "online", mode: data.mode});
 			}
 			else
+			{
 				setWaitResponse(false);
+				logInfo("defy refused");
+			}
 		}
 		socket.on("defy", handleDefy);
 
@@ -142,6 +147,7 @@ export default function GameMenu({ setSetting, setDefy }: MenuProps) {
 				</Paper>
 			</div>
 			<DemoGame />
+			<ToastContainer />
 		</div>
 	)
 }

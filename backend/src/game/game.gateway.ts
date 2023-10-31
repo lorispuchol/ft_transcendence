@@ -38,7 +38,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		const offId: number = this.users.get(client);
 
 		this.queue = this.queue.filter((elem) => elem.socket.id !== client.id);
-		this.defyQueue= this.defyQueue.filter((id) => id !== offId);
+		this.defyQueue = this.defyQueue.filter((id) => id !== offId);
 		this.users.delete(client);
 
 		const specInstance = this.spectator.get(client);
@@ -47,6 +47,8 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			specInstance.spectator = specInstance.spectator.filter((socket: Socket) => (socket.id != client.id));
 			this.spectator.delete(client);
 		}
+
+		this.gameService.rmUserInGame(offId);
 
 		const instance: PongGame | Splatong = this.lobby.get(offId);
 		if (!instance)
@@ -57,7 +59,6 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		this.lobby.delete(offId);
 		this.lobby.delete(otherPlayer);
 		this.eventService.sendInGame(offId, otherPlayer, false);
-		this.gameService.updateUserInGame([...this.lobby.keys()]);
 	}
 
 	@SubscribeMessage("search")

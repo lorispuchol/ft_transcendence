@@ -29,6 +29,22 @@ export class EventService {
 		private userService: UserService,
 	) {}
 
+	private userInGame: number[] = [];
+
+	updateUserInGame(newUserInGame: number[]) {
+		this.userInGame = newUserInGame;
+	}
+
+	rmUserInGame(userId: number) {
+		this.userInGame = this.userInGame.filter((elemId) => (elemId != userId));
+	}
+
+	getUserInGame(userId: number) {
+		if (this.userInGame.indexOf(userId) !== -1)
+			return true;
+		return false;
+	}
+
 	isAlreadyConnected(userId: number): boolean {
 		return (this.eventGateway.isAlreadyConnected(userId));
 	}
