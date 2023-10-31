@@ -52,7 +52,8 @@ export class AuthController {
 			
 		}
 		catch (error) {
-			res.send("something went wrong with 42 api");
+			console.log(error);
+			res.redirect(client_url);
 		}
 	}
 	
