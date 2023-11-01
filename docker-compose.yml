@@ -42,8 +42,8 @@ services:
       REACT_APP_SERVER_PORT: ${SERVER_PORT}
       REACT_APP_CLIENT_PORT: ${CLIENT_PORT}
       REACT_APP_SERVER_HOST: ${SERVER_HOST}
-    # volumes:
-    #   - ./frontend/.:/app/
+    volumes:
+      - ./frontend/.:/app/
   
   db:
     container_name: db
