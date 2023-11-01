@@ -1,4 +1,4 @@
-import { Body, Controller, DefaultValuePipe, Get, HttpException, Param, ParseFilePipe, ParseIntPipe, Patch, Request, UploadedFile, UseInterceptors } from "@nestjs/common";
+import { BadRequestException, Body, Controller, DefaultValuePipe, Get, HttpException, Param, ParseFilePipe, ParseIntPipe, Patch, Request, UploadedFile, UseInterceptors } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { User } from "./user.entity";
 import { newUsername } from "./user.dto";
@@ -18,7 +18,14 @@ const	storage = {
 			const extension: string = Path.parse(file.originalname).ext;
             cb(null, `${filename}${extension}`)
 		}
-	})
+	}),
+    limits: { fileSize: 800000 },
+    fileFilter: (req: any, file: any, cb: any) => {
+        if (!file.mimetype.match(/image\/(jpg|jpeg|png|gif)$/)) {
+            return cb(new BadRequestException('Only image files are allowed!'), false);
+        }
+        cb(null, true);
+    }
 }
 
 @Controller('user')
