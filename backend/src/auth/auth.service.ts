@@ -38,7 +38,7 @@ export class AuthService {
 			user = await this.userService.createOne(login);
 	
 		if (this.eventService.isAlreadyConnected(user.id))
-			return null;
+			return {token: null, otp_secret: "", firstLog};
 		
 		const payload = {id: user.id, login: user.login};
 		if (user.otp_secret)
