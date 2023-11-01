@@ -51,12 +51,12 @@ export default function GamingButton({ id }: {id: number}) {
 
 	function handleDefy() {
 		socket.emit("defyButton", id);
-		navigate("/game");
+		navigate("/game", {state: null});
 	}
 
 	function handleSpec() {
 		socket.emit("spectateButton", id);
-		navigate("/game");
+		navigate("/game", {state: null});
 	}
 
 	if (inGame)

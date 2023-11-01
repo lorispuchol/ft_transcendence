@@ -71,10 +71,10 @@ export default function Everyone() {
 				setUsers(response.data);
 		});
 	
-		function everyoneListener(newUser: number) {
+		function everyoneListener(newUser: any) {
 			setUsers((prev: number[]) =>  {	
-				if (prev.indexOf(newUser) === -1)
-					return ([...prev, newUser]);
+				if (prev.indexOf(newUser.id) === -1)
+					return ([...prev, newUser.id]);
 				return [...prev];
 			});
 		}

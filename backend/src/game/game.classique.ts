@@ -177,11 +177,25 @@ export default class PongGame {
 		switch(id) {
 			case this.p1:
 				if (!this.gameEnded)
-					this.socketP2.emit("end", this.p2);
+				{
+					this.gameEnded = true;
+					this.winner = this.p2;
+					this.socketP2.emit("end", this.winner);
+					this.spectator.forEach((socket: Socket) => {
+						socket.emit("end", this.winner);
+					})
+				}
 				return this.p2;
 			case this.p2:
 				if (!this.gameEnded)
-					this.socketP1.emit("end", this.p1);
+				{
+					this.gameEnded = true;
+					this.winner = this.p1;
+					this.socketP1.emit("end", this.winner);
+					this.spectator.forEach((socket: Socket) => {
+						socket.emit("end", this.winner);
+					})
+				}
 				return this.p1;
 			default:
 				return 0;
