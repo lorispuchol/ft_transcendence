@@ -19,9 +19,4 @@ RUN npm install .
 
 # ENTRYPOINT ["sh", "prod.sh"]
 
-CMD ["tail", "-f"]
-# RUN npm run build
-# CMD ["serve", "-s", "build", "-l", "8585"]
-
-# CMD ["npm", "run", "build"]
-# ENTRYPOINT ["sh", "entrypoint_dev.sh"]
+ENTRYPOINT ["sh", "entrypoint_dev.sh"]

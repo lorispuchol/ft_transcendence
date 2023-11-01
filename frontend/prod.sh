@@ -1,3 +1,3 @@
-npm install -g server
+npm install -g serve
 npm run build
 serve -s build -l 8585
