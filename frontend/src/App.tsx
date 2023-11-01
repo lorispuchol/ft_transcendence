@@ -43,7 +43,7 @@ function WebSocket({ children }: {children: ReactElement}) {
 			id = setTimeout(() => {
 				localStorage.clear();
 				window.location.replace(client_url);
-			}, 500);
+			}, 1000);
 		}
 		newSocket.on("disconnect", notConnected);
 

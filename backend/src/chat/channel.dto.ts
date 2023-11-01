@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty, IsString, IsStrongPassword, MaxLength, MinLength, NotContains, Validate } from "class-validator";
+import { IsAlphanumeric, IsEnum, IsNotEmpty, IsString, IsStrongPassword, MaxLength, MinLength, NotContains, Validate } from "class-validator";
 import { IsChannelNameAvailable, PasswordChannelMatch } from "./channel.decorator";
 import { ChanMode } from "./entities/channel.entity";
 import { MemberDistinc } from "./entities/participant_chan_x_user.entity";
@@ -8,6 +8,7 @@ export class NewChannelWithoutPassword {
 	@IsNotEmpty()
 	@IsString()
 	@MaxLength(33)
+	@IsAlphanumeric()
 	@MinLength(2)
 	@NotContains("+")
 	@Validate(IsChannelNameAvailable)
@@ -23,6 +24,7 @@ export class NewChannelWithPassword {
 	@IsNotEmpty()
 	@IsString()
 	@MaxLength(33)
+	@IsAlphanumeric()
 	@MinLength(2)
 	@NotContains("+")
 	@Validate(IsChannelNameAvailable)
@@ -43,6 +45,7 @@ export class SetPasswordChannel {
 	@IsNotEmpty()
 	@IsString()
 	@MaxLength(33)
+	@IsAlphanumeric()
 	@MinLength(2)
 	@NotContains("+")
 	channelName: string;
@@ -73,6 +76,7 @@ export class RemovePwChannel {
 	@IsNotEmpty()
 	@IsString()
 	@MaxLength(33)
+	@IsAlphanumeric()
 	@MinLength(2)
 	@NotContains("+")
 	channelName: string;
@@ -100,6 +104,7 @@ export class JoinChannelWithPassword {
 	@IsNotEmpty()
 	@IsString()
 	@MaxLength(33)
+	@IsAlphanumeric()
 	@MinLength(2)
 	@NotContains("+")
 	channelName: string;

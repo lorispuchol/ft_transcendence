@@ -1,4 +1,4 @@
-FROM node:19.5.0-alpine
+FROM node:21-alpine
 
 EXPOSE 8080
 
