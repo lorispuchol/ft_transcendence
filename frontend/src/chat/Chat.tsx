@@ -3,7 +3,7 @@ import Chatting from "./Chatting";
 import { GetRequest, server_url } from "../utils/Request";
 import Loading from "../utils/Loading";
 import ErrorHandling from "../utils/Error";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Socket, io } from "socket.io-client";
 import './chat.scss'
 import { ChanMode, ChannelData, MemberDistinc, MessageData, ParticipantData, UserData } from "./interfaceData";
@@ -170,6 +170,7 @@ function ListConv({focusConv, setFocusConv}: focusConvProps) {
 	const socket = useContext(SocketChatContext);
 	const [senderConv, setSenderConv]: [string, Function] = useState(""); 
 	const [response, setResponse]: [Response, Function] = useState({status: "loading"});
+	const navigate = useNavigate();
 	
 	useEffect(() => {
 			GetRequest("/chat/getConvs").then((response) => setResponse(response));
@@ -202,6 +203,9 @@ function ListConv({focusConv, setFocusConv}: focusConvProps) {
 					<ChanButtonConv key={chan.name} chan={chan} focusConv={focusConv} setFocusConv={setFocusConv} />
 				))
 			}
+			<button onClick={() => {navigate("/chat", {state: {to: ""}})}} className="my-5 w-full h-14 btn text-slate-200 bg-purple-900 btn-neutral hover:bg-purple-700">
+					MENU
+			</button>
 		</>
 	)
 }
