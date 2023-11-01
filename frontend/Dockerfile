@@ -15,12 +15,5 @@ WORKDIR '/app'
 
 RUN npm init -y
 RUN npm install .
-#RUN npm audit fix
 
-# ENTRYPOINT ["sh", "prod.sh"]
-
-# RUN npm install serve
-# RUN npm run build
-
-# CMD ["serve", "-s", "build"]
-CMD ["npm", "run", "start"]
+ENTRYPOINT ["sh", "prod.sh"]

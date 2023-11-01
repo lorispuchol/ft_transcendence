@@ -10,7 +10,6 @@ WORKDIR '/app'
 
 RUN npm init -y
 RUN npm install .
-#RUN npm audit fix
 
 ENV TZ=Europe/Paris
 RUN apk add tzdata
