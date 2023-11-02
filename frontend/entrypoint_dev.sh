@@ -1,4 +1,4 @@
 #npm init
-npm install --no-audit .
+npm install --no-audit --no-update-notifier .
 #npm audit fix
 npm start
