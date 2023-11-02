@@ -13,7 +13,6 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 WORKDIR '/app'
 
-RUN npm init -y
-RUN npm install .
+RUN npm install --no-audit --no-update-notifier .
 
 ENTRYPOINT ["sh", "prod.sh"]
