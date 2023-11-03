@@ -1,6 +1,6 @@
 FROM node:21-alpine
 
-ENV NPM_CONFIG_LOGLEVEL silent
+# ENV NPM_CONFIG_LOGLEVEL silent
 
 EXPOSE 8585
 
@@ -13,6 +13,8 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 WORKDIR '/app'
 
+RUN npm install --no-update-notifier -g serve react-scripts
 RUN npm install --no-audit --no-update-notifier .
+
 
 ENTRYPOINT ["sh", "prod.sh"]

@@ -82,6 +82,11 @@ export default function Game() {
 	const { state } = useLocation();
 
 	useEffect(() => {
+		if (state)
+			setSetting((prev: Setting) => ({type: "menu", mode: prev.mode}));
+	}, [state, setSetting])
+
+	useEffect(() => {
 
 		function goToDefy(defyInfo: any) {
 			socket.emit("clear");
@@ -102,12 +107,6 @@ export default function Game() {
 			socket.off("goSpectate", goSpectate);
 		})
 	}, [socket, setDefy, setSetting])
-
-
-	useEffect(() => {
-		if (state)
-			setSetting((prev: Setting) => ({type: "menu", mode: prev.mode}));
-	}, [state, setSetting])
 
 	function returnToMenu() {
 		setSetting({type: "menu", mode: setting.mode});
