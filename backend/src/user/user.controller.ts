@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, DefaultValuePipe, Get, HttpException, Param, ParseFilePipe, ParseIntPipe, Patch, Request, UploadedFile, UseInterceptors } from "@nestjs/common";
+import { BadRequestException, Body, Controller, DefaultValuePipe, Get, HttpException, HttpStatus, Param, ParseFilePipe, ParseIntPipe, Patch, Request, UploadedFile, UseInterceptors } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { User } from "./user.entity";
 import { newUsername } from "./user.dto";
@@ -9,6 +9,7 @@ import Path = require('path');
 import { FileInterceptor } from "@nestjs/platform-express";
 import * as fs from 'fs';
 import { HttpStatusCode } from "axios";
+import Jimp = require("jimp");
 
 const	storage = {
 	storage: diskStorage ({
@@ -82,6 +83,16 @@ export class UserController {
 		if (!user || !file)
 			return ;
 
+		let fileError: boolean = false;
+		try {
+			await Jimp.read(file.path);
+		}
+		catch (err) {
+			fileError = true;
+		}
+		if (fileError)
+			throw new HttpException("Bad file", HttpStatus.FORBIDDEN);
+		
 		let filename = user.avatar;
 		if (filename)
 		{

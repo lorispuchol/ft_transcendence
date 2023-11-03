@@ -41,18 +41,19 @@ export default function SettingsPopup({ close, login }: {close: any, login: stri
 			return ;
 		
 		const imageFile = files[0];
-		reader.onload = (e: any) => {
-    		const img = new Image();
-      		img.onload = () => {
-				setPp(imageFile);
-      		};
-      		img.onerror = () => {
-        		updateError(["bad file"]);
-        		return false;
-      		};
-			img.src = e.target.result;
-    	};
-    	reader.readAsDataURL(imageFile);
+		setPp(imageFile);
+		// reader.onload = (e: any) => {
+    	// 	const img = new Image();
+      	// 	img.onload = () => {
+		// 		setPp(imageFile);
+      	// 	};
+      	// 	img.onerror = () => {
+        // 		updateError(["bad file"]);
+        // 		return false;
+      	// 	};
+		// 	img.src = e.target.result;
+    	// };
+    	// reader.readAsDataURL(imageFile);
 	}
 
 	function updateUsername(e: FormEvent) {
