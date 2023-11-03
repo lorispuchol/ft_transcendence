@@ -69,6 +69,8 @@ export class AuthService {
 		return this.jwtService.signAsync(payload);
 	}
 
+	private waitValidation: Map<number, string> = new Map()
+
 	generateRandomBase32() {
 		const buffer = crypto.randomUUID();
 		const base32 = encode(buffer).replace(/=/g, "").substring(0, 24);
@@ -90,12 +92,35 @@ export class AuthService {
 		});
 		const otp_url = totp.toString();
 
-		this.userService.addOtpSecret(userId, secret);
-
+		this.waitValidation.set(userId, secret);
 		return ({otp_url});
 	}
 
+	async validate2FA(userId: number, code: string): Promise<boolean> {
+		const user = await this.userService.findOneById(userId);
+		const secret = this.waitValidation.get(userId);
+		if (!user || !secret)
+			return false;
+
+		
+		const totp = new OTPAuth.TOTP({
+			issuer: "elpongo.fr",
+			label: "el pongo",
+			algorithm: "SHA1",
+			digits: 6,
+			secret: secret
+		});
+		const delta = totp.validate({token: code, window: 1});
+		if (delta === null)
+			return false;
+
+		this.waitValidation.delete(userId);
+		this.userService.addOtpSecret(userId, secret);
+		return true;
+	}
+
 	rm2FA(userId: number) {
+		this.waitValidation.delete(userId);
 		this.userService.rmOtpSecret(userId);
 		return true;
 	}
