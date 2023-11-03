@@ -39,7 +39,7 @@ export class Channel extends BaseEntity {
 	})
 	password: string
 
-	@OneToMany(() => Participant, (part) => part.user)
+	@OneToMany(() => Participant, (part) => part.channel)
 	participants: Participant[]
 
 	@OneToMany(() => Message, (message) => message.channel)
