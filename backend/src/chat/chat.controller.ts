@@ -156,7 +156,7 @@ export class ChatController {
 		@Request() req: any,
 		@Body() datasChan: NewChannelWithoutPassword
 	) {
-		if (datasChan.mode !== ChanMode.PUBLIC && datasChan.mode !== ChanMode.PRIVATE && datasChan.mode)
+		if (datasChan.mode !== ChanMode.PUBLIC && datasChan.mode !== ChanMode.PRIVATE)
 			return { error: "mode must be one of the following values: public, private" }
 		return await this.chatService.createChannel(
 			await this.userService.findOneByLogin(req.user.login),
