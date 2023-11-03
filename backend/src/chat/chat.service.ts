@@ -481,10 +481,28 @@ export class ChatService {
 		const u: User = await this.userService.findOneByLogin(user);
 		if (!u)
 			throw new HttpException("forbidden", HttpStatus.FORBIDDEN);
-		const displayMessages: Message[] = [];
+		const displayMessages: any[] = [];
 		const request = messages.map( async (msg) => {	
-			if (!await this.relationshipService.ReqIsBlocked(msg.sender, u))
-				displayMessages.push(msg)
+			if (!await this.relationshipService.ReqIsBlocked(msg.sender, u)) {
+				displayMessages.push({
+					id: msg.id,
+					sender: {
+						id: msg.sender.id,
+						login: msg.sender.login,
+						username: msg.sender.username,
+						avatar: msg.sender.avatar,
+						nb_victory: msg.sender.nb_victory,
+						nb_defeat: msg.sender.nb_defeat
+					},
+					channel: {
+						id: msg.channel.id,
+						name: msg.channel.id,
+						mode: msg.channel.mode
+					},
+					content: msg.content,
+					date: msg.date
+				})
+			}
 		})
 		return Promise.all(request).then(() => displayMessages);
 	}
