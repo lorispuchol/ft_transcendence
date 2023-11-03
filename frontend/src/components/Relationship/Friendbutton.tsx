@@ -28,7 +28,7 @@ export function RelationButtonGet({path, setStatus, icon}: RelationButtonProps) 
 		GetRequest("/relationship" + path).then((response: Response) => {
 			if (response.data) {
 				logInfo(response.data.description);
-				setStatus("reload");
+				setStatus();
 			}
 		});
 	}
@@ -46,7 +46,7 @@ export function RelationButtonDelete({path, setStatus, icon}: RelationButtonProp
 		DeleteRequest("/relationship" + path).then((response: Response) => {
 			if (response.data) {
 				logInfo(response.data.description);
-				setStatus("reload");
+				setStatus();
 			}
 		});
 	}
@@ -66,18 +66,18 @@ export default function Friendbutton ({ id }: { id: number}) {
 			if (response.data)
 				setStatus(response.data.status);
 		});
-	}, [status, id]);
+	}, [id]);
 	if (!status)
 		return (<IconButton><PersonAddIcon /></IconButton>);
 	
 	switch(status) {
 		case 'invited':
-			return (<RelationButtonDelete path={"/removeInvitation/" + id} setStatus={setStatus} icon={<CancelScheduleSend />}/>);
+			return (<RelationButtonDelete path={"/removeInvitation/" + id} setStatus={() => {setStatus("noRelation")}} icon={<CancelScheduleSend />}/>);
 		case 'accepted':
-			return (<RelationButtonDelete path={"/removeFriend/" + id} setStatus={setStatus} icon={<PersonRemove />}/>);
+			return (<RelationButtonDelete path={"/removeFriend/" + id} setStatus={() => {setStatus("noRelation")}} icon={<PersonRemove />}/>);
 		case 'noRelation':
 		case 'blocked':
-			return (<RelationButtonGet path={"/invite/" + id} setStatus={setStatus} icon={<PersonAddIcon />}/>);
+			return (<RelationButtonGet path={"/invite/" + id} setStatus={() => {setStatus("invited")}} icon={<PersonAddIcon />}/>);
 		default:
 			return (<IconButton disabled><PersonAddIcon /></IconButton>);
 	}

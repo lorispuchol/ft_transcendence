@@ -6,6 +6,7 @@ import { GetRequest, PatchRequest, client_url } from "../../utils/Request";
 import './SettingsPopup.scss'
 import { Done } from "@mui/icons-material";
 import QRCode from "react-qr-code";
+import { logInfo } from "../../chat/Chat";
 
 
 function updateError(error: string[]) {
@@ -20,6 +21,7 @@ export default function SettingsPopup({ close, login }: {close: any, login: stri
 	const [newUsername, setNewUsername]: [string, Function] = useState('')
 	const [pp, setPp]: [File | null, Function] = useState(null);
 	const [faActived, setFaActived]: [boolean, Function] = useState(false);
+	const [code, setCode]: [string, Function] = useState('')
 	const [qrCode, setQrCode]: [string, Function] = useState("");
 
 	useEffect(() => {
@@ -41,6 +43,7 @@ export default function SettingsPopup({ close, login }: {close: any, login: stri
 			return ;
 		
 		const imageFile = files[0];
+		setPp(imageFile);
 		reader.onload = (e: any) => {
     		const img = new Image();
       		img.onload = () => {
@@ -75,6 +78,7 @@ export default function SettingsPopup({ close, login }: {close: any, login: stri
 		e.preventDefault();
 		if (!pp)
 			return ;
+	
 		const formData = new FormData();
 		formData.append('file', pp);
 		const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
@@ -95,6 +99,9 @@ export default function SettingsPopup({ close, login }: {close: any, login: stri
 		})
 	}
 
+	function codeChange(event: ChangeEvent<HTMLInputElement>) {
+		setCode(event.target.value);
+	}
 
 	function activate2fa() {
 		GetRequest("/auth/setup2FA").then((response:any) => {
@@ -102,6 +109,22 @@ export default function SettingsPopup({ close, login }: {close: any, login: stri
 			{
 				setQrCode(response.data.otp_url);
 				setFaActived(true);
+			}
+			else
+				updateError(response.error);
+		});
+	}
+
+	function validate2fa(e: FormEvent) {
+		e.preventDefault();
+		if (!code)
+			return ;
+
+		GetRequest("/auth/validate2FA/" + code).then((response:any) => {
+			if (response.status === "OK")
+			{
+				setQrCode("");
+				logInfo("2fa successfully activated");
 			}
 			else
 				updateError(response.error);
@@ -117,6 +140,8 @@ export default function SettingsPopup({ close, login }: {close: any, login: stri
 			}
 		});
 	}
+
+
 
 	return (
 		<div className='flex justify-center items-center'>
@@ -151,9 +176,17 @@ export default function SettingsPopup({ close, login }: {close: any, login: stri
 							}
 						</div>
 						{qrCode &&
-							<div className="qr_code">
+						<>
+						<Divider />
+						<form className='settings_option' onSubmit={validate2fa}>
+							<div className="settings_text">Enter code</div>
+							<input type='text' className="username_input" value={code} onChange={codeChange} />
+							<button className='update_button ml-7' onClick={validate2fa}><Done/></button> 
+						</form>
+						<div className="qr_code">
 								<QRCode value={qrCode}/>
-							</div>
+						</div>
+						</>
 						}
 					</Paper>
 				</ClickAwayListener>
