@@ -2,6 +2,7 @@ import { Body, Controller, DefaultValuePipe, Delete, Get, Param, ParseIntPipe, P
 import { ChatService } from "./chat.service";
 import { UserService } from "src/user/user.service";
 import { AddPwChan, ChangeModeChan, Distinction, JoinChannelWithPassword, Mute, NewChannelWithPassword, NewChannelWithoutPassword, RemovePwChannel, SetPasswordChannel } from "./channel.dto";
+import { ChanMode } from "./entities/channel.entity";
 
 @Controller('chat')
 export class ChatController {
@@ -155,6 +156,8 @@ export class ChatController {
 		@Request() req: any,
 		@Body() datasChan: NewChannelWithoutPassword
 	) {
+		if (datasChan.mode !== ChanMode.PUBLIC && datasChan.mode !== ChanMode.PRIVATE && datasChan.mode)
+			return { error: "mode must be one of the following values: public, private" }
 		return await this.chatService.createChannel(
 			await this.userService.findOneByLogin(req.user.login),
 			datasChan.channelName,
@@ -167,6 +170,8 @@ export class ChatController {
 		@Request() req: any,
 		@Body() datasChan: NewChannelWithPassword
 	) {
+		if (datasChan.mode !== ChanMode.PROTECTED)
+			return { error: "mode must be one of the following values: protected" }
 		return await this.chatService.createChannel(
 			await this.userService.findOneByLogin(req.user.login),
 			datasChan.channelName,
