@@ -1,4 +1,4 @@
-import { Body, Controller, DefaultValuePipe, Get, HttpCode, HttpStatus, Param, Post, Query, Redirect, Request, Response, UseGuards } from "@nestjs/common";
+import { Body, Controller, DefaultValuePipe, Get, HttpCode, HttpException, HttpStatus, Param, Post, Query, Redirect, Request, Response, UseGuards } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { Public, client_url, ftConstants } from "./constants";
 import { NewUserWithPassword, UserWithPassword } from "./auth.dto";
@@ -78,9 +78,21 @@ export class AuthController {
 		return (this.authService.setup2FA(req.user.id));
 	}
 
+
 	@Get('rm2FA')
 	rm2FA(@Request() req: any) {
 		return (this.authService.rm2FA(req.user.id));
+	}
+
+	@Get('validate2FA/:code')
+	async validate2FA(
+		@Request() req: any,
+		@Param('code', new DefaultValuePipe("")) code: string
+	) {
+		const success = await this.authService.validate2FA(req.user.id, code);
+		if (!success)
+			throw new HttpException("wrong code", HttpStatus.BAD_REQUEST);
+		return ;
 	}
 
 	@Public()

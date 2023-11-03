@@ -79,35 +79,35 @@ export class ChatService {
 		await this.saveNewMember(newOwner.user, channel, MemberDistinc.OWNER, new Date())
 	}
 
-	async getConvs(user: User): Promise<Channel[]> {
+	async getConvs(user: User): Promise<any[]> {
 
 		if (!user)
 			return ;
 
-		const chans: Channel[] = [];
+		const chans: any[] = [];
 		const parts: Participant[] = await this.participantRepository.find({
 			where: {
 				user: user.id
 			} as FindOptionsWhere<User>
 		})
-		parts.forEach((part) => chans.push(part.channel))
+		parts.forEach((part) => chans.push({id: part.channel.id, name: part.channel.name, mode: part.channel.mode}))
 		return chans;
 	}
 
-	async getNoConvs(user: User): Promise<Channel[]> {
+	async getNoConvs(user: User): Promise<any[]> {
 
 		if (!user)
 			return ;
 		
 		const convs: Channel[] = await this.getConvs(user);
 		const allChans: Channel[] = await this.channelRepository.find();
-		let Noconvs: Channel[] = [];
+		let Noconvs: any[] = [];
 
 		allChans.map(chan => {
 			if(convs.find((value: Channel) => value.id === chan.id))
 				return ;
 			if (chan.mode !== ChanMode.DM && chan.mode !== ChanMode.PRIVATE)
-				Noconvs.push(chan);
+				Noconvs.push({id: chan.id, name: chan.name, mode: chan.mode});
 		})
 		return Noconvs;
 	}
@@ -355,7 +355,7 @@ export class ChatService {
 		return ({status: "OK", description: `${channel.name} is now ${newMode}`})
 	}
 
-	async createChannel(firstUser: User, name: string, mode: ChanMode, password?: string) {
+	async createChannel(firstUser: User, name: string, mode: ChanMode, password?: string): Promise<any> {
 
 		if (!firstUser)
 			throw new HttpException("Request impossible", HttpStatus.FORBIDDEN);
@@ -368,14 +368,15 @@ export class ChatService {
 			name: name,
 			mode: mode
 		})
-		if(password) {
+		if(password && mode === ChanMode.PROTECTED) {
 			const salt = await bcrypt.genSalt();
 			const hash = await bcrypt.hash(password, salt);
 			newChan.password = hash;
 		}
 		await this.channelRepository.save(newChan);
 		await this.saveNewMember(firstUser, newChan, MemberDistinc.OWNER, new Date())
-		return newChan
+
+		return ({id: newChan.id, name: newChan.name,mode: newChan.mode})
 	}
 
 	async createDm(user1: User, user2: User) {
@@ -396,18 +397,34 @@ export class ChatService {
 	}
 
 	async getAllMembers(chanName: string) {
-	
-		const channel: Channel = await this.findChanByName(chanName);
 
+		const channel: Channel = await this.channelRepository.findOne({
+			relations: ["participants"],
+			where: {name: chanName},
+		});
 		if(!channel)
 			return null;
 
-		const participants: Participant[] = await this.participantRepository.find({
-			where: {
-				channel: channel.id
-			} as FindOptionsWhere<Channel>
+		let parts: any[] = [];
+		channel.participants.forEach((part) => {
+			parts.push({
+				user: {
+					id: part.user.id,
+					login: part.user.login,
+					username: part.user.username,
+					avatar: part.user.avatar,
+					nb_victory: part.user.nb_victory,
+					nb_defeat: part.user.nb_defeat
+				},
+				channel: {
+					id: part.channel.id,
+					name: part.channel.name,
+					mode: part.channel.mode
+				},
+				distinction: part.distinction,
+				muteDate: part.muteDate})
 		})
-		return participants;
+		return parts;
 	}
 
 	async saveNewMsg(sender: User, chan: Channel, content: string) {
