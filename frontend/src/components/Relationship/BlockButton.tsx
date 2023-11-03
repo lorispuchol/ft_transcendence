@@ -23,12 +23,12 @@ export default function BlockButton({ id }: {id: number}) {
 			if (response.data)
 				setStatus(response.data!.status);
 		});
-	}, [status, id]);
+	}, [id]);
 	
 	if (!status)
 		return (<IconButton><DoDisturbOn /></IconButton>);
 	
 	if (status === "blocked")
-		return (<RelationButtonDelete path={"/unblock/" + id} setStatus={setStatus} icon={<DoDisturbOff />}/>);
-	return (<RelationButtonGet path={"/block/" + id} setStatus={setStatus} icon={<DoDisturbOn />}/>);
+		return (<RelationButtonDelete path={"/unblock/" + id} setStatus={() => {setStatus("notBlocked")}} icon={<DoDisturbOff />}/>);
+	return (<RelationButtonGet path={"/block/" + id} setStatus={() => {setStatus("blocked")}} icon={<DoDisturbOn />}/>);
 }
