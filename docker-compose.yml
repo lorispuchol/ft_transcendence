@@ -50,6 +50,8 @@ services:
     init: true
     restart: unless-stopped
     image: postgres:latest
+    ports:
+      - 5432:5432                        # map port 5432 on host to port 5432 on container "host:container" Inaccessible from DBeaver if not mapped
     environment:                         # pass environnement variables to container
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
